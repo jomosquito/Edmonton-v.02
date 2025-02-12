@@ -1,7 +1,10 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for,request,redirect
 from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+
 db = SQLAlchemy(app)
 class profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,9 +12,13 @@ class profile(db.Model):
 
     def __repr__(self):
         return '<Task %r>' % self.id
-@app.route('/')
+@app.route('/',methods=['POST','GET'])
 def index():
-    return render_template('index.html') #acceses index.html file gi
+    if  request.method == 'post':
+        return 'test'
+        
+    else:
+        return render_template('index.html') #acceses index.html file gi
 
 if __name__ == "__main__":
     with app.app_context():
