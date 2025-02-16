@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 credentials = (client_id, client_secret)
 scopes = ['Mail.ReadWrite', 'Mail.Send']
 
-# Simple in-memory database for OAuth flow
+# Simple in-memory database for OAuth flows
 class MyDB:
     def __init__(self):
         self.storage = {}
@@ -40,6 +40,7 @@ def deserialize(flow_str):
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
+    last_name = db.Column(db.String(20), nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
 
     def set_password(self, password):
@@ -58,8 +59,8 @@ def index():
     return render_template('add_profile.html') 
 @app.route('/admin')
 def admin():
-    profiles = Profile.query.all()  
-    return render_template('adminpage.html', profiles=profiles)
+    return render_template('adminpage.html') 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -102,7 +103,7 @@ def auth_step_two_callback():
     result = account.con.request_token(requested_url, flow=my_saved_flow)
 
     if result:
-        return redirect('/')
+        return render_template('auth_complete.html')
 
     return "Authentication failed", 400
 
@@ -113,7 +114,7 @@ def profile():
 
     if first_name and pass_word:
         p = Profile(first_name=first_name)
-        p.set_password(pass_word)  # Hash password before storing
+        p.set_password(pass_word)  # Hash pasaword before storing
         db.session.add(p)
         db.session.commit()
         return redirect('/stepone')
@@ -126,7 +127,8 @@ def erase(id):
     if data:
         db.session.delete(data)
         db.session.commit()
-    return redirect('/admin')
+    return redirect('/')
+
 
 if __name__ == "__main__":
     with app.app_context():

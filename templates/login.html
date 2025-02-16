@@ -1,47 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>title here</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full height of the viewport */
-            margin: 0;
-            flex-direction: column; /* Stack links vertically */
-            background: linear-gradient(to right, #6a11cb, #2575fc); /* Modern gradient background */
-            font-family: Arial, sans-serif;
-        }
-        a {
-            display: inline-block;
-            padding: 15px 30px;
-            margin: 15px;
-            text-decoration: none;
-            background: #ffffff;
-            color: #2575fc;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 50px; /* Rounded buttons */
-            text-align: center;
-            width: 250px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out;
-            border: 2px solid transparent;
-        }
-        a:hover {
-            background: #2575fc;
-            color: #ffffff;
-            border: 2px solid #ffffff;
-            transform: scale(1.05); /* Slightly enlarges button on hover */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal</title>
+  <!-- Import Google Fonts for a modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    a {
+      display: inline-block;
+      margin: 15px;
+      padding: 15px 30px;
+      width: 250px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2575fc;
+      background: #ffffff;
+      border-radius: 50px;
+      transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      border: 2px solid transparent;
+    }
+    a:hover {
+      background: #2575fc;
+      color: #ffffff;
+      transform: scale(1.05);
+      border: 2px solid #ffffff;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px; }
+      a {
+        width: 200px;
+        padding: 12px 20px;
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
     <a href="/login">Login</a>
     <a href="/creat">Create Account</a>
     <a href="/admin">Admin Login</a>
+  </div>
 </body>
 </html>
