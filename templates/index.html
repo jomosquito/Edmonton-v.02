@@ -11,6 +11,7 @@
             <th>Added</th>
             <th>Actions</th>
         </tr>
+        {% for task in tasks %}
         <tr>
             <td></td>
             <td></td>
@@ -20,6 +21,7 @@
                 <a href="Update">Update</a>
             </td>
         </tr>
+        {% end for %}
     </table>
     <form action="/" method="POST">
         <input types="text" name="content" id="content ">
