@@ -1,0 +1,55 @@
+{
+    "AccessToken": {
+        "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259-login.microsoftonline.com-accesstoken-209c5bdb-df87-44b8-b2d1-727010d3a686-common-calendars.read calendars.read.shared calendars.readwrite calendars.readwrite.shared contacts.read contacts.read.shared contacts.readwrite contacts.readwrite.shared files.read.all files.readwrite.all mail.read mail.read.shared mail.readwrite mail.readwrite.shared mail.send mail.send.shared mailboxsettings.readwrite presence.read sites.read.all sites.readwrite.all tasks.read tasks.readwrite user.read user.readbasic.all email openid profile": {
+            "credential_type": "AccessToken",
+            "secret": "eyJ0eXAiOiJKV1QiLCJub25jZSI6ImYxaWpRRDlJZkowbnRQdl9mNkFUY1A5a0xTUE1wMk5UM1lQSE1IT1lFblkiLCJhbGciOiJSUzI1NiIsIng1dCI6ImltaTBZMnowZFlLeEJ0dEFxS19UdDVoWUJUayIsImtpZCI6ImltaTBZMnowZFlLeEJ0dEFxS19UdDVoWUJUayJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8xNzBiYmFiZC1hMmYwLTRjOTAtYWQ0Yi0wZThmMGYwYzQyNTkvIiwiaWF0IjoxNzM5Njg0MTg1LCJuYmYiOjE3Mzk2ODQxODUsImV4cCI6MTczOTY4ODYyMSwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFYUUFpLzhaQUFBQW8rcXFpZDhGczA5b2NhZUFiOFBoWHlzNUs2QkRGbjRodmlpNTl5RXVZSmlkcE5XUGVYU05iL1d6WUJaTTJTTVgwc2YxSktDRzZ4aVhucUpXd1ZNbjd1bUVoVWU0dXNJdmptMmhHSzdaSWNHeVBHcWtxMXJUbmtwenVjOUVYckdoU2dTY2xUTnNpWFV2alhVRkx1UG1pZz09IiwiYW1yIjpbInB3ZCJdLCJhcHBfZGlzcGxheW5hbWUiOiJFZG1vbnRvbiIsImFwcGlkIjoiMjA5YzViZGItZGY4Ny00NGI4LWIyZDEtNzI3MDEwZDNhNjg2IiwiYXBwaWRhY3IiOiIxIiwiZmFtaWx5X25hbWUiOiJHbGVpdGVyIiwiZ2l2ZW5fbmFtZSI6IkpvaG4iLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIyNjAwOjE3MDA6MTJjMDo2NjkwOjI1Yzg6Y2RjZDo0ZDFlOmQxZWYiLCJuYW1lIjoiR2xlaXRlciwgSm9obiBQIiwib2lkIjoiMDIzZTAyMzktYjE2NC00ODc2LTljNjgtNDQwYjk5Yzc2NmFmIiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTk0NDI3ODIwMy0zMDIzODE2ODY5LTE0NTM3NDU3NDAtNTIxMjkyIiwicGxhdGYiOiIzIiwicHVpZCI6IjEwMDMyMDAxRjM3QUZDOTciLCJyaCI6IjEuQVFNQXZib0xGX0Npa0V5dFN3NlBEd3hDV1FNQUFBQUFBQUFBd0FBQUFBQUFBQUFCQWZrREFBLiIsInNjcCI6IkNhbGVuZGFycy5SZWFkIENhbGVuZGFycy5SZWFkLlNoYXJlZCBDYWxlbmRhcnMuUmVhZFdyaXRlIENhbGVuZGFycy5SZWFkV3JpdGUuU2hhcmVkIENvbnRhY3RzLlJlYWQgQ29udGFjdHMuUmVhZC5TaGFyZWQgQ29udGFjdHMuUmVhZFdyaXRlIENvbnRhY3RzLlJlYWRXcml0ZS5TaGFyZWQgRmlsZXMuUmVhZC5BbGwgRmlsZXMuUmVhZFdyaXRlLkFsbCBNYWlsLlJlYWQgTWFpbC5SZWFkLlNoYXJlZCBNYWlsLlJlYWRXcml0ZSBNYWlsLlJlYWRXcml0ZS5TaGFyZWQgTWFpbC5TZW5kIE1haWwuU2VuZC5TaGFyZWQgTWFpbGJveFNldHRpbmdzLlJlYWRXcml0ZSBvcGVuaWQgUHJlc2VuY2UuUmVhZCBwcm9maWxlIFNpdGVzLlJlYWQuQWxsIFNpdGVzLlJlYWRXcml0ZS5BbGwgVGFza3MuUmVhZCBUYXNrcy5SZWFkV3JpdGUgVXNlci5SZWFkIFVzZXIuUmVhZEJhc2ljLkFsbCBlbWFpbCIsInNpZCI6IjAwMjBmZDY5LTgwMmUtM2QwMi0xZTMzLWM2MDhkM2EzN2M2NyIsInN1YiI6Imk0VFQ5ZnVnbzM3Nm96LWdUdkYya3NwcTNuRXp5bG5BTXY5ajQ3SkVlc3MiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiTkEiLCJ0aWQiOiIxNzBiYmFiZC1hMmYwLTRjOTAtYWQ0Yi0wZThmMGYwYzQyNTkiLCJ1bmlxdWVfbmFtZSI6ImpwZ2xlaXRlQENvdWdhck5ldC5VSC5FRFUiLCJ1cG4iOiJqcGdsZWl0ZUBDb3VnYXJOZXQuVUguRURVIiwidXRpIjoiaFJ5R2NOWE93a3FyOVBFNVFSSWdBQSIsInZlciI6IjEuMCIsIndpZHMiOlsiYjc5ZmJmNGQtM2VmOS00Njg5LTgxNDMtNzZiMTk0ZTg1NTA5Il0sInhtc19mdGQiOiJPdFlyMGlhdVIzdlJNRDRJMllXXzExTDNDSWY5U2lJbmVOQktoR3lFNFA4IiwieG1zX2lkcmVsIjoiMSA2IiwieG1zX3N0Ijp7InN1YiI6ImdiVjJ0Y21memN0OWpfdGxEUFlsbGZ6dm85dWg5VEJTbXdDb1pHMVk5UFkifSwieG1zX3RjZHQiOjEzOTk0OTQzNTh9.KZnKzBi1c46YllbQXz1QeafjsN11lHbMXOYuqAa7NRN-GvoFqkm226NuHwhsUtgzBCZsg8GLLRali5JoXsSX8x_uyLknbOyr-zF-COQ_gefiyql5He8M5Dy6UnUz7fL43GGxreJUr4ficsB2AjCKUPMAg53dcfD9pjD_q3c5RDLZFGvC4pnH3HOluNDXrbg0k4oHBbyzC3hp7CabOmxPInWP_BBjchSefcCk2vsMImfluBM-Q0a2DEuo-hD36seet-ajJyL8YjYBTRvEXZxje29aNpQJawtoFlFcCZAIk0Qx4XmJktLHWGlNsiXpk6Be5TidjRN8Mn9XEiFabuzGCw",
+            "home_account_id": "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259",
+            "environment": "login.microsoftonline.com",
+            "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+            "target": "Calendars.Read Calendars.Read.Shared Calendars.ReadWrite Calendars.ReadWrite.Shared Contacts.Read Contacts.Read.Shared Contacts.ReadWrite Contacts.ReadWrite.Shared Files.Read.All Files.ReadWrite.All Mail.Read Mail.Read.Shared Mail.ReadWrite Mail.ReadWrite.Shared Mail.Send Mail.Send.Shared MailboxSettings.ReadWrite Presence.Read Sites.Read.All Sites.ReadWrite.All Tasks.Read Tasks.ReadWrite User.Read User.ReadBasic.All email openid profile",
+            "realm": "common",
+            "token_type": "Bearer",
+            "cached_at": "1739684483",
+            "expires_on": "1739688618",
+            "extended_expires_on": "1739688618"
+        }
+    },
+    "Account": {
+        "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259-login.microsoftonline.com-common": {
+            "home_account_id": "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259",
+            "environment": "login.microsoftonline.com",
+            "realm": "common",
+            "local_account_id": "023e0239-b164-4876-9c68-440b99c766af",
+            "username": "jpgleite@CougarNet.UH.EDU",
+            "authority_type": "MSSTS",
+            "account_source": "authorization_code"
+        }
+    },
+    "IdToken": {
+        "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259-login.microsoftonline.com-idtoken-209c5bdb-df87-44b8-b2d1-727010d3a686-common-": {
+            "credential_type": "IdToken",
+            "secret": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImltaTBZMnowZFlLeEJ0dEFxS19UdDVoWUJUayJ9.eyJhdWQiOiIyMDljNWJkYi1kZjg3LTQ0YjgtYjJkMS03MjcwMTBkM2E2ODYiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vMTcwYmJhYmQtYTJmMC00YzkwLWFkNGItMGU4ZjBmMGM0MjU5L3YyLjAiLCJpYXQiOjE3Mzk2ODQxODUsIm5iZiI6MTczOTY4NDE4NSwiZXhwIjoxNzM5Njg4MDg1LCJhaW8iOiJBWVFBZS84WkFBQUFEVktvOVJmY3pFTCs0M1N6elpjNS9leDRPWmNDM0luNXZKTEdXZHdWQnF3NDBKT2JMdnNkbTlPNzhXRDdLZnFsemZrUDRiQWo0S2hrb0s5R05WMVRzdjdlNzhPa1RLVmtIUjhOMW1pZkVuSXVONGtlR0ZDMkdXeXp2b1NtNnJvczRCNmkxTmF0SzRZeWZZYlAvZnBWalVYekJZUHpWcjlJV2dlVUlpWDlwZ0k9IiwibmFtZSI6IkdsZWl0ZXIsIEpvaG4gUCIsIm5vbmNlIjoiM2NkMzk3ZDk5YjlkMzczNDJiMWYyYTc3OGZhOGVjYmZlZTNjM2JlZGE4NGU3MjAwNWY1ZjE0Y2RmNWUxNmNkYyIsIm9pZCI6IjAyM2UwMjM5LWIxNjQtNDg3Ni05YzY4LTQ0MGI5OWM3NjZhZiIsInByZWZlcnJlZF91c2VybmFtZSI6ImpwZ2xlaXRlQENvdWdhck5ldC5VSC5FRFUiLCJyaCI6IjEuQVFNQXZib0xGX0Npa0V5dFN3NlBEd3hDV2R0Ym5DQ0gzN2hFc3RGeWNCRFRwb1lCQWZrREFBLiIsInNpZCI6IjAwMjBmZDY5LTgwMmUtM2QwMi0xZTMzLWM2MDhkM2EzN2M2NyIsInN1YiI6ImdiVjJ0Y21memN0OWpfdGxEUFlsbGZ6dm85dWg5VEJTbXdDb1pHMVk5UFkiLCJ0aWQiOiIxNzBiYmFiZC1hMmYwLTRjOTAtYWQ0Yi0wZThmMGYwYzQyNTkiLCJ1dGkiOiJoUnlHY05YT3drcXI5UEU1UVJJZ0FBIiwidmVyIjoiMi4wIn0.Pu3sGbqmFBvDQnI4s8EPz6xkRmxphnNZmBQsvwFSxJ7Lnes0EBm6vW_H1RTdkuWNQul3pNV7Th7627-NBXo17ZU5Bv28hNoufxggebPTKiFELQ--DshF_sPu0EKKys7YTP8VCUJky6nUSkHL3t6b9p-moqionxeklHDsmALzRKHCh44uhQqoNiDmCJ3Bv-oPpQHiUdVIcmLfjxq6-NxoBNQE3NKqeNPQtrppawFiHvRY65n3nVbDdgztN8-weHjqDmh6f6vFUNDBZXRNXBlsaEmrjKli3jrU1aCKpURgGm8tkGhvjOO9jS_7NqSgzwhcXG6aKEdu-lwzm09boW0Auw",
+            "home_account_id": "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259",
+            "environment": "login.microsoftonline.com",
+            "realm": "common",
+            "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686"
+        }
+    },
+    "RefreshToken": {
+        "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259-login.microsoftonline.com-refreshtoken-209c5bdb-df87-44b8-b2d1-727010d3a686--calendars.read calendars.read.shared calendars.readwrite calendars.readwrite.shared contacts.read contacts.read.shared contacts.readwrite contacts.readwrite.shared files.read.all files.readwrite.all mail.read mail.read.shared mail.readwrite mail.readwrite.shared mail.send mail.send.shared mailboxsettings.readwrite presence.read sites.read.all sites.readwrite.all tasks.read tasks.readwrite user.read user.readbasic.all email openid profile": {
+            "credential_type": "RefreshToken",
+            "secret": "1.AQMAvboLF_CikEytSw6PDwxCWdtbnCCH37hEstFycBDTpoYBAfkDAA.AgABAwEAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9Gek_S4TtyfZbWUHYlyns8eLPoiWJ4sZQDgzuTJpBvzj0vfpWbGtE6JQD2Ff-IapDbwC000EsogSeCVJiVJ7tPgw8LyvhwiBI-hsBBJpU826BsSGiSnwLGK-G7_JVTlbbZf8VHhkwsQITVQCH0eweyYFQS1PM99HrERxvlK2v_Su1q6RX_Vp5Qd6dufIHSr3tBguIpMNJ_Rr0u_jcWIU8TfUXvQPHWwMlTXzBBjpV_VkoU4Se9Fd19sBdwHa3Dzqb90-evqgsrhAoyAgH4zh0Hj1azk3gnPan-NvSpUSH1xqL0WyYsb3qnns8Z26xXeDNVDecMRQpY2f5jOBh2hcknmNPeTGigmGQS9d0KvwL4zj_zLpva-4_bKUWlwbrGaBLGy8h0utOTkBs4FDct3tLHxKso-F1Ok5E_PoJTPDGdEF6scFfwZUeZ-KZEF2X0SQltm_OCE3wndi08eYvy3O7UJyM_yf16MlfiIPGfDkP_ue-7kzwuOfHzrM74UmIEW76obgeTtB_3xZy1FGOJYjtBSj4gv8raz7UMqSwvQ73xTCHCTASTpV1hGt5xkkogmwnJsNurYDEUZcVgqXvrNQALe5Dzj9rpo15EwGy29yeVu_5l3q6nUUIS9-r3JypTfviCPIh0n5IfLF8e623IxKUiNXVQLHl5wqOxmFTCdFL86ApSmc3ZwX_8Wi88aiD2e2aJUMGLjuX5h-IX9QbrJhofuNUBXF9DO99bBTYmR9f2xzaOrM77F_NxyW8GnSOpsMBYzsHActftZVWsZ6CxqXurYIOlv4WBv0F71ZaGgVb_QmIj81KoQ0iSQ3tWjLi7RjCezINPMELA1dvmggBPLVWaCZrtlbGk6SCSGCyfZ7iP3DX90SisI1iVhE_41SUlecr-8npIySey8NgG0zMoroK9WMseS6z0VI3Wzg-ywNyQ_HgAUKit1Ackr0juscM5mtvD8e2oLBzjNUg",
+            "home_account_id": "023e0239-b164-4876-9c68-440b99c766af.170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259",
+            "environment": "login.microsoftonline.com",
+            "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+            "target": "Calendars.Read Calendars.Read.Shared Calendars.ReadWrite Calendars.ReadWrite.Shared Contacts.Read Contacts.Read.Shared Contacts.ReadWrite Contacts.ReadWrite.Shared Files.Read.All Files.ReadWrite.All Mail.Read Mail.Read.Shared Mail.ReadWrite Mail.ReadWrite.Shared Mail.Send Mail.Send.Shared MailboxSettings.ReadWrite Presence.Read Sites.Read.All Sites.ReadWrite.All Tasks.Read Tasks.ReadWrite User.Read User.ReadBasic.All email openid profile",
+            "last_modification_time": "1739684483"
+        }
+    },
+    "AppMetadata": {
+        "appmetadata-login.microsoftonline.com-209c5bdb-df87-44b8-b2d1-727010d3a686": {
+            "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+            "environment": "login.microsoftonline.com"
+        }
+    }
+}

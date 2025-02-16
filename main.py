@@ -1,4 +1,4 @@
-#imports 
+# Imports 
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -41,6 +41,7 @@ class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
     last_name = db.Column(db.String(20), nullable=True)
+    active = db.Column(db.Boolean, default=True, nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
 
     def set_password(self, password):
@@ -56,10 +57,12 @@ def home():
 
 @app.route('/creat')
 def index():
-    return render_template('add_profile.html') 
+    return render_template('add_profile.html')
+
 @app.route('/admin')
 def admin():
-    return render_template('adminpage.html') 
+    profiles = Profile.query.all()  # Retrieve all profiles from the database
+    return render_template('adminpage.html', profiles=profiles)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -71,42 +74,62 @@ def login():
         user = Profile.query.filter_by(first_name=first_name).first()
 
         if user and user.check_password(pass_word):  # Verify hashed password
+            # Check if the user's profile is active
+            if not user.active:
+                return "Your profile is deactivated. Please contact the administrator."
             return "Login Successful!"
         else:
             return "Invalid username or password!"
 
     return render_template('log.html')  # Show login form for GET requests
 
+# Toggle the active status of a rofile
+@app.route('/active/<int:id>')
+def activate(id):
+    profile = Profile.query.get(id)
+    if profile is None:
+        return redirect('/admin')
+    
+    # Toggle the boolean value: if True it becomes False; if False it becomes True
+    profile.active = not profile.active
+
+    # Save the changes
+    db.session.commit()
+    
+    return redirect('/admin')
+
+# Microsoft OAuth Step One
 @app.route('/stepone')
 def auth_step_one():
+    # Create a callback URL for the next step, replacing '127.0.0.1' with 'localhost'
     callback = url_for('auth_step_two_callback', _external=True).replace("127.0.0.1", "localhost")
-
     account = Account(credentials)
     url, flow = account.con.get_authorization_url(requested_scopes=scopes, redirect_uri=callback)
-
-    my_db.store_flow(serialize(flow))  # Store flow for Step 2
-
+    
+    # Store flow for Step 2
+    my_db.store_flow(serialize(flow))
+    
     return redirect(url)
 
+# Microsoft OAuth Step Two Callback
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
-
     my_saved_flow_str = my_db.get_flow()
+    
     if not my_saved_flow_str:
         return "Flow state not found. Restart authentication.", 400
 
     my_saved_flow = deserialize(my_saved_flow_str)
-
     requested_url = request.url  # Get current URL with auth code
-
     result = account.con.request_token(requested_url, flow=my_saved_flow)
 
     if result:
-        return render_template('auth_complete.html')
+        return redirect('/')
 
     return "Authentication failed", 400
 
+# Add a new profile
 @app.route('/add', methods=["POST"])
 def profile():
     first_name = request.form.get("first_name")
@@ -114,13 +137,14 @@ def profile():
 
     if first_name and pass_word:
         p = Profile(first_name=first_name)
-        p.set_password(pass_word)  # Hash pasaword before storing
+        p.set_password(pass_word)  # Hash password before storing
         db.session.add(p)
         db.session.commit()
         return redirect('/stepone')
     else:
         return redirect('/')
 
+# Delete a profile (fixed route syntax)
 @app.route('/delete/<int:id>')
 def erase(id):
     data = Profile.query.get(id)
@@ -128,7 +152,6 @@ def erase(id):
         db.session.delete(data)
         db.session.commit()
     return redirect('/')
-
 
 if __name__ == "__main__":
     with app.app_context():

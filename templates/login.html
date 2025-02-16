@@ -5,13 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portal</title>
   <!-- Import Google Fonts for a modern look -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -19,46 +23,62 @@
       background: linear-gradient(135deg, #6a11cb, #2575fc);
     }
     .container {
-      text-align: center;
-      padding: 40px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 20px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      /* Gradient text effect */
+      background: -webkit-linear-gradient(45deg, #f3ec78, #af4261);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     a {
-      display: inline-block;
-      margin: 15px;
-      padding: 15px 30px;
-      width: 250px;
+      display: block;
+      margin: 20px auto;
+      padding: 15px;
+      width: 80%;
+      max-width: 300px;
       text-decoration: none;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 600;
       color: #2575fc;
       background: #ffffff;
       border-radius: 50px;
-      transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      border: 2px solid transparent;
+      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     a:hover {
-      background: #2575fc;
-      color: #ffffff;
       transform: scale(1.05);
-      border: 2px solid #ffffff;
+      background: #f0f0f0;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
     @media (max-width: 480px) {
-      .container { padding: 20px; }
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
       a {
-        width: 200px;
-        padding: 12px 20px;
         font-size: 1rem;
+        padding: 12px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <h1>PORTAL</h1>
     <a href="/login">Login</a>
     <a href="/creat">Create Account</a>
     <a href="/admin">Admin Login</a>
