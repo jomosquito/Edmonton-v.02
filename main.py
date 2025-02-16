@@ -40,7 +40,6 @@ def deserialize(flow_str):
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
-    last_name = db.Column(db.String(20), nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
 
     def set_password(self, password):
@@ -57,7 +56,10 @@ def home():
 @app.route('/creat')
 def index():
     return render_template('add_profile.html') 
-
+@app.route('/admin')
+def admin():
+    profiles = Profile.query.all()  
+    return render_template('adminpage.html', profiles=profiles)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -100,7 +102,7 @@ def auth_step_two_callback():
     result = account.con.request_token(requested_url, flow=my_saved_flow)
 
     if result:
-        return render_template('auth_complete.html')
+        return redirect('/')
 
     return "Authentication failed", 400
 
@@ -124,7 +126,7 @@ def erase(id):
     if data:
         db.session.delete(data)
         db.session.commit()
-    return redirect('/')
+    return redirect('/admin')
 
 if __name__ == "__main__":
     with app.app_context():
