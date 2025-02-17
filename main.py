@@ -78,7 +78,9 @@ def login():
             # Check if the user's profile is active
             if not user.active:
                 return "Your profile is deactivated. Please contact the administrator."
-            return render_template('userhompage.html')
+            profiles = Profile.query.all()
+
+            return render_template('userhompage.html', user=user)
         else:
             return "Invalid username or password!"
 

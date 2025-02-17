@@ -9,6 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* CSS Variables for easy theme customization */
+    :root {
+      --primary-color: #2575fc;
+      --secondary-color: #6a11cb;
+      --accent-color: #f3ec78;
+      --background-color: #f0f2f5;
+      --card-bg: #fff;
+    }
+    
     /* Reset and base styles */
     * {
       box-sizing: border-box;
@@ -17,75 +26,113 @@
     }
     body {
       font-family: 'Poppins', sans-serif;
-      background: #f0f2f5;
+      background: var(--background-color);
       color: #333;
     }
-    /* Header styles */
+    
+    /* Header styles with a gradient background */
     header {
-      background: #2575fc;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
       color: #fff;
       padding: 20px;
       text-align: center;
       font-size: 2rem;
       font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+    
     /* Layout container */
     .dashboard-container {
       display: flex;
-      min-height: calc(100vh - 60px); /* Adjust based on header height */
+      min-height: calc(100vh - 80px);
     }
+    
     /* Sidebar navigation */
     nav {
       width: 250px;
-      background: #6a11cb;
+      background: var(--secondary-color);
       padding: 20px;
       color: #fff;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     }
     nav ul {
       list-style: none;
+      padding: 0;
     }
     nav ul li {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     nav ul li a {
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
       color: #fff;
       text-decoration: none;
       font-size: 1.1rem;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
     }
     nav ul li a:hover {
-      color: #f3ec78;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
     }
-    /* Main content area */
+    
+    /* Main content area with fade-in animation */
     main {
       flex: 1;
       padding: 40px;
+      animation: fadeIn 0.5s ease-in;
     }
-    /* Card component */
+    
+    /* Card component with hover effects */
     .card {
-      background: #fff;
+      background: var(--card-bg);
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
     .card h2 {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      color: var(--primary-color);
     }
-    /* Buttons */
+    .card p {
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    /* Button styles */
     .btn {
       display: inline-block;
       margin: 10px 10px 10px 0;
       padding: 10px 20px;
-      background: #2575fc;
+      background: var(--primary-color);
       color: #fff;
       text-decoration: none;
       border-radius: 5px;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.3s ease;
     }
     .btn:hover {
-      background: #1a5dc6;
+      background: var(--secondary-color);
+      transform: translateY(-3px);
     }
+    
+    /* Fade-in animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .dashboard-container {
@@ -94,6 +141,10 @@
       nav {
         width: 100%;
         text-align: center;
+        box-shadow: none;
+      }
+      main {
+        padding: 20px;
       }
     }
   </style>
@@ -113,7 +164,7 @@
     </nav>
     <main>
       <div class="card">
-        <h2>Welcome back, [Username]!</h2>
+        <h2>Welcome back, {{ user.first_name }}!</h2>
         <p>This is your personalized dashboard. Use the navigation on the left to manage your account, view reports, or adjust settings.</p>
         <a class="btn" href="/profile">View Profile</a>
         <a class="btn" href="/settings">Settings</a>

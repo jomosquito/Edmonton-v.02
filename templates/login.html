@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -20,7 +20,7 @@
       justify-content: center;
       align-items: center;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      background: linear-gradient(135deg, #680fee, #70517f);
     }
     .container {
       background: rgba(255, 255, 255, 0.15);
@@ -32,6 +32,7 @@
       border: 1px solid rgba(255, 255, 255, 0.18);
       max-width: 400px;
       width: 90%;
+      animation: fadeIn 0.8s ease-in-out;
     }
     h1 {
       font-size: 3rem;
@@ -61,6 +62,16 @@
       transform: scale(1.05);
       background: #f0f0f0;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     @media (max-width: 480px) {
       .container {
