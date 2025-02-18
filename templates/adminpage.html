@@ -26,15 +26,20 @@
         th {
             background-color: #f2f2f2;
         }
-        .activeb, .delete-btn {
+        /* Styling for action buttons (Activate and Delete) */
+        .action-btn {
+            display: inline-block;
+            background-color: #008CBA; /* blue color */
+            color: #fff;
+            padding: 8px 16px;
             text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
             margin-right: 5px;
         }
-        .delete-btn {
-            color: red;
-        }
-        .h1 {
-            color: blue;
+        .action-btn:hover {
+            background-color: #14e71b;
         }
         /* Styling for the Return button */
         .return-btn {
@@ -50,6 +55,21 @@
         }
         .return-btn:hover {
             background-color: #8345a0;
+        }
+        /* Styling for the privileges button (User/Admin) */
+        .priv-btn {
+            display: inline-block;
+            background-color: #008CBA;
+            color: #fff;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+        }
+        .priv-btn:hover {
+            background-color: #14e71b;
         }
         /* Centering the Return button */
         .button-container {
@@ -67,6 +87,7 @@
             <tr>
                 <th>ID</th>
                 <th>UserName</th>
+                <th>Privileges</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -77,6 +98,13 @@
                 <td>{{ data.id }}</td>
                 <td>{{ data.first_name }}</td>
                 <td>
+                    {% if data.privilages_ == "admin" %}
+                       Admin 
+                    {% else %}
+                       User
+                     {% endif %}
+                </td>
+                <td>
                     {% if data.active %}
                         Active
                     {% else %}
@@ -85,15 +113,23 @@
                 </td>
                 <td>
                     <!-- Toggle active status -->
-                    <a href="/active/{{ data.id }}" class="activeb">
+                    <a href="/active/{{ data.id }}" class="action-btn">
                         {% if data.active %}
                             Deactivate
                         {% else %}
                             Activate
                         {% endif %}
                     </a>
+                    <!-- Change privileges -->
+                    <a href="/priv/{{ data.id }}" class="priv-btn">
+                        {% if data.privilages_ == "user" %}
+                            Admin
+                        {% else %}
+                            User
+                        {% endif %}
+                    </a>
                     <!-- Delete profile -->
-                    <a href="/delete/{{ data.id }}" class="delete-btn">Delete</a>
+                    <a href="/delete/{{ data.id }}" class="action-btn">Delete</a>
                 </td>
             </tr>
             {% endfor %}
