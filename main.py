@@ -62,7 +62,7 @@ class Profile(db.Model):
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
     privilages_ = db.Column(db.String(20), default='user')
     email_ = db.Column(db.String(100), nullable=True)
-    usertokenid= db.Column(db.String(100,nullable=True))
+    usertokenid= db.Column(db.String(100),nullable=True)
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
