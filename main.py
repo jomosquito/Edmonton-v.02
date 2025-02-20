@@ -67,6 +67,7 @@ class Profile(db.Model):
     usertokenid= db.Column(db.String(100),nullable=True)
     bio = db.Column(db.Text, nullable=True)
     profile_pic = db.Column(db.String(200), nullable=True)
+    # make more user attributes
 
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
@@ -87,7 +88,7 @@ def index():
 @app.route('/admin')
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
-    return render_template('adminpage.html', profiles=profiles)
+    return render_template('adminlogin.html', profiles=profiles)
 @app.route('/profile')
 def profileview():
     user_id = session.get('user_id')
