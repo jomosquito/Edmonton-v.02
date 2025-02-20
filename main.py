@@ -1,10 +1,10 @@
-# Imports 
+# Imports
 from flask import Flask, render_template, url_for, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from O365 import Account
 import json
-from config import client_id, client_secret
+from config import client_id, client_secret, SECRET_KEY
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
@@ -12,6 +12,8 @@ import jwt
 
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = SECRET_KEY
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
@@ -41,7 +43,7 @@ def deserialize(flow_str):
 
 # Profile Model
 def open1():
-    
+
     with open('o365_token.txt', 'r') as token_file:
         token_data = json.load(token_file)
         account_data = token_data.get("Account")
@@ -49,10 +51,10 @@ def open1():
         for account in account_data.values():
             email = account.get("username")
             idtoken = account.get
-            
+
         for account in id_data.values():
             idtoken = account.get("home_account_id")
-            
+
         return email,idtoken
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,6 +65,9 @@ class Profile(db.Model):
     privilages_ = db.Column(db.String(20), default='user')
     email_ = db.Column(db.String(100), nullable=True)
     usertokenid= db.Column(db.String(100),nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+    profile_pic = db.Column(db.String(200), nullable=True)
+
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -85,7 +90,13 @@ def admin():
     return render_template('adminpage.html', profiles=profiles)
 @app.route('/profile')
 def profileview():
-    return render_template('profile. html')
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    return render_template('profile.html', user=user)
+
 @app.route('/loginadmin', methods=['GET', 'POST'])
 def loginadmin():
     if request.method == 'POST':
@@ -99,7 +110,7 @@ def loginadmin():
             # Check if the user's profile is active
             if not user.active:
                 return "Your profile is deactivated. Please contact the administrator."
-            
+
             return render_template('adminpage.html', profiles=profiles)
         else:
             return "Invalid username or password!"
@@ -116,15 +127,52 @@ def login():
         user = Profile.query.filter_by(first_name=first_name).first()
 
         if user and user.check_password(pass_word):  # Verify hashed password
-            # Check if the user's profile is active
             if not user.active:
                 return "Your profile is deactivated. Please contact the administrator."
-            
+
+            # Save the user's id in the session
+            session['user_id'] = user.id
+
             return render_template('userhompage.html', user=user)
         else:
             return "Invalid username or password!"
 
     return render_template('log.html')  # Show login form for GET requests
+
+@app.route('/userhompage')
+def user_home():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    return render_template('userhompage.html', user=user)
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+
+    if request.method == 'POST':
+        new_email = request.form.get("email")
+        if new_email:
+            user.email_ = new_email
+            db.session.commit()
+        return redirect(url_for('settings'))
+
+    return render_template('settings.html', user=user)
+
+@app.route('/reports')
+def reports():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    return render_template('reports.html', user=user)
+
+
+
 
 # Toggle the active status of a profile
 @app.route('/active/<int:id>')
@@ -132,13 +180,13 @@ def activate(id):
     profile = Profile.query.get(id)
     if profile is None:
         return redirect('/ap')
-    
+
     # Toggle the boolean value: if True becomes False; if False becomes True
     profile.active = not profile.active
 
     # Save the changes
     db.session.commit()
-    
+
     return redirect('/ap')
 
 # Updated /ap route to return all profiles
@@ -155,19 +203,19 @@ def auth_step_one():
     callback = url_for('auth_step_two_callback', _external=True).replace("127.0.0.1", "localhost")
     account = Account(credentials)
     url, flow = account.con.get_authorization_url(requested_scopes=scopes, redirect_uri=callback)
-    
+
     # Store flow for Step 2
     my_db.store_flow(serialize(flow))
-    
+
     return redirect(url)
 
 # Microsoft OAuth Step Two Callback
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
-    
+
     my_saved_flow_str = my_db.get_flow()
-    
+
     if not my_saved_flow_str:
         return "Flow state not found. Restart authentication.", 400
 
@@ -176,7 +224,7 @@ def auth_step_two_callback():
     result = account.con.request_token(requested_url, flow=my_saved_flow)
     email, idtoken=open1()
 
-  
+
     if result:
         profile = Profile.query.order_by(Profile.id.desc()).first()
         if profile:
@@ -184,7 +232,7 @@ def auth_step_two_callback():
             profile.usertokenid = idtoken
             db.session.commit()
         return redirect('/')
-       
+
 
     return "Authentication failed", 400
 
@@ -199,10 +247,10 @@ def profile():
         p.set_password(pass_word)  # Hash password before storing
         db.session.add(p)
         db.session.commit()
-       
+
         return redirect('/stepone')
     else:
-       
+
         return redirect('/')
 
 # Change privileges for a profile
@@ -211,15 +259,15 @@ def change_privileges(id):
     data = Profile.query.get(id)
     if data is None:
         return redirect('/ap')
-    
+
     if data.privilages_ == "user":
         data.privilages_ = "admin"
     else:
         data.privilages_ = "user"
-    
+
     db.session.commit()
     return redirect('/ap')
-    
+
 # Delete a profile
 @app.route('/delete/<int:id>')
 def erase(id):
@@ -231,5 +279,5 @@ def erase(id):
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  
+        db.create_all()
     app.run(debug=True)
