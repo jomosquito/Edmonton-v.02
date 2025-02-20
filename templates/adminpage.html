@@ -86,6 +86,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Email</th>
                 <th>UserName</th>
                 <th>Privileges</th>
                 <th>Status</th>
@@ -95,7 +96,9 @@
         <tbody>
             {% for data in profiles %}
             <tr>
+
                 <td>{{ data.id }}</td>
+                <td>{{data.email_}}</td>
                 <td>{{ data.first_name }}</td>
                 <td>
                     {% if data.privilages_ == "admin" %}

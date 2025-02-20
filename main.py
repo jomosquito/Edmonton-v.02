@@ -1,5 +1,5 @@
 # Imports 
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from O365 import Account
@@ -40,6 +40,20 @@ def deserialize(flow_str):
     return json.loads(flow_str)
 
 # Profile Model
+def open1():
+    
+    with open('o365_token.txt', 'r') as token_file:
+        token_data = json.load(token_file)
+        account_data = token_data.get("Account")
+        id_data = token_data.get("IdToken")
+        for account in account_data.values():
+            email = account.get("username")
+            idtoken = account.get
+            
+        for account in id_data.values():
+            idtoken = account.get("home_account_id")
+            
+        return email,idtoken
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
@@ -47,7 +61,8 @@ class Profile(db.Model):
     active = db.Column(db.Boolean, default=True, nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
     privilages_ = db.Column(db.String(20), default='user')
-
+    email_ = db.Column(db.String(100), nullable=True)
+    usertokenid= db.Column(db.String(100,nullable=True))
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -67,7 +82,7 @@ def index():
 @app.route('/admin')
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
-    return render_template('adminlogin.html', profiles=profiles)
+    return render_template('adminpage.html', profiles=profiles)
 @app.route('/profile')
 def profileview():
     return render_template('profile. html')
@@ -159,11 +174,17 @@ def auth_step_two_callback():
     my_saved_flow = deserialize(my_saved_flow_str)
     requested_url = request.url  # Get current URL with auth code
     result = account.con.request_token(requested_url, flow=my_saved_flow)
+    email, idtoken=open1()
 
   
     if result:
-           
+        profile = Profile.query.order_by(Profile.id.desc()).first()
+        if profile:
+            profile.email_ = email  # Update the email field
+            profile.usertokenid = idtoken
+            db.session.commit()
         return redirect('/')
+       
 
     return "Authentication failed", 400
 
@@ -178,8 +199,10 @@ def profile():
         p.set_password(pass_word)  # Hash password before storing
         db.session.add(p)
         db.session.commit()
+       
         return redirect('/stepone')
     else:
+       
         return redirect('/')
 
 # Change privileges for a profile
