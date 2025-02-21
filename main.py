@@ -313,7 +313,7 @@ def create_profile():
             "active": request.form.get("active") == "on"
         }
         profiles.append(new_profile)
-        return redirect(url_for("index"))
+        return redirect('/ap')
 
     return render_template("create.html")
 
