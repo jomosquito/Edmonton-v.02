@@ -277,6 +277,25 @@ def erase(id):
         db.session.commit()
     return redirect('/ap')
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update_user(id):
+    user = Profile.query.get(id)
+    if not user:
+        return "User not found", 404
+
+    if request.method == 'POST':
+        user.email_ = request.form.get("email")
+        user.first_name = request.form.get("username")
+        user.privilages_ = request.form.get("privileges")
+        user.active = True if request.form.get("active") == "on" else False
+        
+        db.session.commit()
+        # redirect to the admin page after update
+        return redirect('/ap')
+
+    return render_template('update.html', profile=user)
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
