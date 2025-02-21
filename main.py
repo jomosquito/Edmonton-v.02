@@ -67,6 +67,7 @@ class Profile(db.Model):
     usertokenid= db.Column(db.String(100),nullable=True)
     bio = db.Column(db.Text, nullable=True)
     profile_pic = db.Column(db.String(200), nullable=True)
+    phoneN_= db.Column(db.String(200), nullable=True)
     # make more user attributes
 
     def set_password(self, password):
@@ -88,7 +89,7 @@ def index():
 @app.route('/admin')
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
-    return render_template('adminlogin.html', profiles=profiles)
+    return render_template('adminpage.html', profiles=profiles)
 @app.route('/profile')
 def profileview():
     user_id = session.get('user_id')
@@ -112,7 +113,7 @@ def loginadmin():
             if not user.active:
                 return "Your profile is deactivated. Please contact the administrator."
 
-            return render_template('adminpage.html', profiles=profiles)
+            return render_template('adminlogin.html', profiles=profiles)
         else:
             return "Invalid username or password!"
 
@@ -241,18 +242,21 @@ def auth_step_two_callback():
 @app.route('/add', methods=["POST"])
 def profile():
     first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")   # Retrieve last name from form
+    phone_number = request.form.get("phoneN_")   # Retrieve phone number from form
     pass_word = request.form.get("pass_word")
 
     if first_name and pass_word:
-        p = Profile(first_name=first_name)
+        # Create a new Profile instance with last name and phone number
+        p = Profile(first_name=first_name, last_name=last_name, phoneN_=phone_number)
         p.set_password(pass_word)  # Hash password before storing
         db.session.add(p)
         db.session.commit()
 
         return redirect('/stepone')
     else:
+        return render_template('userhomepage.html')
 
-        return redirect('/')
 
 # Change privileges for a profile
 @app.route('/priv/<int:id>')

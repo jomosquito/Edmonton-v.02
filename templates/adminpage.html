@@ -89,7 +89,9 @@
             <tr>
                 <th>ID</th>
                 <th>Email</th>
-                <th>UserName</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Phone Number</th>
                 <th>Privileges</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -102,6 +104,8 @@
                 <td>{{ data.id }}</td>
                 <td>{{data.email_}}</td>
                 <td>{{ data.first_name }}</td>
+                <td>{{ data.last_name }}</td>
+                <td>{{ data.phoneN_ }}</td>
                 <td>
                     {% if data.privilages_ == "admin" %}
                        Admin 
@@ -109,6 +113,7 @@
                        User
                      {% endif %}
                 </td>
+               
                 <td>
                     {% if data.active %}
                         Active
