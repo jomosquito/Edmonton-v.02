@@ -1,3 +1,4 @@
-/﻿config.py
+/config.py
 /o365_token.txt
-
+/instance/site.db
+/__pycache__/

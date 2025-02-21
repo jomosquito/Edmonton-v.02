@@ -1,9 +1,184 @@
 <!DOCTYPE html>
-<html>
-  <head></head>
-  <body>
-    <a href="/login">Login</a>
-    <br />
-    <a href="/creat">create account</a>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      height: 100vh;
+      /* Ensure the body takes up the full height */
+      overflow: hidden;
+      display: flex;
+      /* Enables flexbox */
+      justify-content: center;
+      /* Centers content horizontally */
+      align-items: center;
+      /* Centers content vertically */
+      background: #000;
+    }
+
+    /* Fullscreen container for the particles */
+    #particles-js {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    /* Main content */
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 400px;
+      width: 90%;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      background: -webkit-linear-gradient(45deg, #f3ec78, #af4261);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    a {
+      display: block;
+      margin: 20px auto;
+      padding: 15px;
+      width: 80%;
+      max-width: 300px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2575fc;
+      background: #ffffff;
+      border-radius: 50px;
+      transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    a:hover {
+      transform: scale(1.05);
+      background: #f0f0f0;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particle container for moving stars -->
+  <div id="particles-js"></div>
+
+  <!-- Main container with login and account creation options -->
+  <div class="container">
+    <h1>PORTAL</h1>
+    <a href="/login">User Login</a>
+    <a href="/creat">Create Account</a>
+    <a href="/admin">Admin Login</a>
+  </div>
+
+  <!-- Include Particles.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+
+  <script>
+    // Particles.js configuration
+    particlesJS('particles-js', {
+      particles: {
+        number: {
+          value: 200, // Number of particles (stars)
+          density: {
+            enable: true,
+            value_area: 800
+          }
+        },
+        shape: {
+          type: 'circle', // Shape of particles
+          stroke: {
+            width: 0,
+            color: '#fff'
+          }
+        },
+        opacity: {
+          value: 0.5, // Particle opacity
+          random: true,
+          anim: {
+            enable: true,
+            speed: 1,
+            opacity_min: 0.1,
+            sync: false
+          }
+        },
+        size: {
+          value: 3, // Particle size
+          random: true,
+          anim: {
+            enable: true,
+            speed: 2,
+            size_min: 1,
+            sync: false
+          }
+        },
+        move: {
+          enable: true,
+          speed: 1, // Speed of movement
+          direction: 'none',
+          random: true,
+          straight: false,
+          out_mode: 'out', // Particles disappear after leaving the screen
+          bounce: false,
+          attract: {
+            enable: false
+          }
+        }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: {
+            enable: false
+          },
+          onclick: {
+            enable: false
+          }
+        }
+      },
+      retina_detect: true
+    });
+  </script>
+</body>
+
 </html>

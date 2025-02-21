@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Form</title>
+    <title>Admin Login</title>
     <style>
         /* Global Styles */
         body {
@@ -11,14 +11,14 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
+            background: linear-gradient(to right, #720cd8, #5005a5);
             font-family: Arial, sans-serif;
             margin: 0;
         }
 
-        /* Form Container */
-        .form-container {
-            background: white;
+        /* Login Container */
+        .login-container {
+            background: rgb(239, 240, 241);
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -27,13 +27,13 @@
         }
 
         /* Heading */
-        .form-container h3 {
+        .login-container h2 {
             margin-bottom: 20px;
             color: #333;
         }
 
         /* Form Inputs */
-        .form-container input {
+        .login-container input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -42,13 +42,8 @@
             font-size: 16px;
         }
 
-        /* Password Input */
-        .form-container input[type="password"] {
-            letter-spacing: 1px;
-        }
-
         /* Submit Button */
-        .form-container button {
+        .login-container button {
             width: 100%;
             padding: 12px;
             background: #2575fc;
@@ -60,13 +55,13 @@
             transition: background 0.3s ease-in-out;
         }
 
-        .form-container button:hover {
+        .login-container button:hover {
             background: #6a11cb;
         }
 
         /* Responsive Design */
         @media (max-width: 400px) {
-            .form-container {
+            .login-container {
                 width: 90%;
             }
         }
@@ -74,14 +69,12 @@
 </head>
 <body>
 
-    <div class="form-container">
-        <h3>Create Account</h3>
-        <form action="/add" method="POST">
-            <input type="text" name="first_name" placeholder="firstname..." required>
-            <input type="text" name="last_name" placeholder="lastname..." required>
-            <input type="text" name="phoneN_" placeholder="phone number" required>
-            <input type="password" name="pass_word" placeholder="Password..." required>
-            <button type="submit">Add</button>
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        <form action="/loginadmin" method="POST">
+            <input type="text" name="first_name" placeholder="Username" required>
+            <input type="password" name="pass_word" placeholder="Password" required>
+            <button type="submit">Login</button>
         </form>
     </div>
 
