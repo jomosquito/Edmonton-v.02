@@ -300,6 +300,23 @@ def update_user(id):
 
     return render_template('update.html', profile=user)
 
+@app.route("/create", methods=["GET", "POST"])
+def create_profile():
+    if request.method == "POST":
+        # Create a new profile from the form data
+        new_profile = {
+            "id": len(profiles) + 1,  # Auto-generate ID
+            "email_": request.form.get("email"),
+            "first_name": request.form.get("first_name"),
+            "last_name": request.form.get("last_name"),
+            "privilages_": request.form.get("privileges"),
+            "active": request.form.get("active") == "on"
+        }
+        profiles.append(new_profile)
+        return redirect(url_for("index"))
+
+    return render_template("create.html")
+
 
 if __name__ == "__main__":
     with app.app_context():
