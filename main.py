@@ -289,13 +289,21 @@ def update_user(id):
         return "User not found", 404
 
     if request.method == 'POST':
-        user.email_ = request.form.get("email")
-        user.first_name = request.form.get("username")
-        user.privilages_ = request.form.get("privileges")
-        user.active = True if request.form.get("active") == "on" else False
-        
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        email = request.form.get("email")
+        phone_number = request.form.get("phoneN_")
+        privileges = request.form.get("privileges")
+        active = True if request.form.get("active") == "on" else False
+
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email_ = email
+        user.phoneN_ = phone_number
+        user.privilages_ = privileges
+        user.active = active
+
         db.session.commit()
-        # redirect to the admin page after update
         return redirect('/ap')
 
     return render_template('update.html', profile=user)
