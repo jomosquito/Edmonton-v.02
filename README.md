@@ -16,10 +16,11 @@ This project is a web application for managing user profiles.
 
 3. **Fill in the configuration file:**
 
+    ```sh
     client_id = 'your_client_id'
     client_secret = 'your_client_secret'
     SECRET_KEY = 'your_secret_key'
 
 3. **Run the application:**
 
-  python main.py
+    python main.py
