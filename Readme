@@ -1,5 +1,0 @@
-* make a config.py file containing *
-client_id =' '
-client_secret=' '
-
-to run from terminal: py main.py 
