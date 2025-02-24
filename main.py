@@ -311,18 +311,17 @@ def update_user(id):
 @app.route("/create", methods=["GET", "POST"])
 def create_profile():
     if request.method == "POST":
-        # Create a new profile from the form data
-        new_profile = {
-            "id": len(profiles) + 1,  # Auto-generate ID
-            "email_": request.form.get("email"),
-            "first_name": request.form.get("first_name"),
-            "last_name": request.form.get("last_name"),
-            "privilages_": request.form.get("privileges"),
-            "active": request.form.get("active") == "on"
-        }
-        profiles.append(new_profile)
+        new_profile = Profile(
+            first_name=request.form.get("first_name"),
+            last_name=request.form.get("last_name"),
+            email_=request.form.get("email"),
+            privilages_=request.form.get("privileges"),
+            active=request.form.get("active") == "on",
+            pass_word=generate_password_hash("defaultpassword")  # set a default or get from form
+        )
+        db.session.add(new_profile)
+        db.session.commit()
         return redirect('/ap')
-
     return render_template("create.html")
 
 
