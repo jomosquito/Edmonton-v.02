@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Profiles Admin</title>
     <style>
         /* Page background styling */
         body {
-            background-color: #6a5acd; /* blueish purple */
+            background-color: #6a5acd;
+            /* blueish purple */
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             color: #fff;
         }
+
         /* Basic styling for the table */
         table {
             width: 100%;
@@ -19,17 +22,22 @@
             color: #000;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         /* Styling for action buttons (Activate and Delete) */
         .action-btn {
             display: inline-block;
-            background-color: #008CBA; /* blue color */
+            background-color: #008CBA;
+            /* blue color */
             color: #fff;
             padding: 8px 16px;
             text-decoration: none;
@@ -38,9 +46,11 @@
             transition: background-color 0.3s ease;
             margin-right: 5px;
         }
+
         .action-btn:hover {
             background-color: #14e71b;
         }
+
         /* Styling for the Return button */
         .return-btn {
             display: inline-block;
@@ -53,9 +63,11 @@
             transition: background-color 0.3s ease;
             margin: 20px 0;
         }
+
         .return-btn:hover {
             background-color: #8345a0;
         }
+
         /* Styling for the privileges button (User/Admin) */
         .priv-btn {
             display: inline-block;
@@ -68,21 +80,24 @@
             transition: background-color 0.3s ease;
             margin-right: 5px;
         }
+
         .priv-btn:hover {
             background-color: #14e71b;
         }
+
         /* Centering the Return button */
         .button-container {
             text-align: center;
         }
     </style>
 </head>
+
 <body>
     <div class="button-container">
         <a href="/" class="return-btn">Return</a>
-        <a href = '/create' class="return-btn">Create</a>
+        <a href='/create' class="return-btn">Create</a>
     </div>
-    
+
     <table>
         <thead>
             <tr>
@@ -107,46 +122,45 @@
                 <td>{{ data.phoneN_ }}</td>
                 <td>
                     {% if data.privilages_ == "admin" %}
-                       Admin 
+                    Admin
                     {% else %}
-                       User
-                     {% endif %}
+                    User
+                    {% endif %}
                 </td>
-               
+
                 <td>
                     {% if data.active %}
-                        Active
+                    Active
                     {% else %}
-                        Inactive
+                    Inactive
                     {% endif %}
                 </td>
                 <td>
                     <!-- Toggle active status -->
                     <a href="/active/{{ data.id }}" class="action-btn">
                         {% if data.active %}
-                            Deactivate
+                        Deactivate
                         {% else %}
-                            Activate
+                        Activate
                         {% endif %}
                     </a>
                     <!-- Change privileges -->
                     <a href="/priv/{{ data.id }}" class="priv-btn">
                         {% if data.privilages_ == "user" %}
-                            Admin
+                        Admin
                         {% else %}
-                            User
+                        User
                         {% endif %}
                     </a>
                     <!-- Update user data -->
                     <a href="/update/{{ data.id }}" class="action-btn">Update</a>
                     <!-- Delete profile -->
                     <a href="/delete/{{ data.id }}" class="action-btn">Delete</a>
-                    <!-- Create user data -->
-                    <a href="/create/{{ data.id }}" class="action-btn">Create</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </body>
+
 </html>
