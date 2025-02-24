@@ -24,3 +24,9 @@ This project is a web application for managing user profiles.
 3. **Run the application:**
 
     python main.py
+
+4. **Open in your web browser:**
+
+    After running "python main.py" in your command terminal...
+
+    Click on the hyperlink: http://127.0.0.1:5000
