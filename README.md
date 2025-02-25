@@ -15,7 +15,8 @@ This project is a web application for managing user profiles.
     pip install -r requirements.txt
 
 3. **Fill in the configuration (config.py) file:**
-     Get your keys from: https://www.microsoft.com/en-us/security/business/microsoft-entra
+     Keys are for O365 authentication. 
+     Get your keys from: https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
     ```sh
     client_id = 'your_client_id'
     client_secret = 'your_client_secret'
