@@ -25,15 +25,15 @@ This project is a web application for managing user profiles.
     ```sh
     pip install Flask flask_sqlalchemy O365 werkzeug
 
-This command installs:
+**This command installs**:
 
-Flask: The web framework.
+**Flask**: The web framework.
 
-flask_sqlalchemy: An ORM for working with databases.
+**flask_sqlalchemy**: An ORM for working with databases.
 
-O365: A library for integrating with Microsoft Office 365.
+**O365**: A library for integrating with Microsoft Office 365.
 
-werkzeug: Provides security utilities like password hashing.
+**werkzeug**: Provides security utilities like password hashing.
 
     
 4. **Run the application:**
