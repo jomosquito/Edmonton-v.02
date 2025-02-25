@@ -23,7 +23,7 @@ This project is a web application for managing user profiles.
     SECRET_KEY = 'your_secret_key'
 3. **Install all necessary dependencies**
     ```sh
-pip install Flask flask_sqlalchemy O365 werkzeug
+    pip install Flask flask_sqlalchemy O365 werkzeug
 
 This command installs:
 
