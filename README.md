@@ -28,8 +28,11 @@ This project is a web application for managing user profiles.
 This command installs:
 
 Flask: The web framework.
+
 flask_sqlalchemy: An ORM for working with databases.
+
 O365: A library for integrating with Microsoft Office 365.
+
 werkzeug: Provides security utilities like password hashing.
 
     
