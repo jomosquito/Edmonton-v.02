@@ -13,18 +13,6 @@ This project is a web application for managing user profiles.
 2. **Setup Instructions**
 
     pip install -r requirements.txt
-
-3. **Fill in the configuration (config.py) file:**
-     Keys are for O365 authentication. 
-     Get your keys from: https://learn.microsoft.com/en-us/entra/fundamentals/entra-admin-center 
-    ```sh
-    client_id = 'your_client_id'
-    client_secret = 'your_client_secret'
-    SECRET_KEY = 'your_secret_key'
-4. **Install all necessary dependencies**
-    ```sh
-    pip install Flask flask_sqlalchemy O365 werkzeug
-
 **This command installs**:
 
 **Flask**: The web framework.
@@ -35,7 +23,15 @@ This project is a web application for managing user profiles.
 
 **werkzeug**: Provides security utilities like password hashing.
 
-    
+4. **Fill in the configuration (config.py) file:**
+     Keys are for O365 authentication. 
+     Get your keys from: https://learn.microsoft.com/en-us/entra/fundamentals/entra-admin-center 
+    ```sh
+    client_id = 'your_client_id'
+    client_secret = 'your_client_secret'
+    SECRET_KEY = 'your_secret_key'
+
+
 5. **Run the application:**
 
     python main.py
