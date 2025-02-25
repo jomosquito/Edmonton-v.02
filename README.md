@@ -24,6 +24,7 @@ This project is a web application for managing user profiles.
 
 **werkzeug**: Provides security utilities like password hashing.
 
+
 4. **Fill in the configuration (config.py) file:**
      Keys are for O365 authentication. 
      Get your keys from: https://learn.microsoft.com/en-us/entra/fundamentals/entra-admin-center 
@@ -34,10 +35,11 @@ This project is a web application for managing user profiles.
 
 
 5. **Run the application:**
-
+   ```sh
     python main.py
 
-6. **Open in your web browser:**
+
+7. **Open in your web browser:**
 
     After running "python main.py" in your command terminal...
 
