@@ -11,8 +11,9 @@ This project is a web application for managing user profiles.
    cd Edmonton
 
 2. **Setup Instructions**
+   ```sh
+   pip install -r requirements.txt
 
-    pip install -r requirements.txt
 **This command installs**:
 
 **Flask**: The web framework.
