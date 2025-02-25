@@ -16,7 +16,7 @@ This project is a web application for managing user profiles.
 
 3. **Fill in the configuration (config.py) file:**
      Keys are for O365 authentication. 
-     Get your keys from: https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?
+     Get your keys from: https://learn.microsoft.com/en-us/entra/fundamentals/entra-admin-center 
     ```sh
     client_id = 'your_client_id'
     client_secret = 'your_client_secret'
