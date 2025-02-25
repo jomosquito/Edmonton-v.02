@@ -21,12 +21,23 @@ This project is a web application for managing user profiles.
     client_id = 'your_client_id'
     client_secret = 'your_client_secret'
     SECRET_KEY = 'your_secret_key'
+3. **Install all necessary dependencies**
+    ```sh
+pip install Flask flask_sqlalchemy O365 werkzeug
 
-3. **Run the application:**
+This command installs:
+
+Flask: The web framework.
+flask_sqlalchemy: An ORM for working with databases.
+O365: A library for integrating with Microsoft Office 365.
+werkzeug: Provides security utilities like password hashing.
+
+    
+4. **Run the application:**
 
     python main.py
 
-4. **Open in your web browser:**
+5. **Open in your web browser:**
 
     After running "python main.py" in your command terminal...
 
