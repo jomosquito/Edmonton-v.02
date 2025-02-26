@@ -295,6 +295,7 @@ def update_user(id):
         phone_number = request.form.get("phoneN_")
         privileges = request.form.get("privileges")
         active = True if request.form.get("active") == "on" else False
+        new_password = request.form.get("pass_word")
 
         user.first_name = first_name
         user.last_name = last_name
@@ -302,6 +303,10 @@ def update_user(id):
         user.phoneN_ = phone_number
         user.privilages_ = privileges
         user.active = active
+
+        # if a new password is provided, update it
+        if new_password:
+            user.set_password(new_password)
 
         db.session.commit()
         return redirect('/ap')
@@ -316,7 +321,7 @@ def create_profile():
         if not password:
             # Optionally handle missing password case
             return "Password is required", 400
-        
+
         new_profile = Profile(
             first_name=request.form.get("first_name"),
             last_name=request.form.get("last_name"),
