@@ -311,13 +311,19 @@ def update_user(id):
 @app.route("/create", methods=["GET", "POST"])
 def create_profile():
     if request.method == "POST":
+        # Get the password provided in the form
+        password = request.form.get("pass_word")
+        if not password:
+            # Optionally handle missing password case
+            return "Password is required", 400
+        
         new_profile = Profile(
             first_name=request.form.get("first_name"),
             last_name=request.form.get("last_name"),
             email_=request.form.get("email"),
             privilages_=request.form.get("privileges"),
             active=request.form.get("active") == "on",
-            pass_word=generate_password_hash("defaultpassword")  # set a default or get from form
+            pass_word=generate_password_hash(password)  # Use provided password
         )
         db.session.add(new_profile)
         db.session.commit()
