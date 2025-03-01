@@ -113,7 +113,7 @@ def loginadmin():
             if not user.active:
                 return "Your profile is deactivated. Please contact the administrator."
 
-            return render_template('adminpage.html', profiles=profiles)
+            return render_template('adminpage.html', profiles=profiles) #test
         else:
             return "Invalid username or password!"
 
