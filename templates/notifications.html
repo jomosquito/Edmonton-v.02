@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Notifications</title>
+  <!-- Import Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2575fc;
+      --secondary-color: #6a11cb;
+      --background-color: #f0f2f5;
+      --card-bg: #fff;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--background-color);
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .dashboard-container {
+      display: flex;
+      min-height: calc(100vh - 80px);
+    }
+    nav {
+      width: 250px;
+      background: var(--secondary-color);
+      padding: 20px;
+      color: #fff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav ul li {
+      margin-bottom: 20px;
+    }
+    nav ul li a {
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    nav ul li a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+    main {
+      flex: 1;
+      padding: 40px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      margin-bottom: 15px;
+      color: var(--primary-color);
+    }
+    .card p {
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+    ul.notifications {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul.notifications li {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    ul.notifications li:last-child {
+      border-bottom: none;
+    }
+    .notification-actions {
+      margin-top: 10px;
+    }
+    .notification-actions form {
+      display: inline;
+    }
+    .notification-actions button {
+      padding: 5px 10px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .notification-actions .approve {
+      background: var(--primary-color);
+      color: #fff;
+    }
+    .notification-actions .approve:hover {
+      background: var(--secondary-color);
+    }
+    .notification-actions .reject {
+      background: #e74c3c;
+      color: #fff;
+    }
+    .notification-actions .reject:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <header>Admin Notifications</header>
+  <div class="dashboard-container">
+    <nav>
+      <ul>
+        <li><a href="/adminpage.html">Dashboard</a></li>
+        <li><a href="/approvals">Approvals</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+    <main>
+      <div class="card">
+        <h2>Pending User Requests</h2>
+        <p>The following user requests are awaiting your review:</p>
+        {% if pending_requests %}
+          <ul class="notifications">
+            {% for req in pending_requests %}
+              <li>
+                <strong>User:</strong> {{ req.user.first_name }} {{ req.user.last_name }}<br>
+                <strong>Request:</strong> {{ req.request_type }}<br>
+                <strong>Details:</strong> {{ req.details }}<br>
+                <div class="notification-actions">
+                  <form action="{{ url_for('approve_request', request_id=req.id) }}" method="POST">
+                    <button type="submit" class="approve">Approve</button>
+                  </form>
+                  <form action="{{ url_for('reject_request', request_id=req.id) }}" method="POST">
+                    <button type="submit" class="reject">Reject</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No pending requests.</p>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</body>
+</html>
