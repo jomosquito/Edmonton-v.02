@@ -45,7 +45,7 @@ def open1():
         for account in account_data.values():
             email = account.get("username")
             # Note: 'idtoken' assignment in loop is ambiguous; adjust as needed.
-            idtoken = account.get  
+            idtoken = account.get
         for account in id_data.values():
             idtoken = account.get("home_account_id")
         return email, idtoken
@@ -66,7 +66,7 @@ class Profile(db.Model):
     address = db.Column(db.String(200), nullable=True)
     enroll_status = db.Column(db.String(200), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -82,7 +82,7 @@ class TermWithdrawalRequest(db.Model):
     reason = db.Column(db.String(200), nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Relationship to access the requesting user's profile
     user = db.relationship('Profile', backref='withdrawal_requests')
 
@@ -90,7 +90,7 @@ class TermWithdrawalRequest(db.Model):
     @property
     def request_type(self):
         return "Term Withdrawal"
-    
+
     @property
     def details(self):
         return f"Reason: {self.reason}"
@@ -105,7 +105,8 @@ def home():
 
 @app.route('/notifications')
 def notification():
-    return render_template('notifications.html')
+    pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
+    return render_template('notifications.html', pending_requests=pending_requests)
 
 @app.route('/creat')
 def index():
