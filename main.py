@@ -68,6 +68,10 @@ class Profile(db.Model):
     bio = db.Column(db.Text, nullable=True)
     profile_pic = db.Column(db.String(200), nullable=True)
     phoneN_= db.Column(db.String(200), nullable=True)
+    address = db.Column(db.String(200), nullable=True)
+    enroll_status = db.Column(db.String(200), nullable=True)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    
     # make more user attributes
 
     def set_password(self, password):
@@ -110,9 +114,6 @@ def loginadmin():
 
         if user and user.check_password(pass_word) and user.privilages_ == "admin":
             # Check if the user's profile is active
-            if not user.active:
-                return "Your profile is deactivated. Please contact the administrator."
-
             return render_template('adminpage.html', profiles=profiles) #test
         else:
             return "Invalid username or password!"
@@ -245,6 +246,8 @@ def profile():
     last_name = request.form.get("last_name")   # Retrieve last name from form
     phone_number = request.form.get("phoneN_")   # Retrieve phone number from form
     pass_word = request.form.get("pass_word")
+    address = request.form.get("address")
+    enroll_status = request.form.get("enroll_status")
 
     if first_name and pass_word:
         # Create a new Profile instance with last name and phone number
@@ -326,7 +329,8 @@ def create_profile():
             first_name=request.form.get("first_name"),
             last_name=request.form.get("last_name"),
             email_=request.form.get("email"),
-            privilages_=request.form.get("privileges"),
+            privilages_=request.form.get("p"
+            "rivileges"),
             active=request.form.get("active") == "on",
             pass_word=generate_password_hash(password)  # Use provided password
         )

@@ -151,6 +151,7 @@
         <li><a href="/userhompage">Dashboard</a></li>
         <li><a href="/profile">Profile</a></li>
         <li><a href="/settings">Settings</a></li>
+        <li><a href="/status">Request Statuses</a></li>
         <li><a href="/">Logout</a></li>
       </ul>
     </nav>
@@ -161,11 +162,29 @@
         <form action="/settings" method="POST">
           <!-- Example: Update email address -->
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" value="{{ user.email_ }}" required>
+          <input type="email" id="email" name="email" value="{{ user.email }}" required>
           <button type="submit" class="btn">Save Changes</button>
         </form>
-        <!-- Back to Dashboard Button -->
-        <a class="btn" href="/userhompage">Back to Dashboard</a>
+      </div>
+      <div class="card">
+        <h2>Change of Address</h2>
+        <p>Submit your change of address request:</p>
+        <form action="/addresschangerequest" method="POST">
+          <!-- Example: Update address -->
+          <label for="address">Address:</label>
+          <input type="text" id="address" name="address" value="{{ user.address }}" required>
+          <button type="submit" class="btn">Submit Request</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Term withdraw Request</h2>
+        <p>Submit the reason why below</p>
+        <form action="/Termdroprequest" method="POST">
+          <!-- Example: Update address -->
+          <label for="Reson why"></label>
+          <input type="text" id="drop" name="drop" value="{{ user.enrollstatus }}" required>
+          <button type="submit" class="btn">Submit Request</button>
+        </form>
       </div>
     </main>
   </div>
