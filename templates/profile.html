@@ -135,14 +135,12 @@
         <h2>{{ user.first_name }}'s Profile</h2>
         <div class="profile-info">
           <p><strong>First Name:</strong> {{ user.first_name }}</p>
-          {% if user.last_name %}
           <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-          {% endif %}
           <p><strong>Email:</strong> {{ user.email_ }}</p>
-          <p><strong>Privileges:</strong> {{ user.privilages_|capitalize }}</p>
-          <p><strong>Status:</strong> {% if user.active %}Active{% else %}Inactive{% endif %}</p>
-          {% if user.usertokenid %}
-          {% endif %}
+          <p><strong>Phone Number:</strong> {{ user.phoneN_ }}</p>
+          <p><strong>Address:</strong> {{ user.address }}</p>
+          <p><strong>Privileges:</strong> {{ user.privilages_ }}</p>
+          <p><strong>Date Created:</strong> {{ user.date_created }}</p>
         </div>
         <!-- Back button to return to the dashboard -->
         <a class="btn" href="/userhompage">Back to Dashboard</a>

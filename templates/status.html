@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Status</title>
+  <title>Request Status</title>
   <!-- Import Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS Variables for theme consistency */
     :root {
       --primary-color: #2575fc;
       --secondary-color: #6a11cb;
@@ -17,7 +17,6 @@
       --card-bg: #fff;
     }
 
-    /* Base reset and styling */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -95,34 +94,44 @@
       color: var(--primary-color);
     }
 
-    /* Table styling */
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
+      background-color: var(--card-bg);
+      color: #333;
     }
 
     th, td {
-      padding: 12px;
-      text-align: left;
       border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
     }
 
     th {
-      background: var(--primary-color);
+      background-color: var(--primary-color);
       color: #fff;
     }
 
-    tr:nth-child(even) {
-      background: #f9f9f9;
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--primary-color);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+      margin-top: 20px;
     }
 
-    tr:hover {
-      background: #f1f1f1;
+    .btn:hover {
+      background: var(--secondary-color);
     }
   </style>
 </head>
+
 <body>
-  <header>User Requests</header>
+  <header>Request Status</header>
   <div class="dashboard-container">
     <nav>
       <ul>
@@ -135,7 +144,7 @@
     </nav>
     <main>
       <div class="card">
-        <h2>Your Requests</h2>
+        <h2>Term Withdrawal Requests</h2>
         <table>
           <thead>
             <tr>
@@ -146,7 +155,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for request in requests %}
+            {% for request in term_requests %}
             <tr>
               <td>{{ request.id }}</td>
               <td>{{ request.reason }}</td>
@@ -157,7 +166,32 @@
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Address Change Requests</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>New Address</th>
+              <th>Status</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in address_requests %}
+            <tr>
+              <td>{{ request.id }}</td>
+              <td>{{ request.new_address }}</td>
+              <td>{{ request.status }}</td>
+              <td>{{ request.created_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <a class="btn" href="/userhompage">Back to Dashboard</a>
     </main>
   </div>
 </body>
+
 </html>

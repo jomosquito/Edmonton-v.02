@@ -1,91 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notifications</title>
+  <title>Admin Notifications</title>
+  <a class="btn-back" href="{{ url_for('admin') }}">Return to Admin Page</a>
   <style>
-    /* Page background styling */
     body {
-      background-color: #6a5acd; /* blueish purple */
       font-family: Arial, sans-serif;
+      background-color: #6a5acd; /* blueish purple */
+      color: #fff;
       margin: 0;
       padding: 20px;
-      color: #fff;
     }
-
-    /* Navigation buttons styling */
-    .button-container {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .return-btn {
-      display: inline-block;
-      background-color: #0c120c;
-      color: #fff;
-      padding: 10px 20px;
-      text-decoration: none;
-      font-size: 18px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-      margin: 20px 10px;
-    }
-
-    .return-btn:hover {
-      background-color: #8345a0;
-    }
-
-    /* Table styling */
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
       background-color: #fff;
       color: #000;
-      margin-top: 20px;
     }
-
     th, td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
-
     th {
-      background-color: #f2f2f2;
-    }
-
-    /* Action button styling */
-    .action-btn {
-      display: inline-block;
-      background-color: #008CBA; /* blue color */
+      background-color: #6a5acd;
       color: #fff;
-      padding: 8px 16px;
-      text-decoration: none;
-      font-size: 16px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-      margin-right: 5px;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: white;
       border: none;
-    }
-
-    .action-btn:hover {
-      background-color: #14e71b;
-    }
-
-    button.action-btn {
+      border-radius: 3px;
       cursor: pointer;
+    }
+    button.reject {
+      background-color: #f44336;
+    }
+    .btn-back {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #2575fc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+    }
+    .btn-back:hover {
+      background: #6a11cb;
     }
   </style>
 </head>
-<body>
-  <div class="button-container">
-    <a href="/a" class="return-btn">Return</a>
-    <a href="/create" class="return-btn">Create</a>
-    <a href="/notifications" class="return-btn">Notifications</a>
-  </div>
 
-  <h1>Pending Requests</h1>
+<body>
+  <h1>Pending Term Withdrawal Requests</h1>
   <table>
     <thead>
       <tr>
@@ -105,15 +78,50 @@
         <td>{{ request.status }}</td>
         <td>
           <form action="{{ url_for('approve_request', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="action-btn">Approve</button>
+            <button type="submit">Approve</button>
           </form>
           <form action="{{ url_for('reject_request', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="action-btn">Reject</button>
+            <button type="submit" class="reject">Reject</button>
           </form>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+
+  <h1>Pending Address Change Requests</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User ID</th>
+        <th>New Address</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for request in pending_address_requests %}
+      <tr>
+        <td>{{ request.id }}</td>
+        <td>{{ request.user_id }}</td>
+        <td>{{ request.new_address }}</td>
+        <td>{{ request.status }}</td>
+        <td>
+          <form action="{{ url_for('approve_address_change', request_id=request.id) }}" method="post" style="display:inline;">
+            <button type="submit">Approve</button>
+          </form>
+          <form action="{{ url_for('reject_address_change', request_id=request.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="reject">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Back to Admin Page Button -->
+  
 </body>
+
 </html>

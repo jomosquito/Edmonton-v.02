@@ -77,7 +77,15 @@ class TermWithdrawalRequest(db.Model):
     @property
     def details(self):
         return f"Reason: {self.reason}"
+class AddressChangeRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    new_address = db.Column(db.String(200), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Relationship to access the requesting user's profile
+    user = db.relationship('Profile', backref='address_change_requests')
 # -------------------------------
 # Routes
 # -------------------------------
@@ -90,12 +98,14 @@ def status():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    requests = TermWithdrawalRequest.query.filter_by(user_id=user_id).all()
-    return render_template('status.html', requests=requests)
+    term_requests = TermWithdrawalRequest.query.filter_by(user_id=user_id).all()
+    address_requests = AddressChangeRequest.query.filter_by(user_id=user_id).all()
+    return render_template('status.html', term_requests=term_requests, address_requests=address_requests)
 @app.route('/notifications')
 def notification():
     pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
-    return render_template('notifications.html', pending_requests=pending_requests)
+    pending_address_requests = AddressChangeRequest.query.filter_by(status='pending').all()
+    return render_template('notifications.html', pending_requests=pending_requests, pending_address_requests=pending_address_requests)
 
 @app.route('/creat')
 def index():
@@ -359,9 +369,9 @@ def term_withdraw_request():
     reason = request.form.get("reason")
     if not reason:
         return "No reason selected", 400
-    new_request = TermWithdrawalRequest(user_id=user.id, reason=reason)
+    new_request = TermWithdrawalRequest(user_id=user.id, reason=reason, status='pending')
     db.session.add(new_request)
-    db.session.commit()
+    db.session.commit()  # Ensure the request is saved to the database
     return redirect(url_for('settings'))
 
 # Admin endpoint to view pending term withdrawal requests
@@ -373,19 +383,49 @@ def approvals():
 # Endpoint to approve a pending request
 @app.route('/approve_request/<int:request_id>', methods=['POST'])
 def approve_request(request_id):
-    request = TermWithdrawalRequest.query.get(request_id)
-    if request:
-        request.status = 'approved'
+    req_record = TermWithdrawalRequest.query.get(request_id)
+    if req_record:
+        req_record.status = 'approved'
+        db.session.commit()
+    return redirect(url_for('notification'))
+@app.route('/reject_request/<int:request_id>', methods=['POST'])
+def reject_request(request_id):
+    req_record = TermWithdrawalRequest.query.get(request_id)
+    if req_record:
+        req_record.status = 'rejected'
+        db.session.commit()
+    return redirect(url_for('notification'))
+@app.route('/approve_address_change/<int:request_id>', methods=['POST'])
+def approve_address_change(request_id):
+    req_record = AddressChangeRequest.query.get(request_id)
+    if req_record:
+        user = Profile.query.get(req_record.user_id)
+        if user:
+            user.address = req_record.new_address  # Update the user's address
+        req_record.status = 'approved'
         db.session.commit()
     return redirect(url_for('notification'))
 
-@app.route('/reject_request/<int:request_id>', methods=['POST'])
-def reject_request(request_id):
-    request = TermWithdrawalRequest.query.get(request_id)
-    if request:
-        request.status = 'rejected'
+@app.route('/reject_address_change/<int:request_id>', methods=['POST'])
+def reject_address_change(request_id):
+    req_record = AddressChangeRequest.query.get(request_id)
+    if req_record:
+        req_record.status = 'rejected'
         db.session.commit()
     return redirect(url_for('notification'))
+@app.route('/request_address_change', methods=['POST'])
+def request_address_change():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    new_address = request.form.get("new_address")
+    if not new_address:
+        return "No address provided", 400
+    address_request = AddressChangeRequest(user_id=user.id, new_address=new_address, status='pending')
+    db.session.add(address_request)
+    db.session.commit()
+    return redirect(url_for('settings'))
 
 if __name__ == "__main__":
     with app.app_context():

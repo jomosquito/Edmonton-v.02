@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Requests</title>
+  <title>Settings</title>
   <!-- Import Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,44 +96,40 @@
       color: var(--primary-color);
     }
 
-    form {
-      display: flex;
-      flex-direction: column;
+    .form-group {
+      margin-bottom: 20px;
     }
 
     label {
-      margin-bottom: 5px;
-      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
     }
 
-    input, select {
+    input, textarea, select, button {
+      width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
       border-radius: 5px;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
+    button {
       background: var(--primary-color);
       color: #fff;
-      text-decoration: none;
       border: none;
-      border-radius: 5px;
-      transition: background 0.3s ease;
       cursor: pointer;
-      font-size: 1rem;
-      align-self: flex-start;
+      transition: background 0.3s ease;
     }
 
-    .btn:hover {
+    button:hover {
       background: var(--secondary-color);
     }
   </style>
 </head>
+
 <body>
-  <header>User Requests</header>
+  <header>Settings</header>
   <div class="dashboard-container">
     <nav>
       <ul>
@@ -144,43 +141,38 @@
       </ul>
     </nav>
     <main>
-      <!-- Settings Update Form -->
+      <!-- Term Withdrawal Request -->
       <div class="card">
-        <h2>Settings</h2>
-        <p>Update your preferences below:</p>
-        <form action="/settings" method="POST">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" value="{{ user.email_ }}" required>
-          <button type="submit" class="btn">Save Changes</button>
+        <h2>Request Term Withdrawal</h2>
+        <form action="{{ url_for('term_withdraw_request') }}" method="post">
+          <div class="form-group">
+            <label for="reason">Reason:</label>
+            <select id="reason" name="reason" required>
+              <option value="" disabled selected>Select a reason</option>
+              <option value="Financial Issues">Financial Issues</option>
+              <option value="Health Problems">Health Problems</option>
+              <option value="Personal Reasons">Personal Reasons</option>
+              <option value="Academic Challenges">Academic Challenges</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <button type="submit">Submit Request</button>
         </form>
       </div>
-      <!-- Change of Address Request -->
+
+      <!-- Address Change Request -->
       <div class="card">
-        <h2>Change of Address</h2>
-        <p>Submit your change of address request:</p>
-        <form action="/addresschangerequest" method="POST">
-          <label for="address">Address:</label>
-          <input type="text" id="address" name="address" value="{{ user.address }}" required>
-          <button type="submit" class="btn">Submit Request</button>
-        </form>
-      </div>
-      <!-- Term Withdrawal Request Form -->
-      <div class="card">
-        <h2>Term Withdraw Request</h2>
-        <p>Submit your reason for term withdrawal:</p>
-        <form action="/Termdroprequest" method="POST">
-          <label for="reason">Select Reason:</label>
-          <select id="reason" name="reason" required>
-            <option value="">--Please choose an option--</option>
-            <option value="financial">Financial Constraints</option>
-            <option value="academic">Academic Reasons</option>
-            <option value="personal">Personal Reasons</option>
-            <option value="other">Other</option>
-          </select>
-          <button type="submit" class="btn">Submit Request</button>
+        <h2>Request Address Change</h2>
+        <form action="{{ url_for('request_address_change') }}" method="post">
+          <div class="form-group">
+            <label for="new_address">New Address:</label>
+            <input type="text" id="new_address" name="new_address" placeholder="Enter your new address" required>
+          </div>
+          <button type="submit">Submit Address Change</button>
         </form>
       </div>
     </main>
   </div>
 </body>
+
 </html>
