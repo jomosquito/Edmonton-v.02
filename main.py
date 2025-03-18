@@ -87,7 +87,11 @@ def home():
     return render_template('login.html')
 @app.route('/status')
 def status():
-    return render_template('status.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    requests = TermWithdrawalRequest.query.filter_by(user_id=user_id).all()
+    return render_template('status.html', requests=requests)
 @app.route('/notifications')
 def notification():
     pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
@@ -102,7 +106,10 @@ def index():
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
     return render_template('adminpage.html', profiles=profiles)
-
+@app.route('/a')
+def ad():
+    profiles = Profile.query.all()  # Retrieve all profiles from the database
+    return render_template('adminpage.html', profiles=profiles)
 @app.route('/profile')
 def profileview():
     user_id = session.get('user_id')
@@ -366,23 +373,19 @@ def approvals():
 # Endpoint to approve a pending request
 @app.route('/approve_request/<int:request_id>', methods=['POST'])
 def approve_request(request_id):
-    req_record = TermWithdrawalRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'approved'
-        user = Profile.query.get(req_record.user_id)
-        if user:
-            user.enroll_status = req_record.reason
+    request = TermWithdrawalRequest.query.get(request_id)
+    if request:
+        request.status = 'approved'
         db.session.commit()
-    return redirect(url_for('approvals'))
+    return redirect(url_for('notification'))
 
-# Endpoint to reject a pending request
 @app.route('/reject_request/<int:request_id>', methods=['POST'])
 def reject_request(request_id):
-    req_record = TermWithdrawalRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'rejected'
+    request = TermWithdrawalRequest.query.get(request_id)
+    if request:
+        request.status = 'rejected'
         db.session.commit()
-    return redirect(url_for('approvals'))
+    return redirect(url_for('notification'))
 
 if __name__ == "__main__":
     with app.app_context():
