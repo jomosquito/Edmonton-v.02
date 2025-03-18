@@ -36,21 +36,7 @@ def serialize(flow):
 def deserialize(flow_str):
     return json.loads(flow_str)
 
-# Profile Model helper for O365 token
-def open1():
-    with open('o365_token.txt', 'r') as token_file:
-        token_data = json.load(token_file)
-        account_data = token_data.get("Account")
-        id_data = token_data.get("IdToken")
-        for account in account_data.values():
-            email = account.get("username")
-            # Note: 'idtoken' assignment in loop is ambiguous; adjust as needed.
-            idtoken = account.get
-        for account in id_data.values():
-            idtoken = account.get("home_account_id")
-        return email, idtoken
-
-# Profile Model
+# Updated Profile Model with new fields for optional token claims
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
@@ -61,7 +47,6 @@ class Profile(db.Model):
     email_ = db.Column(db.String(100), nullable=True)
     usertokenid = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.Text, nullable=True)
-    profile_pic = db.Column(db.String(200), nullable=True)
     phoneN_ = db.Column(db.String(200), nullable=True)
     address = db.Column(db.String(200), nullable=True)
     enroll_status = db.Column(db.String(200), nullable=True)
@@ -73,9 +58,7 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
-# -------------------------------
 # New Model for Term Withdrawal Requests
-# -------------------------------
 class TermWithdrawalRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
@@ -171,7 +154,7 @@ def settings():
     if request.method == 'POST':
         new_email = request.form.get("email")
         if new_email:
-            user.email_ = new_email  # Use email_ from model
+            user.email_ = new_email  # Update email field
             db.session.commit()
         return redirect(url_for('settings'))
     return render_template('settings.html', user=user)
@@ -200,34 +183,68 @@ def ap():
     profiles = Profile.query.all()
     return render_template('adminpage.html', profiles=profiles)
 
+# -------------------------------
+# Microsoft OAuth Endpoints
+# -------------------------------
+def open1():
+
+    with open('o365_token.txt', 'r') as token_file:
+        token_data = json.load(token_file)
+        account_data = token_data.get("Account")
+        id_data = token_data.get("IdToken")
+        for account in account_data.values():
+            email = account.get("username")
+            idtoken = account.get
+
+        for account in id_data.values():
+            idtoken = account.get("home_account_id")
+
+        return email,idtoken
 # Microsoft OAuth Step One
+
+
+# Microsoft OAuth Step Two Callback
 @app.route('/stepone')
 def auth_step_one():
+    # Create a callback URL for the next step, replacing '127.0.0.1' with 'localhost'
     callback = url_for('auth_step_two_callback', _external=True).replace("127.0.0.1", "localhost")
     account = Account(credentials)
     url, flow = account.con.get_authorization_url(requested_scopes=scopes, redirect_uri=callback)
+
+    # Store flow for Step 2
     my_db.store_flow(serialize(flow))
+
     return redirect(url)
 
 # Microsoft OAuth Step Two Callback
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
+
     my_saved_flow_str = my_db.get_flow()
+
     if not my_saved_flow_str:
         return "Flow state not found. Restart authentication.", 400
+
     my_saved_flow = deserialize(my_saved_flow_str)
-    requested_url = request.url
+    requested_url = request.url  # Get current URL with auth code
     result = account.con.request_token(requested_url, flow=my_saved_flow)
-    email, idtoken = open1()
+    email, idtoken=open1()
+
+
     if result:
         profile = Profile.query.order_by(Profile.id.desc()).first()
         if profile:
-            profile.email_ = email
+            profile.email_ = email  # Update the email field
             profile.usertokenid = idtoken
             db.session.commit()
         return redirect('/')
+
+
     return "Authentication failed", 400
+# -------------------------------
+# User and Admin Endpoints
+# -------------------------------
 
 # Add a new profile
 @app.route('/add', methods=["POST"])
