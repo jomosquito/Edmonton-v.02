@@ -85,7 +85,9 @@ class TermWithdrawalRequest(db.Model):
 @app.route('/')
 def home():
     return render_template('login.html')
-
+@app.route('/status')
+def status():
+    return render_template('status.html')
 @app.route('/notifications')
 def notification():
     pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
