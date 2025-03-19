@@ -732,7 +732,8 @@ def download_documentation(request_id, file_index):
     
     return send_file(file_path, as_attachment=True)
 
-<<<<<<< HEAD
+
+
 
 @app.route('/submit_student_drop', methods=['POST'])
 def submit_student_drop():
@@ -793,10 +794,35 @@ def admin_student_drops():
     return render_template('admin_student_drops.html', drop_requests=drop_requests)
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
 def approve_student_drop(request_id):
+    """Approve a student-initiated drop request and generate a PDF"""
     req_record = StudentInitiatedDrop.query.get(request_id)
     if req_record:
+        # Get admin signature if available
+        user_id = session.get('user_id')
+        admin = Profile.query.get(user_id)
+        admin_signature = None  # You'd need to implement signature storage for admins
+
+        # Change status to approved
         req_record.status = 'approved'
-        db.session.commit()
+        db.session.commit()  # Commit first to save the status
+
+        # Generate PDF with LaTeX
+        from pdf_utils import generate_student_drop_pdf
+        pdf_path = generate_student_drop_pdf(req_record, admin_signature)
+
+        # Store the PDF path in the request record
+        if pdf_path:
+            # If this is the first generated PDF
+            if not req_record.generated_pdfs:
+                req_record.generated_pdfs = json.dumps([pdf_path])
+            else:
+                # Otherwise append to existing list
+                pdfs = json.loads(req_record.generated_pdfs)
+                pdfs.append(pdf_path)
+                req_record.generated_pdfs = json.dumps(pdfs)
+
+            db.session.commit()
+
     return redirect(url_for('notification'))
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
 def reject_student_drop(request_id):
@@ -808,7 +834,7 @@ def reject_student_drop(request_id):
 @app.route('/student_initiated_drop')
 def student_initiated_drop():
     return render_template('student_initiated_drop.html')
-=======
+
 @app.route('/drafts')
 def drafts():
     """View draft medical withdrawal requests"""
@@ -818,7 +844,7 @@ def drafts():
     
     draft_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id, status='draft').all()
     return render_template('drafts.html', draft_requests=draft_requests)
->>>>>>> d615be9da52f5374745d0c60d1b09838931e88c6
+
 
 if __name__ == "__main__":
     with app.app_context():

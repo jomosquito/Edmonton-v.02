@@ -111,12 +111,6 @@
       line-height: 1.6;
     }
 
-    .card .icon {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
-
     .button {
       display: inline-block;
       padding: 12px 24px;
@@ -137,50 +131,6 @@
       transform: translateY(-2px);
       box-shadow: 0 5px 12px rgba(200, 16, 46, 0.4);
     }
-
-    .intro-text {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .intro-text h1 {
-      color: var(--primary-color);
-      margin-bottom: 10px;
-    }
-
-    .intro-text p {
-      line-height: 1.6;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .feature-card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      text-align: center;
-    }
-
-    .feature-card i {
-      font-size: 32px;
-      margin-bottom: 15px;
-      color: var(--accent-color);
-    }
-
-    .feature-card h3 {
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
   </style>
 </head>
 
@@ -197,36 +147,16 @@
       </ul>
     </nav>
     <main>
-      <div class="intro-text">
-        <h1>Available Request Forms</h1>
-        <p>Select from the following forms to submit a request to the University of Houston. Make sure to complete all required fields and upload any necessary documentation.</p>
-      </div>
-
-      <!-- Medical/Administrative Withdrawal Card -->
       <div class="card">
         <h2>Medical/Administrative Term Withdrawal</h2>
         <p>Use this form to request a complete withdrawal from all courses for medical or administrative reasons. This request requires supporting documentation and approval from multiple departments.</p>
-        <p>For medical withdrawals, you'll need documentation from a healthcare provider. For administrative withdrawals, appropriate documentation will be required based on the nature of your request.</p>
         <a href="{{ url_for('medical_withdrawal_form') }}" class="button">Complete Form</a>
       </div>
 
-      <!-- Information Section -->
-      <div class="features">
-        <div class="feature-card">
-          <i>📋</i>
-          <h3>Documentation Required</h3>
-          <p>All withdrawal requests require appropriate supporting documentation uploaded with your submission.</p>
-        </div>
-        <div class="feature-card">
-          <i>⏱️</i>
-          <h3>Submission Deadline</h3>
-          <p>Requests must be filed no later than 140 days following the close of the semester.</p>
-        </div>
-        <div class="feature-card">
-          <i>📱</i>
-          <h3>Check Status</h3>
-          <p>Track the status of your requests in the Request Statuses page.</p>
-        </div>
+      <div class="card">
+        <h2>Student-Initiated Drop Request</h2>
+        <p>Use this form to request a drop for a specific course. Ensure all required fields are completed before submission.</p>
+        <a href="{{ url_for('student_initiated_drop') }}" class="button">Complete Form</a>
       </div>
     </main>
   </div>
