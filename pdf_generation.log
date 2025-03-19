@@ -1,0 +1,1150 @@
+2025-03-18 21:36:35,496 - DEBUG - PDF directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:36:35,496 - DEBUG - Template directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates
+2025-03-18 21:36:35,498 - DEBUG - Looking for template at: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates\medical_withdrawal_template.tex
+2025-03-18 21:36:35,498 - INFO - Template found at: static\templates\medical_withdrawal_template.tex
+2025-03-18 21:36:35,499 - DEBUG - Using signature file path: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\uploads\signatures\sig_1_20250319023635.png
+2025-03-18 21:36:35,499 - DEBUG - Created temporary LaTeX file at: static\temp\medical_withdrawal_3_pending_20250319023635.tex
+2025-03-18 21:36:35,499 - DEBUG - Searching for pdflatex executable...
+2025-03-18 21:36:35,499 - DEBUG - Trying pdflatex at: pdflatex
+2025-03-18 21:36:35,696 - INFO - Found pdflatex at: pdflatex
+2025-03-18 21:36:35,696 - DEBUG - Running pdflatex with output directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:36:35,696 - DEBUG - Source file: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\temp\medical_withdrawal_3_pending_20250319023635.tex
+2025-03-18 21:36:50,903 - DEBUG - PDF directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:36:50,903 - DEBUG - Template directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates
+2025-03-18 21:36:50,904 - DEBUG - Looking for template at: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates\medical_withdrawal_template.tex
+2025-03-18 21:36:50,904 - INFO - Template found at: static\templates\medical_withdrawal_template.tex
+2025-03-18 21:36:50,904 - DEBUG - Using signature file path: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\uploads\signatures\sig_1_20250319023650.png
+2025-03-18 21:36:50,905 - DEBUG - Created temporary LaTeX file at: static\temp\medical_withdrawal_4_pending_20250319023650.tex
+2025-03-18 21:36:50,905 - DEBUG - Searching for pdflatex executable...
+2025-03-18 21:36:50,905 - DEBUG - Trying pdflatex at: pdflatex
+2025-03-18 21:36:51,099 - INFO - Found pdflatex at: pdflatex
+2025-03-18 21:36:51,099 - DEBUG - Running pdflatex with output directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:36:51,099 - DEBUG - Source file: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\temp\medical_withdrawal_4_pending_20250319023650.tex
+2025-03-18 21:36:54,625 - ERROR - Error compiling LaTeX file:
+2025-03-18 21:36:54,625 - ERROR - pdflatex: major issue: So far, you have not checked for MiKTeX updates.
+
+2025-03-18 21:36:54,625 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+
+(C:/Users/masca/OneDrive/Documents/GitHub/Edmonton/static/temp/medical_withdraw
+al_3_pending_20250319023635.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+
+! LaTeX Error: File `kvoptions.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.151 \RequirePackage{kvoptions}[2009/07/17]
+                                            ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\
+pdfs\medical_withdrawal_3_pending_20250319023635.log.
+
+2025-03-18 21:36:54,625 - INFO - 127.0.0.1 - - [18/Mar/2025 21:36:54] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-03-18 21:37:07,692 - ERROR - Error compiling LaTeX file:
+2025-03-18 21:37:07,692 - ERROR - pdflatex: major issue: So far, you have not checked for MiKTeX updates.
+
+2025-03-18 21:37:07,692 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+
+(C:/Users/masca/OneDrive/Documents/GitHub/Edmonton/static/temp/medical_withdraw
+al_4_pending_20250319023650.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atbegshi-ltx.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atveryend-ltx.sty)
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\color.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def)
+No file medical_withdrawal_4_pending_20250319023650.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg))
+
+LaTeX Warning: Reference `LastPage' on page 1 undefined on input line 83.
+
+[1{C:/Users/masca/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319023650.png
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users 
+                                       \masca \OneDrive \Documents \GitHub \...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users \masca 
+                                              \OneDrive \Documents \GitHub \...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...rning: File `C:\Users \masca \OneDrive 
+                                                  \Documents \GitHub \Edmont...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ... `C:\Users \masca \OneDrive \Documents 
+                                                  \GitHub \Edmonton \static ...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...rs \masca \OneDrive \Documents \GitHub 
+                                                  \Edmonton \static \uploads...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...\OneDrive \Documents \GitHub \Edmonton 
+                                                  \static \uploads \signatur...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...e \Documents \GitHub \Edmonton \static 
+                                                  \uploads \signatures \sig ...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...nts \GitHub \Edmonton \static \uploads 
+                                                  \signatures \sig _1_202503...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...\Edmonton \static \uploads \signatures 
+                                                  \sig _1_20250319023650.png...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...nton \static \uploads \signatures \sig 
+                                                  _1_20250319023650.png' not...
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+
+LaTeX Warning: File `C:_1_20250319023650.png' not found on input line 122.
+
+
+! Package pdftex.def Error: File `C:_1_20250319023650.png' not found: using dra
+ft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.122 ...oads\signatures\sig_1_20250319023650.png}
+                                                   \\
+
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 127.
+
+[2]
+Overfull \hbox (85.24686pt too wide) in paragraph at lines 152--164
+[][] 
+
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 166.
+
+[3]
+(C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs\medical_withdraw
+al_4_pending_20250319023650.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `medical_withdrawal_4_pending_202503190236
+50.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)<C:/Users/masca/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/masca/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
+masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C
+:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti
+10.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmti12.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmtt12.pfb>
+Output written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+\medical_withdrawal_4_pending_20250319023650.pdf (3 pages, 98649 bytes).
+Transcript written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\
+pdfs\medical_withdrawal_4_pending_20250319023650.log.
+
+2025-03-18 21:37:07,692 - INFO - 127.0.0.1 - - [18/Mar/2025 21:37:07] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-03-18 21:37:07,700 - INFO - 127.0.0.1 - - [18/Mar/2025 21:37:07] "GET /status HTTP/1.1" 200 -
+2025-03-18 21:39:21,002 - INFO - 127.0.0.1 - - [18/Mar/2025 21:39:21] "GET /settings HTTP/1.1" 200 -
+2025-03-18 21:39:21,881 - INFO - 127.0.0.1 - - [18/Mar/2025 21:39:21] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+2025-03-18 21:39:21,895 - INFO - 127.0.0.1 - - [18/Mar/2025 21:39:21] "[36mGET /static/css/medical_withdrawal.css HTTP/1.1[0m" 304 -
+2025-03-18 21:39:21,904 - INFO - 127.0.0.1 - - [18/Mar/2025 21:39:21] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+2025-03-18 21:40:28,688 - DEBUG - PDF directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:40:28,688 - DEBUG - Template directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates
+2025-03-18 21:40:28,688 - DEBUG - Looking for template at: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates\medical_withdrawal_template.tex
+2025-03-18 21:40:28,688 - INFO - Template found at: static\templates\medical_withdrawal_template.tex
+2025-03-18 21:40:28,689 - DEBUG - Using signature file path: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\uploads\signatures\sig_1_20250319024028_jurors_favorite_award_1.jpg
+2025-03-18 21:40:28,689 - DEBUG - Created temporary LaTeX file at: static\temp\medical_withdrawal_5_pending_20250319024028.tex
+2025-03-18 21:40:28,689 - DEBUG - Searching for pdflatex executable...
+2025-03-18 21:40:28,689 - DEBUG - Trying pdflatex at: pdflatex
+2025-03-18 21:40:28,881 - INFO - Found pdflatex at: pdflatex
+2025-03-18 21:40:28,881 - DEBUG - Running pdflatex with output directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:40:28,881 - DEBUG - Source file: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\temp\medical_withdrawal_5_pending_20250319024028.tex
+2025-03-18 21:40:29,351 - ERROR - Error compiling LaTeX file:
+2025-03-18 21:40:29,351 - ERROR - pdflatex: major issue: So far, you have not checked for MiKTeX updates.
+
+2025-03-18 21:40:29,351 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+
+(C:/Users/masca/OneDrive/Documents/GitHub/Edmonton/static/temp/medical_withdraw
+al_5_pending_20250319024028.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atbegshi-ltx.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atveryend-ltx.sty)
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\color.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def)
+No file medical_withdrawal_5_pending_20250319024028.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg))
+
+LaTeX Warning: Reference `LastPage' on page 1 undefined on input line 83.
+
+[1{C:/Users/masca/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024028_juro...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024028_jurors_f...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024028_juro...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024028_jurors_f...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024028_juro...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024028_jurors_f...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users 
+                                       \masca \OneDrive \Documents \GitHub \...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users \masca 
+                                              \OneDrive \Documents \GitHub \...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...rning: File `C:\Users \masca \OneDrive 
+                                                  \Documents \GitHub \Edmont...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ... `C:\Users \masca \OneDrive \Documents 
+                                                  \GitHub \Edmonton \static ...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...rs \masca \OneDrive \Documents \GitHub 
+                                                  \Edmonton \static \uploads...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...\OneDrive \Documents \GitHub \Edmonton 
+                                                  \static \uploads \signatur...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...e \Documents \GitHub \Edmonton \static 
+                                                  \uploads \signatures \sig ...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...nts \GitHub \Edmonton \static \uploads 
+                                                  \signatures \sig _1_202503...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...\Edmonton \static \uploads \signatures 
+                                                  \sig _1_20250319024028_jur...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+! Undefined control sequence.
+<write> ...nton \static \uploads \signatures \sig 
+                                                  _1_20250319024028_jurors_f...
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+
+LaTeX Warning: File `C:_1_20250319024028_jurors_favorite_award_1.jpg' not found
+ on input line 122.
+
+
+! Package pdftex.def Error: File `C:_1_20250319024028_jurors_favorite_award_1.j
+pg' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.122 ...250319024028_jurors_favorite_award_1.jpg}
+                                                   \\
+
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 127.
+
+[2]
+Overfull \hbox (85.24686pt too wide) in paragraph at lines 152--164
+[][] 
+
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 166.
+
+[3]
+(C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs\medical_withdraw
+al_5_pending_20250319024028.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `medical_withdrawal_5_pending_202503190240
+28.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)<C:/Users/masca/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/masca/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
+masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C
+:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti
+10.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmti12.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmtt12.pfb>
+Output written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+\medical_withdrawal_5_pending_20250319024028.pdf (3 pages, 100958 bytes).
+Transcript written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\
+pdfs\medical_withdrawal_5_pending_20250319024028.log.
+
+2025-03-18 21:40:29,352 - INFO - 127.0.0.1 - - [18/Mar/2025 21:40:29] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-03-18 21:40:29,358 - INFO - 127.0.0.1 - - [18/Mar/2025 21:40:29] "GET /status HTTP/1.1" 200 -
+2025-03-18 21:45:37,835 - DEBUG - PDF directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:45:37,835 - DEBUG - Template directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates
+2025-03-18 21:45:37,836 - DEBUG - Looking for template at: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\templates\medical_withdrawal_template.tex
+2025-03-18 21:45:37,836 - INFO - Template found at: static\templates\medical_withdrawal_template.tex
+2025-03-18 21:45:37,837 - DEBUG - Using signature file path: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\uploads\signatures\sig_1_20250319024537_image.png
+2025-03-18 21:45:37,838 - DEBUG - Created temporary LaTeX file at: static\temp\medical_withdrawal_6_pending_20250319024537.tex
+2025-03-18 21:45:37,838 - DEBUG - Searching for pdflatex executable...
+2025-03-18 21:45:37,838 - DEBUG - Trying pdflatex at: pdflatex
+2025-03-18 21:45:38,038 - INFO - Found pdflatex at: pdflatex
+2025-03-18 21:45:38,038 - DEBUG - Running pdflatex with output directory: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+2025-03-18 21:45:38,038 - DEBUG - Source file: C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\temp\medical_withdrawal_6_pending_20250319024537.tex
+2025-03-18 21:45:38,508 - ERROR - Error compiling LaTeX file:
+2025-03-18 21:45:38,508 - ERROR - pdflatex: major issue: So far, you have not checked for MiKTeX updates.
+
+2025-03-18 21:45:38,508 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.3) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+
+(C:/Users/masca/OneDrive/Documents/GitHub/Edmonton/static/temp/medical_withdraw
+al_6_pending_20250319024537.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.s
+ty) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc
+.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atbegshi-ltx.sty))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/base\atveryend-ltx.sty)
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfil
+echeck.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquec
+ounter.sty)))
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\color.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+) (C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def)
+No file medical_withdrawal_6_pending_20250319024537.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+(C:\Users\masca\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg))
+
+LaTeX Warning: Reference `LastPage' on page 1 undefined on input line 83.
+
+[1{C:/Users/masca/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024537_imag...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024537_image.png
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024537_imag...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024537_image.png
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users 
+                   masca OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca 
+                         OneDrive Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive 
+                                  Documents GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> C:Users masca OneDrive Documents 
+                                            GitHub Edmonton static uploads s...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ers masca OneDrive Documents GitHub 
+                                                  Edmonton static uploads si...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... OneDrive Documents GitHub Edmonton 
+                                                  static uploads signatures ...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ve Documents GitHub Edmonton static 
+                                                  uploads signatures sig _1_...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...ents GitHub Edmonton static uploads 
+                                                  signatures sig _1_20250319...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ... Edmonton static uploads signatures 
+                                                  sig _1_20250319024537_imag...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<argument> ...onton static uploads signatures sig 
+                                                  _1_20250319024537_image.png
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users 
+                                       \masca \OneDrive \Documents \GitHub \...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> 
+LaTeX Warning: File `C:\Users \masca 
+                                              \OneDrive \Documents \GitHub \...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...rning: File `C:\Users \masca \OneDrive 
+                                                  \Documents \GitHub \Edmont...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ... `C:\Users \masca \OneDrive \Documents 
+                                                  \GitHub \Edmonton \static ...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...rs \masca \OneDrive \Documents \GitHub 
+                                                  \Edmonton \static \uploads...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...\OneDrive \Documents \GitHub \Edmonton 
+                                                  \static \uploads \signatur...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...e \Documents \GitHub \Edmonton \static 
+                                                  \uploads \signatures \sig ...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...nts \GitHub \Edmonton \static \uploads 
+                                                  \signatures \sig _1_202503...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...\Edmonton \static \uploads \signatures 
+                                                  \sig _1_20250319024537_ima...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+! Undefined control sequence.
+<write> ...nton \static \uploads \signatures \sig 
+                                                  _1_20250319024537_image.pn...
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+
+LaTeX Warning: File `C:_1_20250319024537_image.png' not found on input line 122
+.
+
+
+! Package pdftex.def Error: File `C:_1_20250319024537_image.png' not found: usi
+ng draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.122 ...ignatures\sig_1_20250319024537_image.png}
+                                                   \\
+
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 127.
+
+[2]
+Overfull \hbox (85.24686pt too wide) in paragraph at lines 152--164
+[][] 
+
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 166.
+
+[3]
+(C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs\medical_withdraw
+al_6_pending_20250319024537.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `medical_withdrawal_6_pending_202503190245
+37.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)<C:/Users/masca/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/masca/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
+masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C
+:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti
+10.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmti12.pfb><C:/Users/masca/AppData/Local/Programs/MiKTeX/fonts/type1/publi
+c/amsfonts/cm/cmtt12.pfb>
+Output written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\pdfs
+\medical_withdrawal_6_pending_20250319024537.pdf (3 pages, 99413 bytes).
+Transcript written on C:\Users\masca\OneDrive\Documents\GitHub\Edmonton\static\
+pdfs\medical_withdrawal_6_pending_20250319024537.log.
+
+2025-03-18 21:45:38,509 - INFO - 127.0.0.1 - - [18/Mar/2025 21:45:38] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-03-18 21:45:38,517 - INFO - 127.0.0.1 - - [18/Mar/2025 21:45:38] "GET /status HTTP/1.1" 200 -

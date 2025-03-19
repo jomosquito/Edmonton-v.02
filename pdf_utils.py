@@ -3,6 +3,13 @@ import json
 import subprocess
 import shutil
 from datetime import datetime
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, 
+                   filename='pdf_generation.log',
+                   format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
     """
@@ -19,9 +26,15 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
         # Create necessary directories
         pdf_dir = os.path.join('static', 'pdfs')
         temp_dir = os.path.join('static', 'temp')
-        template_dir = os.path.join('templates')
+        
+        # IMPORTANT: Look in the static/templates directory instead of templates
+        template_dir = os.path.join('static', 'templates')
+        
         os.makedirs(pdf_dir, exist_ok=True)
         os.makedirs(temp_dir, exist_ok=True)
+        
+        logger.debug(f"PDF directory: {os.path.abspath(pdf_dir)}")
+        logger.debug(f"Template directory: {os.path.abspath(template_dir)}")
         
         # Status and unique identifier for the file
         status = request_data.status
@@ -29,9 +42,22 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
         
         # Check if LaTeX template exists
         template_path = os.path.join(template_dir, 'medical_withdrawal_template.tex')
+        logger.debug(f"Looking for template at: {os.path.abspath(template_path)}")
+        
         if not os.path.exists(template_path):
-            print(f"Template not found at {template_path}")
-            return None
+            logger.error(f"Template not found at {template_path}")
+            # Try finding it in a different location as a fallback
+            alt_template_path = os.path.join('templates', 'medical_withdrawal_template.tex')
+            logger.debug(f"Trying alternative template location: {os.path.abspath(alt_template_path)}")
+            
+            if os.path.exists(alt_template_path):
+                logger.info(f"Found template at alternative location: {alt_template_path}")
+                template_path = alt_template_path
+            else:
+                logger.error("Template not found in alternative location either")
+                return None
+        else:
+            logger.info(f"Template found at: {template_path}")
             
         # Read the LaTeX template
         with open(template_path, 'r', encoding='utf-8') as file:
@@ -79,13 +105,39 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
         # Initial and signature
         template_content = template_content.replace('INITIAL', request_data.initial)
         
-        # Use absolute path for signature
-        signature_path = os.path.abspath(request_data.signature) if hasattr(request_data, 'signature') and request_data.signature else None
-        if signature_path and os.path.exists(signature_path):
+        # Handle signature based on its type
+        sig_replaced = False
+        if request_data.signature and os.path.exists(request_data.signature):
+            # It's a file path
+            signature_path = os.path.abspath(request_data.signature)
             template_content = template_content.replace('SIGNATURE_PATH', signature_path)
-        else:
-            # No signature available
-            template_content = template_content.replace('\\includegraphics[width=5cm]{SIGNATURE_PATH}', 'No signature provided')
+            sig_replaced = True
+            logger.debug(f"Using signature file path: {signature_path}")
+        elif request_data.signature and request_data.signature.startswith('data:image'):
+            # It's a data URL, save it as an image
+            import base64
+            sig_dir = os.path.join('static', 'uploads', 'signatures')
+            os.makedirs(sig_dir, exist_ok=True)
+            
+            sig_filename = f"temp_sig_{request_data.id}_{file_id}.png"
+            sig_path = os.path.join(sig_dir, sig_filename)
+            
+            try:
+                img_data = request_data.signature.split(',')[1]
+                with open(sig_path, "wb") as f:
+                    f.write(base64.b64decode(img_data))
+                    
+                template_content = template_content.replace('SIGNATURE_PATH', os.path.abspath(sig_path))
+                sig_replaced = True
+                logger.debug(f"Created signature image from data URL: {sig_path}")
+            except Exception as e:
+                logger.error(f"Error processing signature data URL: {str(e)}")
+        
+        if not sig_replaced:
+            # Text signature or no signature
+            sig_text = request_data.signature or 'No signature provided'
+            template_content = template_content.replace('\\includegraphics[width=5cm]{SIGNATURE_PATH}', sig_text)
+            logger.debug(f"Using text for signature: {sig_text}")
         
         # Signature date
         signature_date = request_data.signature_date.strftime('%B %d, %Y') if hasattr(request_data, 'signature_date') and request_data.signature_date else datetime.utcnow().strftime('%B %d, %Y')
@@ -117,6 +169,18 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
             Administrator Signature: & \\includegraphics[width=5cm]{{{admin_sig_path}}} \\\\
             Date: & {datetime.utcnow().strftime('%B %d, %Y')} \\\\
             \\end{{tabular}}"""
+        elif status == 'approved':
+            admin_sig_section = f"""\\section*{{Administrative Approval}}
+            \\begin{{tabular}}{{l l}}
+            Administrator: & Approved electronically \\\\
+            Date: & {datetime.utcnow().strftime('%B %d, %Y')} \\\\
+            \\end{{tabular}}"""
+        elif status == 'rejected':
+            admin_sig_section = f"""\\section*{{Administrative Decision}}
+            \\begin{{tabular}}{{l l}}
+            Status: & \\textbf{{REJECTED}} \\\\
+            Date: & {datetime.utcnow().strftime('%B %d, %Y')} \\\\
+            \\end{{tabular}}"""
             
         template_content = template_content.replace('ADMIN_SIGNATURE_SECTION', admin_sig_section)
         
@@ -127,35 +191,50 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
         with open(tex_path, 'w', encoding='utf-8') as f:
             f.write(template_content)
         
+        logger.debug(f"Created temporary LaTeX file at: {tex_path}")
+        
         # Generate PDF filename
         pdf_filename = f"medical_withdrawal_{request_data.id}_{status}_{file_id}.pdf"
         pdf_path = os.path.join(pdf_dir, pdf_filename)
         
         # Compile the LaTeX file to create a PDF
         try:
-            # Try to find pdflatex
+            # Try to find pdflatex in various locations
+            logger.debug("Searching for pdflatex executable...")
             pdflatex_paths = [
                 "pdflatex",  # Try system PATH first
                 r"C:\Program Files\MiKTeX\miktex\bin\x64\pdflatex.exe",
                 r"C:\Program Files (x86)\MiKTeX\miktex\bin\pdflatex.exe",
+                r"/usr/bin/pdflatex",  # Linux
+                r"/usr/local/bin/pdflatex",  # macOS
+                r"C:\texlive\2022\bin\win32\pdflatex.exe",  # TexLive on Windows
             ]
             
             pdflatex = None
             for path in pdflatex_paths:
                 try:
+                    logger.debug(f"Trying pdflatex at: {path}")
                     result = subprocess.run([path, "--version"], 
-                                           stdout=subprocess.PIPE, 
-                                           stderr=subprocess.PIPE)
+                                         stdout=subprocess.PIPE, 
+                                         stderr=subprocess.PIPE)
                     if result.returncode == 0:
                         pdflatex = path
+                        logger.info(f"Found pdflatex at: {path}")
                         break
-                except:
-                    continue
-                
+                except Exception as e:
+                    logger.debug(f"Failed to execute {path}: {str(e)}")
+            
             if not pdflatex:
-                print("pdflatex not found. Make sure LaTeX is installed.")
+                logger.error("pdflatex not found. Make sure LaTeX is installed.")
                 return None
                 
+            # Run pdflatex with extended error reporting
+            logger.debug(f"Running pdflatex with output directory: {os.path.abspath(pdf_dir)}")
+            logger.debug(f"Source file: {os.path.abspath(tex_path)}")
+            
+            # Create directory if it doesn't exist
+            os.makedirs(pdf_dir, exist_ok=True)
+            
             # Run pdflatex
             process = subprocess.run(
                 [pdflatex, '-interaction=nonstopmode', 
@@ -166,26 +245,52 @@ def generate_medical_withdrawal_pdf(request_data, admin_signature=None):
             
             # Check if PDF was created
             if process.returncode != 0:
-                print("Error compiling LaTeX file:")
-                print(process.stderr)
+                logger.error("Error compiling LaTeX file:")
+                logger.error(process.stderr)
+                logger.error(process.stdout)  # Also log stdout for more context
                 return None
+            
+            # Run pdflatex a second time to resolve references
+            process = subprocess.run(
+                [pdflatex, '-interaction=nonstopmode', 
+                 f'-output-directory={os.path.abspath(pdf_dir)}', 
+                 os.path.abspath(tex_path)],
+                capture_output=True, text=True
+            )
                 
+            # Check if PDF file was actually created
+            expected_pdf_path = os.path.join(pdf_dir, pdf_filename)
+            if os.path.exists(expected_pdf_path):
+                logger.info(f"PDF generated successfully at: {expected_pdf_path}")
+            else:
+                logger.error(f"PDF not found at expected location: {expected_pdf_path}")
+                # Check if PDF has a different name (without file_id perhaps)
+                base_name = f"medical_withdrawal_{request_data.id}_{status}"
+                for file in os.listdir(pdf_dir):
+                    if file.startswith(base_name) and file.endswith('.pdf'):
+                        expected_pdf_path = os.path.join(pdf_dir, file)
+                        logger.info(f"Found PDF with different name: {expected_pdf_path}")
+                        break
+            
             # Clean up auxiliary files
             for ext in ['.aux', '.log', '.out']:
                 aux_file = os.path.join(pdf_dir, f"{os.path.splitext(pdf_filename)[0]}{ext}")
                 if os.path.exists(aux_file):
                     os.remove(aux_file)
+                    logger.debug(f"Removed auxiliary file: {aux_file}")
             
             # Clean up temporary tex file
             os.remove(tex_path)
+            logger.debug(f"Removed temporary LaTeX file: {tex_path}")
                 
-            print(f"PDF generated successfully: {pdf_path}")
-            return pdf_path
+            return expected_pdf_path
             
         except Exception as e:
-            print(f"Error running pdflatex: {str(e)}")
+            logger.error(f"Error running pdflatex: {str(e)}")
             return None
             
     except Exception as e:
-        print(f"Error generating PDF: {str(e)}")
+        logger.error(f"Error generating PDF: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return None
