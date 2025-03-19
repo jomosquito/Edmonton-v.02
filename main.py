@@ -58,7 +58,21 @@ class Profile(db.Model):
     address = db.Column(db.String(200), nullable=True)
     enroll_status = db.Column(db.String(200), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    def set_password(self, password):
+        self.pass_word = generate_password_hash(password)
 
+    def check_password(self, password):
+        return check_password_hash(self.pass_word, password)
+class StudentInitiatedDrop(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_name = db.Column(db.String(100), nullable=False)
+    student_id = db.Column(db.String(20), nullable=False)
+    course_title = db.Column(db.String(200), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    signature = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -134,15 +148,32 @@ def home():
 def status():
     user_id = session.get('user_id')
     if not user_id:
-        return redirect(url_for('login'))
-    medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
-    return render_template('status.html', medical_requests=medical_requests)
+        return redirect(url_for('login'))  # Redirect to login if the user is not logged in
 
+    # Query medical withdrawal requests for the logged-in user
+    medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
+
+    # Query student-initiated drop requests for the logged-in user
+    student_drop_requests = StudentInitiatedDrop.query.filter_by(student_id=user_id).all()
+
+    return render_template(
+        'status.html',
+        medical_requests=medical_requests,
+        student_drop_requests=student_drop_requests
+    )
 @app.route('/notifications')
 def notification():
+    # Query pending medical withdrawal requests
     pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
-    return render_template('notifications.html', pending_medical_requests=pending_medical_requests)
-
+    
+    # Query pending student drop requests
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    
+    return render_template(
+        'notifications.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops
+    )
 @app.route('/creat')
 def index():
     return render_template('add_profile.html')
@@ -604,6 +635,82 @@ def download_documentation(request_id, file_index):
         return "File not found", 404
     
     return send_file(file_path, as_attachment=True)
+
+
+@app.route('/submit_student_drop', methods=['POST'])
+def submit_student_drop():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))  # Redirect to login if the user is not logged in
+
+    # Get form data
+    student_name = request.form.get('studentName')
+    student_id = request.form.get('studentID')
+    course_title = request.form.get('course')
+    reason = request.form.get('reason')
+    date_str = request.form.get('date')  # Get the date as a string
+    signature_type = request.form.get('signature_type')
+
+    # Validate form data
+    if not all([student_name, student_id, course_title, reason, date_str, signature_type]):
+        return "All fields are required", 400
+
+    # Convert the date string to a Python date object
+    try:
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return "Invalid date format. Please use YYYY-MM-DD.", 400
+
+    # Handle signature based on the selected type
+    if signature_type == 'draw':
+        signature_data = request.form.get('signature_data')
+        if not signature_data:
+            return "Signature is required for the selected option", 400
+    elif signature_type == 'upload':
+        signature_upload = request.files.get('signature_upload')
+        if not signature_upload:
+            return "Signature file is required for the selected option", 400
+        # Save the uploaded file (optional)
+        signature_upload.save(f"uploads/{signature_upload.filename}")
+    elif signature_type == 'text':
+        signature_text = request.form.get('signature_text')
+        if not signature_text:
+            return "Typed signature is required for the selected option", 400
+
+    # Save the drop request to the database
+    drop_request = StudentInitiatedDrop(
+        student_name=student_name,
+        student_id=student_id,
+        course_title=course_title,
+        reason=reason,
+        date=date,  # Use the converted Python date object
+        signature=signature_type  # Save the signature type (optional)
+    )
+    db.session.add(drop_request)
+    db.session.commit()
+
+    return redirect(url_for('settings'))  # Redirect back to the settings page
+@app.route('/admin/student_drops')
+def admin_student_drops():
+    drop_requests = StudentInitiatedDrop.query.all()
+    return render_template('admin_student_drops.html', drop_requests=drop_requests)
+@app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
+def approve_student_drop(request_id):
+    req_record = StudentInitiatedDrop.query.get(request_id)
+    if req_record:
+        req_record.status = 'approved'
+        db.session.commit()
+    return redirect(url_for('notification'))
+@app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
+def reject_student_drop(request_id):
+    req_record = StudentInitiatedDrop.query.get(request_id)
+    if req_record:
+        req_record.status = 'rejected'
+        db.session.commit()
+    return redirect(url_for('notification'))
+@app.route('/student_initiated_drop')
+def student_initiated_drop():
+    return render_template('student_initiated_drop.html')
 
 if __name__ == "__main__":
     with app.app_context():
