@@ -19,6 +19,8 @@ db = SQLAlchemy(app)
 
 # Create upload directories
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentation'), exist_ok=True)
+os.makedirs(os.path.join('static', 'pdfs'), exist_ok=True)
+os.makedirs(os.path.join('static', 'temp'), exist_ok=True)
 
 # Microsoft OAuth Credentials
 credentials = (client_id, client_secret)
@@ -108,6 +110,9 @@ class MedicalWithdrawalRequest(db.Model):
     
     # File paths for uploaded documentation
     documentation_files = db.Column(db.Text, nullable=True)  # JSON array of file paths
+    
+    # Add a new field to store paths to generated PDFs
+    generated_pdfs = db.Column(db.Text, nullable=True)  # JSON array of PDF file paths
     
     # Status and timestamps
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
@@ -318,14 +323,6 @@ def add_profile():
     else:
         return render_template('userhompage.html')
 
-@app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
-def reject_medical_withdrawal(request_id):
-    """Reject a medical withdrawal request"""
-    req_record = MedicalWithdrawalRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'rejected'
-        db.session.commit()
-    return redirect(url_for('notification'))
 
 # Change privileges for a profile
 @app.route('/priv/<int:id>')
@@ -409,7 +406,9 @@ def medical_withdrawal_form():
     if not user_id:
         return redirect(url_for('login'))
     user = Profile.query.get(user_id)
-    return render_template('medical_withdrawal.html', user=user)
+    # Add today's date for the form
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    return render_template('medical_withdrawal.html', user=user, today_date=today_date)
 
 @app.route('/submit_medical_withdrawal', methods=['POST'])
 def submit_medical_withdrawal():
@@ -518,7 +517,19 @@ def submit_medical_withdrawal():
         db.session.add(new_request)
         db.session.commit()
         
+        # Generate PDF if the form is being submitted (not saved as draft)
         if request.form.get('action') == 'submit':
+            # Import the PDF generation function
+            from pdf_utils import generate_medical_withdrawal_pdf
+            
+            # Generate the PDF
+            pdf_path = generate_medical_withdrawal_pdf(new_request)
+            
+            # Store the PDF path in the database
+            if pdf_path:
+                new_request.generated_pdfs = json.dumps([pdf_path])
+                db.session.commit()
+            
             return redirect(url_for('status'))
         else:
             return redirect(url_for('drafts'))
@@ -550,9 +561,9 @@ def view_medical_request(request_id):
                           is_admin=is_admin,
                           courses=json.loads(request_record.courses))
 
-
 @app.route('/approve_medical_withdrawal/<int:request_id>', methods=['POST'])
 def approve_medical_withdrawal(request_id):
+    """Approve a medical withdrawal request and generate a PDF"""
     req_record = MedicalWithdrawalRequest.query.get(request_id)
     if req_record:
         # Get admin signature if available
@@ -560,19 +571,104 @@ def approve_medical_withdrawal(request_id):
         admin = Profile.query.get(user_id)
         admin_signature = None  # You'd need to implement signature storage for admins
         
+        # Change status to approved
         req_record.status = 'approved'
+        db.session.commit()  # Commit first to save the status
         
         # Generate PDF with LaTeX
         from pdf_utils import generate_medical_withdrawal_pdf
         pdf_path = generate_medical_withdrawal_pdf(req_record, admin_signature)
         
-        # Store the PDF path in the request record if needed
+        # Store the PDF path in the request record
         if pdf_path:
-            # You might want to add a field to store this path
-            req_record.approved_pdf_path = pdf_path
+            # If this is the first generated PDF
+            if not req_record.generated_pdfs:
+                req_record.generated_pdfs = json.dumps([pdf_path])
+            else:
+                # Otherwise append to existing list
+                pdfs = json.loads(req_record.generated_pdfs)
+                pdfs.append(pdf_path)
+                req_record.generated_pdfs = json.dumps(pdfs)
+                
+            db.session.commit()
             
-        db.session.commit()
     return redirect(url_for('notification'))
+
+@app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
+def reject_medical_withdrawal(request_id):
+    """Reject a medical withdrawal request and generate a PDF"""
+    req_record = MedicalWithdrawalRequest.query.get(request_id)
+    if req_record:
+        # Change status to rejected
+        req_record.status = 'rejected'
+        db.session.commit()  # Commit first to save the status
+        
+        # Generate PDF with LaTeX
+        from pdf_utils import generate_medical_withdrawal_pdf
+        pdf_path = generate_medical_withdrawal_pdf(req_record)
+        
+        # Store the PDF path
+        if pdf_path:
+            # If this is the first generated PDF
+            if not req_record.generated_pdfs:
+                req_record.generated_pdfs = json.dumps([pdf_path])
+            else:
+                # Otherwise append to existing list
+                pdfs = json.loads(req_record.generated_pdfs)
+                pdfs.append(pdf_path)
+                req_record.generated_pdfs = json.dumps(pdfs)
+                
+            db.session.commit()
+            
+    return redirect(url_for('notification'))
+
+@app.route('/download_pdf/<int:request_id>/<string:status>')
+def download_pdf(request_id, status):
+    """Download a generated PDF for a medical withdrawal request"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    request_record = MedicalWithdrawalRequest.query.get(request_id)
+    
+    if not request_record:
+        return "Request not found", 404
+    
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.user_id != user_id:
+        return "Unauthorized", 403
+    
+    # Find the most recent PDF with the given status
+    pdf_dir = os.path.join('static', 'pdfs')
+    search_pattern = f"medical_withdrawal_{request_id}_{status}_"
+    
+    matching_files = []
+    if os.path.exists(pdf_dir):
+        for filename in os.listdir(pdf_dir):
+            if filename.startswith(search_pattern) and filename.endswith('.pdf'):
+                matching_files.append(os.path.join(pdf_dir, filename))
+    
+    if matching_files:
+        # Sort by creation time, newest first
+        latest_pdf = max(matching_files, key=os.path.getctime)
+        return send_file(latest_pdf, as_attachment=True)
+    elif request_record.generated_pdfs:
+        # Check if we have stored paths in the database
+        pdfs = json.loads(request_record.generated_pdfs)
+        # Find PDFs containing the status in their path
+        status_pdfs = [pdf for pdf in pdfs if status in pdf]
+        if status_pdfs:
+            return send_file(status_pdfs[-1], as_attachment=True)
+    
+    # If no PDF found, generate one on the fly
+    from pdf_utils import generate_medical_withdrawal_pdf
+    pdf_path = generate_medical_withdrawal_pdf(request_record)
+    if pdf_path and os.path.exists(pdf_path):
+        return send_file(pdf_path, as_attachment=True)
+    
+    return "PDF file not found", 404
 
 @app.route('/download_documentation/<int:request_id>/<int:file_index>')
 def download_documentation(request_id, file_index):
@@ -604,6 +700,16 @@ def download_documentation(request_id, file_index):
         return "File not found", 404
     
     return send_file(file_path, as_attachment=True)
+
+@app.route('/drafts')
+def drafts():
+    """View draft medical withdrawal requests"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    draft_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id, status='draft').all()
+    return render_template('drafts.html', draft_requests=draft_requests)
 
 if __name__ == "__main__":
     with app.app_context():

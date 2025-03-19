@@ -1,44 +1,31 @@
-# Makefile for generating PDFs from LaTeX templates
+.PHONY: all clean
 
-# Directories
-TEMPLATES_DIR = templates
-TEMP_DIR = static/temp
+# Define the target PDF directory
 PDF_DIR = static/pdfs
-LOGO_DIR = static/templates
+TEMP_DIR = static/temp
 
-# LaTeX command
-LATEX = pdflatex
-LATEX_OPTS = -interaction=nonstopmode
+# Check if directories exist, create if needed
+$(shell mkdir -p $(PDF_DIR) $(TEMP_DIR))
 
-# Rules
-.PHONY: all clean setup create_logo
-
-# Default rule
-all: setup create_logo
-
-# Rule to compile a specific LaTeX file to PDF
+# Define the rule to compile a LaTeX file to PDF
 %.pdf: %.tex
-    $(LATEX) $(LATEX_OPTS) -output-directory=$(PDF_DIR) $<
+    pdflatex -interaction=nonstopmode -output-directory=$(dir $@) $<
+    pdflatex -interaction=nonstopmode -output-directory=$(dir $@) $<
 
-# Setup directory structure
-setup:
-    @mkdir -p $(TEMP_DIR)
-    @mkdir -p $(PDF_DIR)
-    @mkdir -p $(LOGO_DIR)
-    @echo "Directory structure created"
+# Define a rule to create a PDF from a request ID
+pdf-from-request: 
+    @echo "Generating PDF from request ID $(REQUEST_ID)"
+    python -c "from pdf_utils import generate_medical_withdrawal_pdf; from main import MedicalWithdrawalRequest, db; request = MedicalWithdrawalRequest.query.get($(REQUEST_ID)); generate_medical_withdrawal_pdf(request)"
 
-# Create UH logo
-create_logo:
-    @python create_logo.py
+# More thorough clean command
+clean-all:
+    @echo "Cleaning all LaTeX auxiliary files..."
+    @find $(PDF_DIR) -name "*.aux" -o -name "*.log" -o -name "*.out" -type f -delete
+    @find $(TEMP_DIR) -type f -delete
+    @echo "Cleanup complete."
 
-# Generate Medical Withdrawal PDF
-medical_withdrawal:
-    @cp $(TEMPLATES_DIR)/medical_withdrawal_template.tex $(TEMP_DIR)/temp_medical_withdrawal.tex
-    $(LATEX) $(LATEX_OPTS) -output-directory=$(PDF_DIR) $(TEMP_DIR)/temp_medical_withdrawal.tex
-    @echo "Medical Withdrawal PDF generated"
-
-# Clean temporary files
-clean:
-    @rm -f $(PDF_DIR)/*.aux $(PDF_DIR)/*.log $(PDF_DIR)/*.out
-    @rm -f $(TEMP_DIR)/temp_*.tex
-    @echo "Temporary files cleaned"
+# Scheduled cleanup (can be called from cron/scheduled task)
+scheduled-cleanup:
+    @echo "Running scheduled cleanup of auxiliary files..."
+    python clean_latex_files.py
+    @echo "Scheduled cleanup complete."
