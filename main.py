@@ -1,17 +1,24 @@
 # Imports
-from flask import Flask, render_template, url_for, request, redirect, session
+from flask import Flask, render_template, url_for, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from O365 import Account
 import json
+import os
 from config import client_id, client_secret, SECRET_KEY
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import jwt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 db = SQLAlchemy(app)
+
+# Create upload directories
+os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentation'), exist_ok=True)
 
 # Microsoft OAuth Credentials
 credentials = (client_id, client_secret)
@@ -58,34 +65,63 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
-# New Model for Term Withdrawal Requests
-class TermWithdrawalRequest(db.Model):
+# Medical/Administrative Withdrawal Request Model
+class MedicalWithdrawalRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
-    reason = db.Column(db.String(200), nullable=False)
+    
+    # Student Information
+    last_name = db.Column(db.String(100), nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    middle_name = db.Column(db.String(100), nullable=True)
+    myuh_id = db.Column(db.String(20), nullable=False)
+    college = db.Column(db.String(100), nullable=False)
+    plan_degree = db.Column(db.String(100), nullable=False)
+    
+    # Address Information
+    address = db.Column(db.String(200), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(50), nullable=False)
+    zip_code = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    
+    # Withdrawal Information
+    term_year = db.Column(db.String(50), nullable=False)
+    last_date = db.Column(db.Date, nullable=False)
+    reason_type = db.Column(db.String(50), nullable=False)  # Medical or Administrative
+    details = db.Column(db.Text, nullable=False)
+    
+    # Questions
+    financial_assistance = db.Column(db.Boolean, default=False)
+    health_insurance = db.Column(db.Boolean, default=False)
+    campus_housing = db.Column(db.Boolean, default=False)
+    visa_status = db.Column(db.Boolean, default=False)
+    gi_bill = db.Column(db.Boolean, default=False)
+    
+    # Courses as JSON
+    courses = db.Column(db.Text, nullable=False) 
+    
+    # Acknowledgment & Signature
+    initial = db.Column(db.String(10), nullable=False)
+    signature = db.Column(db.String(100), nullable=True)
+    signature_date = db.Column(db.Date, nullable=False)
+    
+    # File paths for uploaded documentation
+    documentation_files = db.Column(db.Text, nullable=True)  # JSON array of file paths
+    
+    # Status and timestamps
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
     # Relationship to access the requesting user's profile
-    user = db.relationship('Profile', backref='withdrawal_requests')
-
-    # Helper properties for display in the admin portal
+    user = db.relationship('Profile', backref='medical_withdrawals')
+    
+    # Helper property for display in the admin portal
     @property
     def request_type(self):
-        return "Term Withdrawal"
+        return f"{self.reason_type} Term Withdrawal"
 
-    @property
-    def details(self):
-        return f"Reason: {self.reason}"
-class AddressChangeRequest(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
-    new_address = db.Column(db.String(200), nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relationship to access the requesting user's profile
-    user = db.relationship('Profile', backref='address_change_requests')
 # -------------------------------
 # Routes
 # -------------------------------
@@ -93,19 +129,19 @@ class AddressChangeRequest(db.Model):
 @app.route('/')
 def home():
     return render_template('login.html')
+
 @app.route('/status')
 def status():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    term_requests = TermWithdrawalRequest.query.filter_by(user_id=user_id).all()
-    address_requests = AddressChangeRequest.query.filter_by(user_id=user_id).all()
-    return render_template('status.html', term_requests=term_requests, address_requests=address_requests)
+    medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
+    return render_template('status.html', medical_requests=medical_requests)
+
 @app.route('/notifications')
 def notification():
-    pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
-    pending_address_requests = AddressChangeRequest.query.filter_by(status='pending').all()
-    return render_template('notifications.html', pending_requests=pending_requests, pending_address_requests=pending_address_requests)
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+    return render_template('notifications.html', pending_medical_requests=pending_medical_requests)
 
 @app.route('/creat')
 def index():
@@ -116,10 +152,12 @@ def index():
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
     return render_template('adminpage.html', profiles=profiles)
+
 @app.route('/a')
 def ad():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
     return render_template('adminpage.html', profiles=profiles)
+
 @app.route('/profile')
 def profileview():
     user_id = session.get('user_id')
@@ -206,7 +244,6 @@ def ap():
 # Microsoft OAuth Endpoints
 # -------------------------------
 def open1():
-
     with open('o365_token.txt', 'r') as token_file:
         token_data = json.load(token_file)
         account_data = token_data.get("Account")
@@ -219,10 +256,8 @@ def open1():
             idtoken = account.get("home_account_id")
 
         return email,idtoken
+
 # Microsoft OAuth Step One
-
-
-# Microsoft OAuth Step Two Callback
 @app.route('/stepone')
 def auth_step_one():
     # Create a callback URL for the next step, replacing '127.0.0.1' with 'localhost'
@@ -282,6 +317,15 @@ def add_profile():
         return redirect('/stepone')
     else:
         return render_template('userhompage.html')
+
+@app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
+def reject_medical_withdrawal(request_id):
+    """Reject a medical withdrawal request"""
+    req_record = MedicalWithdrawalRequest.query.get(request_id)
+    if req_record:
+        req_record.status = 'rejected'
+        db.session.commit()
+    return redirect(url_for('notification'))
 
 # Change privileges for a profile
 @app.route('/priv/<int:id>')
@@ -356,76 +400,210 @@ def logout():
     return redirect(url_for('login'))
 
 # -------------------------------
-# New Endpoints for Term Withdrawal Requests
+# Medical Withdrawal Form Routes
 # -------------------------------
 
-# Endpoint to receive a term withdrawal request from the user
-@app.route('/Termdroprequest', methods=['POST'])
-def term_withdraw_request():
+@app.route('/medical-withdrawal-form')
+def medical_withdrawal_form():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
     user = Profile.query.get(user_id)
-    reason = request.form.get("reason")
-    if not reason:
-        return "No reason selected", 400
-    new_request = TermWithdrawalRequest(user_id=user.id, reason=reason, status='pending')
-    db.session.add(new_request)
-    db.session.commit()  # Ensure the request is saved to the database
-    return redirect(url_for('settings'))
+    return render_template('medical_withdrawal.html', user=user)
 
-# Admin endpoint to view pending term withdrawal requests
-@app.route('/approvals')
-def approvals():
-    pending_requests = TermWithdrawalRequest.query.filter_by(status='pending').all()
-    return render_template('admin_notifications.html', pending_requests=pending_requests)
-
-# Endpoint to approve a pending request
-@app.route('/approve_request/<int:request_id>', methods=['POST'])
-def approve_request(request_id):
-    req_record = TermWithdrawalRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'approved'
-        db.session.commit()
-    return redirect(url_for('notification'))
-@app.route('/reject_request/<int:request_id>', methods=['POST'])
-def reject_request(request_id):
-    req_record = TermWithdrawalRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'rejected'
-        db.session.commit()
-    return redirect(url_for('notification'))
-@app.route('/approve_address_change/<int:request_id>', methods=['POST'])
-def approve_address_change(request_id):
-    req_record = AddressChangeRequest.query.get(request_id)
-    if req_record:
-        user = Profile.query.get(req_record.user_id)
-        if user:
-            user.address = req_record.new_address  # Update the user's address
-        req_record.status = 'approved'
-        db.session.commit()
-    return redirect(url_for('notification'))
-
-@app.route('/reject_address_change/<int:request_id>', methods=['POST'])
-def reject_address_change(request_id):
-    req_record = AddressChangeRequest.query.get(request_id)
-    if req_record:
-        req_record.status = 'rejected'
-        db.session.commit()
-    return redirect(url_for('notification'))
-@app.route('/request_address_change', methods=['POST'])
-def request_address_change():
+@app.route('/submit_medical_withdrawal', methods=['POST'])
+def submit_medical_withdrawal():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
+    
+    try:
+        # Extract course data
+        course_subjects = request.form.getlist('course_subject[]')
+        course_numbers = request.form.getlist('course_number[]')
+        course_sections = request.form.getlist('course_section[]')
+        
+        # Combine course data into JSON
+        courses = []
+        for i in range(len(course_subjects)):
+            if i < len(course_numbers) and i < len(course_sections):
+                courses.append({
+                    'subject': course_subjects[i],
+                    'number': course_numbers[i],
+                    'section': course_sections[i]
+                })
+        
+        # Handle file uploads
+        documentation_files = []
+        if 'documentation' in request.files:
+            files = request.files.getlist('documentation')
+            for file in files:
+                if file and file.filename:
+                    filename = secure_filename(f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{file.filename}")
+                    upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'documentation')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    file_path = os.path.join(upload_dir, filename)
+                    file.save(file_path)
+                    documentation_files.append(file_path)
+        
+        # Process signature based on chosen method
+        signature_type = request.form.get('signature_type')
+        signature = None
+        
+        if signature_type == 'draw':
+            signature_data = request.form.get('signature_data')
+            if signature_data:
+                # Create signature directory
+                signature_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
+                os.makedirs(signature_dir, exist_ok=True)
+                
+                # Generate filename
+                signature_filename = f"sig_{user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.png"
+                signature_path = os.path.join(signature_dir, signature_filename)
+                
+                # Save signature image by parsing data URL
+                if signature_data.startswith('data:image'):
+                    import base64
+                    img_data = signature_data.split(',')[1]
+                    with open(signature_path, "wb") as f:
+                        f.write(base64.b64decode(img_data))
+                    signature = signature_path
+        
+        elif signature_type == 'upload' and 'signature_upload' in request.files:
+            sig_file = request.files['signature_upload']
+            if sig_file and sig_file.filename:
+                signature_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
+                os.makedirs(signature_dir, exist_ok=True)
+                
+                sig_filename = secure_filename(f"sig_{user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{sig_file.filename}")
+                sig_path = os.path.join(signature_dir, sig_filename)
+                sig_file.save(sig_path)
+                signature = sig_path
+        
+        elif signature_type == 'text':
+            # Just store the text as the signature
+            signature = request.form.get('signature_text')
+        
+        # Create new medical withdrawal request
+        new_request = MedicalWithdrawalRequest(
+            user_id=user_id,
+            last_name=request.form.get('last_name'),
+            first_name=request.form.get('first_name'),
+            middle_name=request.form.get('middle_name'),
+            myuh_id=request.form.get('myuh_id'),
+            college=request.form.get('college'),
+            plan_degree=request.form.get('plan_degree'),
+            address=request.form.get('address'),
+            city=request.form.get('city'),
+            state=request.form.get('state'),
+            zip_code=request.form.get('zip'),
+            phone=request.form.get('phone'),
+            term_year=request.form.get('term_year'),
+            last_date=datetime.strptime(request.form.get('last_date'), '%Y-%m-%d'),
+            reason_type=request.form.get('reason'),
+            details=request.form.get('details'),
+            financial_assistance=(request.form.get('financial_assistance') == 'yes'),
+            health_insurance=(request.form.get('health_insurance') == 'yes'),
+            campus_housing=(request.form.get('campus_housing') == 'yes'),
+            visa_status=(request.form.get('visa') == 'yes'),
+            gi_bill=(request.form.get('gi_bill') == 'yes'),
+            courses=json.dumps(courses),
+            initial=request.form.get('initial'),
+            signature=signature,  # This can now be None or a path or text
+            signature_date=datetime.strptime(request.form.get('signature_date'), '%Y-%m-%d'),
+            documentation_files=json.dumps(documentation_files) if documentation_files else None,
+            status='pending' if request.form.get('action') == 'submit' else 'draft'
+        )
+        
+        db.session.add(new_request)
+        db.session.commit()
+        
+        if request.form.get('action') == 'submit':
+            return redirect(url_for('status'))
+        else:
+            return redirect(url_for('drafts'))
+            
+    except Exception as e:
+        print(f"Error processing medical withdrawal: {str(e)}")
+        db.session.rollback()
+        return "An error occurred while processing your request. Please try again.", 500
+
+@app.route('/view-medical-request/<int:request_id>')
+def view_medical_request(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
     user = Profile.query.get(user_id)
-    new_address = request.form.get("new_address")
-    if not new_address:
-        return "No address provided", 400
-    address_request = AddressChangeRequest(user_id=user.id, new_address=new_address, status='pending')
-    db.session.add(address_request)
-    db.session.commit()
-    return redirect(url_for('settings'))
+    request_record = MedicalWithdrawalRequest.query.get(request_id)
+    
+    if not request_record:
+        return "Request not found", 404
+    
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.user_id != user_id:
+        return "Unauthorized", 403
+    
+    return render_template('view_medical_request.html', 
+                          request=request_record,
+                          is_admin=is_admin,
+                          courses=json.loads(request_record.courses))
+
+
+@app.route('/approve_medical_withdrawal/<int:request_id>', methods=['POST'])
+def approve_medical_withdrawal(request_id):
+    req_record = MedicalWithdrawalRequest.query.get(request_id)
+    if req_record:
+        # Get admin signature if available
+        user_id = session.get('user_id')
+        admin = Profile.query.get(user_id)
+        admin_signature = None  # You'd need to implement signature storage for admins
+        
+        req_record.status = 'approved'
+        
+        # Generate PDF with LaTeX
+        from pdf_utils import generate_medical_withdrawal_pdf
+        pdf_path = generate_medical_withdrawal_pdf(req_record, admin_signature)
+        
+        # Store the PDF path in the request record if needed
+        if pdf_path:
+            # You might want to add a field to store this path
+            req_record.approved_pdf_path = pdf_path
+            
+        db.session.commit()
+    return redirect(url_for('notification'))
+
+@app.route('/download_documentation/<int:request_id>/<int:file_index>')
+def download_documentation(request_id, file_index):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    request_record = MedicalWithdrawalRequest.query.get(request_id)
+    
+    if not request_record:
+        return "Request not found", 404
+    
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.user_id != user_id:
+        return "Unauthorized", 403
+    
+    # Get documentation files
+    if not request_record.documentation_files:
+        return "No documentation files found", 404
+    
+    files = json.loads(request_record.documentation_files)
+    if file_index >= len(files):
+        return "File not found", 404
+    
+    file_path = files[file_index]
+    if not os.path.exists(file_path):
+        return "File not found", 404
+    
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == "__main__":
     with app.app_context():

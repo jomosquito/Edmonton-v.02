@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Notifications</title>
-  <a class="btn-back" href="{{ url_for('admin') }}">Return to Admin Page</a>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,114 +13,172 @@
       margin: 0;
       padding: 20px;
     }
+    
+    h1 {
+      margin-top: 30px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
       background-color: #fff;
       color: #000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
     }
+    
     th, td {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 12px;
       text-align: left;
     }
+    
     th {
       background-color: #6a5acd;
       color: #fff;
+      font-weight: 600;
     }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    
     button {
-      padding: 5px 10px;
+      padding: 8px 16px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 3px;
+      border-radius: 4px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
     button.reject {
       background-color: #f44336;
     }
+    
     .btn-back {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: #2575fc;
       color: #fff;
       text-decoration: none;
       border-radius: 5px;
       transition: background 0.3s ease;
-      margin-top: 20px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    
     .btn-back:hover {
       background: #6a11cb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .no-requests {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    @media (max-width: 768px) {
+      table {
+        font-size: 14px;
+      }
+      
+      th, td {
+        padding: 8px;
+      }
+      
+      .actions-cell {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      button {
+        width: 100%;
+        margin-bottom: 5px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>Pending Term Withdrawal Requests</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User ID</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for request in pending_requests %}
-      <tr>
-        <td>{{ request.id }}</td>
-        <td>{{ request.user_id }}</td>
-        <td>{{ request.reason }}</td>
-        <td>{{ request.status }}</td>
-        <td>
-          <form action="{{ url_for('approve_request', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit">Approve</button>
-          </form>
-          <form action="{{ url_for('reject_request', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="reject">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="admin-header">
+    <h1>Admin Notifications</h1>
+    <a class="btn-back" href="{{ url_for('admin') }}">Return to Admin Page</a>
+  </div>
 
-  <h1>Pending Address Change Requests</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User ID</th>
-        <th>New Address</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for request in pending_address_requests %}
-      <tr>
-        <td>{{ request.id }}</td>
-        <td>{{ request.user_id }}</td>
-        <td>{{ request.new_address }}</td>
-        <td>{{ request.status }}</td>
-        <td>
-          <form action="{{ url_for('approve_address_change', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit">Approve</button>
-          </form>
-          <form action="{{ url_for('reject_address_change', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="reject">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <!-- Back to Admin Page Button -->
+  <h1>Pending Medical/Administrative Withdrawal Requests</h1>
   
+  {% if pending_medical_requests %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Student</th>
+        <th>Type</th>
+        <th>Term</th>
+        <th>Submission Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for request in pending_medical_requests %}
+      <tr>
+        <td>{{ request.id }}</td>
+        <td>{{ request.first_name }} {{ request.last_name }}</td>
+        <td>{{ request.reason_type }} Withdrawal</td>
+        <td>{{ request.term_year }}</td>
+        <td>{{ request.created_at.strftime('%m/%d/%Y') }}</td>
+        <td class="actions-cell">
+          <form action="{{ url_for('view_medical_request', request_id=request.id) }}" method="get" style="display:inline;">
+            <button type="submit">View</button>
+          </form>
+          <form action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}" method="post" style="display:inline;">
+            <button type="submit">Approve</button>
+          </form>
+          <form action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="reject">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="no-requests">
+    <p>There are no pending medical withdrawal requests at this time.</p>
+  </div>
+  {% endif %}
 </body>
 
 </html>
