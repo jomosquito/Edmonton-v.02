@@ -22,6 +22,11 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentation'), exist_ok
 os.makedirs(os.path.join('static', 'pdfs'), exist_ok=True)
 os.makedirs(os.path.join('static', 'temp'), exist_ok=True)
 
+# Custom filter for JSON parsing
+@app.template_filter('from_json')
+def from_json(value):
+    return json.loads(value) if value else []
+
 # Microsoft OAuth Credentials
 credentials = (client_id, client_secret)
 scopes = ['Mail.ReadWrite', 'Mail.Send', 'email']
