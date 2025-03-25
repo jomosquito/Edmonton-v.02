@@ -1,134 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Notifications</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #6a5acd; /* blueish purple */
+        color: #fff;
+        margin: 0;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        color: #000;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #6a5acd;
+        color: #fff;
+      }
+      button {
+        padding: 5px 10px;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+      button[disabled] {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      button.approve {
+        background-color: #4caf50;
+      }
+      button.approve:hover:not([disabled]) {
+        background-color: #45a049;
+      }
+      button.reject {
+        background-color: #f44336;
+      }
+      button.reject:hover:not([disabled]) {
+        background-color: #d32f2f;
+      }
+      .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #2575fc;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+        margin-top: 20px;
+      }
+      .btn-back:hover {
+        background: #6a11cb;
+      }
+      .view-pdf {
+        background-color: #2196F3;
+        color: white;
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      .view-pdf:hover {
+        background-color: #0b7dda;
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+      .request-row-viewed {
+        background-color: #e8f5e9;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Notifications</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #6a5acd; /* blueish purple */
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #fff;
-      color: #000;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #6a5acd;
-      color: #fff;
-    }
-    button {
-      padding: 5px 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    button.reject {
-      background-color: #f44336;
-    }
-    .btn-back {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #2575fc;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background 0.3s ease;
-      margin-top: 20px;
-    }
-    .btn-back:hover {
-      background: #6a11cb;
-    }
-  </style>
-</head>
+  <body>
+    <h1>Admin Notifications</h1>
 
-<body>
-  <h1>Admin Notifications</h1>
+    <!-- Pending Medical Withdrawal Requests -->
+    <h2>Pending Medical Withdrawal Requests</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in pending_medical_requests %}
+        <tr id="request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
+          <td>{{ request.id }}</td>
+          <td>{{ request.user_id }}</td>
+          <td>{{ request.first_name }} {{ request.last_name }}</td>
+          <td>{{ request.reason_type }}</td>
+          <td>{{ request.status }}</td>
+          <td>
+            <div class="request-actions">
+              <!-- View PDF button -->
+              <a
+                href="{{ url_for('download_pdf', request_id=request.id, status='pending') }}"
+                class="view-pdf"
+                target="_blank"
+                onclick="markAsViewed({{ request.id }}, {{ session.get('user_id') }})"
+              >
+                View PDF
+              </a>
 
-  <!-- Pending Medical Withdrawal Requests -->
-  <h2>Pending Medical Withdrawal Requests</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User ID</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for request in pending_medical_requests %}
-      <tr>
-        <td>{{ request.id }}</td>
-        <td>{{ request.user_id }}</td>
-        <td>{{ request.reason_type }}</td>
-        <td>{{ request.status }}</td>
-        <td>
-          <form action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit">Approve</button>
-          </form>
-          <form action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="reject">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+              <!-- Show approve/reject buttons - initially disabled -->
+              <form
+                action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}"
+                method="post"
+                style="display: inline"
+              >
+                <button 
+                  type="submit" 
+                  class="approve" 
+                  id="approve-{{ request.id }}"
+                  {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                >
+                  Approve
+                </button>
+              </form>
 
-  <!-- Pending Student Drop Requests -->
-  <h2>Pending Student Drop Requests</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Student Name</th>
-        <th>Student ID</th>
-        <th>Course Title</th>
-        <th>Reason</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for request in pending_student_drops %}
-      <tr>
-        <td>{{ request.id }}</td>
-        <td>{{ request.student_name }}</td>
-        <td>{{ request.student_id }}</td>
-        <td>{{ request.course_title }}</td>
-        <td>{{ request.reason }}</td>
-        <td>{{ request.status }}</td>
-        <td>
-          <form action="{{ url_for('approve_student_drop', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit">Approve</button>
-          </form>
-          <form action="{{ url_for('reject_student_drop', request_id=request.id) }}" method="post" style="display:inline;">
-            <button type="submit" class="reject">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+              <form
+                action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}"
+                method="post"
+                style="display: inline"
+              >
+                <button 
+                  type="submit" 
+                  class="reject"
+                  id="reject-{{ request.id }}"
+                  {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                >
+                  Reject
+                </button>
+              </form>
+              
+              <!-- Status message -->
+              <span id="status-{{ request.id }}" class="tooltip">
+                {% if not request.has_admin_viewed(session.get('user_id')) %}
+                <span class="tooltiptext">View PDF first</span>
+                {% endif %}
+              </span>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <!-- Back to Admin Page Button -->
-  <a class="btn-back" href="{{ url_for('admin') }}">Return to Admin Page</a>
-</body>
+    <!-- Pending Student Drop Requests -->
+    <h2>Pending Student Drop Requests</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Student Name</th>
+          <th>Student ID</th>
+          <th>Course Title</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in pending_student_drops %}
+        <tr>
+          <td>{{ request.id }}</td>
+          <td>{{ request.student_name }}</td>
+          <td>{{ request.student_id }}</td>
+          <td>{{ request.course_title }}</td>
+          <td>{{ request.reason }}</td>
+          <td>{{ request.status }}</td>
+          <td>
+            <form
+              action="{{ url_for('approve_student_drop', request_id=request.id) }}"
+              method="post"
+              style="display: inline"
+            >
+              <button type="submit" class="approve">Approve</button>
+            </form>
+            <form
+              action="{{ url_for('reject_student_drop', request_id=request.id) }}"
+              method="post"
+              style="display: inline"
+            >
+              <button type="submit" class="reject">Reject</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
+    <!-- Back to Admin Page Button -->
+    <a class="btn-back" href="{{ url_for('admin') }}">Return to Admin Page</a>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // Any initial setup
+      });
+
+      // Function to handle AJAX update when PDF is viewed
+      function markAsViewed(requestId, adminId) {
+        // After PDF is opened, wait a moment and then update UI
+        setTimeout(() => {
+          // Enable the buttons
+          document.getElementById(`approve-${requestId}`).disabled = false;
+          document.getElementById(`reject-${requestId}`).disabled = false;
+          
+          // Add viewed class to row
+          document.getElementById(`request-${requestId}`).classList.add('request-row-viewed');
+          
+          // Remove tooltip
+          document.getElementById(`status-${requestId}`).innerHTML = '';
+
+          // Add visual feedback
+          let statusElem = document.getElementById(`status-${requestId}`);
+          statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+          
+          // After showing confirmation for 3 seconds, remove it
+          setTimeout(() => {
+            statusElem.innerHTML = '';
+          }, 3000);
+          
+          // Make AJAX call to update server-side state
+          fetch(`/mark_pdf_viewed/${requestId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+        }, 2000); // Wait 2 seconds to simulate viewing the PDF
+      }
+    </script>
+  </body>
 </html>

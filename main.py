@@ -141,6 +141,15 @@ class MedicalWithdrawalRequest(db.Model):
     # Relationship to access the requesting user's profile
     user = db.relationship('Profile', backref='medical_withdrawals')
     
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+
+    # Helper method to check if an admin has viewed the request
+    def has_admin_viewed(self, admin_id):
+        if not self.admin_viewed:
+            return False
+        viewed_by = json.loads(self.admin_viewed)
+        return str(admin_id) in viewed_by
+    
     # Helper property for display in the admin portal
     @property
     def request_type(self):
@@ -622,62 +631,88 @@ def view_medical_request(request_id):
 @app.route('/approve_medical_withdrawal/<int:request_id>', methods=['POST'])
 def approve_medical_withdrawal(request_id):
     """Approve a medical withdrawal request and generate a PDF"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+        
     req_record = MedicalWithdrawalRequest.query.get(request_id)
-    if req_record:
-        # Get admin signature if available
-        user_id = session.get('user_id')
-        admin = Profile.query.get(user_id)
-        admin_signature = None  # You'd need to implement signature storage for admins
+    if not req_record:
+        return "Request not found", 404
         
-        # Change status to approved
-        req_record.status = 'approved'
-        db.session.commit()  # Commit first to save the status
-        
-        # Generate PDF with LaTeX
-        from pdf_utils import generate_medical_withdrawal_pdf
-        pdf_path = generate_medical_withdrawal_pdf(req_record, admin_signature)
-        
-        # Store the PDF path in the request record
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-                
-            db.session.commit()
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before approving", 400
+    
+    # Change status to approved
+    req_record.status = 'approved'
+    db.session.commit()
+    
+    # Get admin signature if available
+    admin_signature = None  # You'd need to implement signature storage for admins
+    
+    # Generate PDF with LaTeX
+    from pdf_utils import generate_medical_withdrawal_pdf
+    pdf_path = generate_medical_withdrawal_pdf(req_record, admin_signature)
+    
+    # Store the PDF path in the request record
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
             
+        db.session.commit()
+        
     return redirect(url_for('notification'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
 def reject_medical_withdrawal(request_id):
     """Reject a medical withdrawal request and generate a PDF"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+        
     req_record = MedicalWithdrawalRequest.query.get(request_id)
-    if req_record:
-        # Change status to rejected
-        req_record.status = 'rejected'
-        db.session.commit()  # Commit first to save the status
+    if not req_record:
+        return "Request not found", 404
         
-        # Generate PDF with LaTeX
-        from pdf_utils import generate_medical_withdrawal_pdf
-        pdf_path = generate_medical_withdrawal_pdf(req_record)
-        
-        # Store the PDF path
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-                
-            db.session.commit()
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before rejecting", 400
+    
+    # Change status to rejected
+    req_record.status = 'rejected'
+    db.session.commit()
+    
+    # Generate PDF with LaTeX
+    from pdf_utils import generate_medical_withdrawal_pdf
+    pdf_path = generate_medical_withdrawal_pdf(req_record)
+    
+    # Store the PDF path
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
             
+        db.session.commit()
+        
     return redirect(url_for('notification'))
 
 @app.route('/download_pdf/<int:request_id>/<string:status>')
@@ -698,6 +733,18 @@ def download_pdf(request_id, status):
     if not is_admin and request_record.user_id != user_id:
         return "Unauthorized", 403
     
+    # If admin is viewing, mark as viewed
+    if is_admin:
+        if not request_record.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(request_record.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        request_record.admin_viewed = json.dumps(admin_viewed)
+        db.session.commit()
+    
+    # Rest of existing code remains the same
     # Find the most recent PDF with the given status
     pdf_dir = os.path.join('static', 'pdfs')
     search_pattern = f"medical_withdrawal_{request_id}_{status}_"
@@ -754,13 +801,25 @@ def download_documentation(request_id, file_index):
         return "File not found", 404
     
     file_path = files[file_index]
+    
+    # Fix file path - ensure it has the correct path structure
     if not os.path.exists(file_path):
-        return "File not found", 404
+        # Try prefixing with static if the path starts with uploads
+        if (file_path.startswith('uploads/')):
+            fixed_path = os.path.join('static', file_path)
+            if os.path.exists(fixed_path):
+                file_path = fixed_path
+        # Try other common path variations
+        elif not file_path.startswith('static/'):
+            fixed_path = os.path.join('static', 'uploads', os.path.basename(file_path))
+            if os.path.exists(fixed_path):
+                file_path = fixed_path
+    
+    # Final check if file exists
+    if not os.path.exists(file_path):
+        return "File not found at path: " + file_path, 404
     
     return send_file(file_path, as_attachment=True)
-
-
-
 
 @app.route('/submit_student_drop', methods=['POST'])
 def submit_student_drop():
