@@ -36,8 +36,8 @@ This project is a web application for managing user profiles.
 
 5. **Run the application:**
    ```sh
+   python migrations.py
     python main.py
-
 
 7. **Open in your web browser:**
    First run, "python migrations.py",
