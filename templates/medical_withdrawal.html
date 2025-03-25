@@ -1,407 +1,673 @@
-.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medical/Administrative Term Withdrawal Form</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/medical_withdrawal.css') }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-  <header>
-    <div class="header-top">
-      <h1>University of Houston</h1>
-      <h2>Medical/Administrative Term Withdrawal Request Form</h2>
-    </div>
-    <div class="header-notice">
-      <p>State law requires that you be informed of the following: (1) with few exceptions, you are entitled on request to be informed about the information the university collects about you by use of this form; (2) under sections 552.021 and 552.023 of the Government Code, you are entitled to receiving and review the information; and (3) under section 559.004 of the Government Code, you are entitled to have the university correct information about you that is incorrect.</p>
-    </div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medical/Administrative Term Withdrawal Form</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/medical_withdrawal.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="header-top">
+        <h1>University of Houston</h1>
+        <h2>Medical/Administrative Term Withdrawal Request Form</h2>
+      </div>
+      <div class="header-notice">
+        <p>
+          State law requires that you be informed of the following: (1) with few
+          exceptions, you are entitled on request to be informed about the
+          information the university collects about you by use of this form; (2)
+          under sections 552.021 and 552.023 of the Government Code, you are
+          entitled to receiving and review the information; and (3) under
+          section 559.004 of the Government Code, you are entitled to have the
+          university correct information about you that is incorrect.
+        </p>
+      </div>
+    </header>
 
-  <div class="form-container">
-    <form action="{{ url_for('submit_medical_withdrawal') }}" method="post" enctype="multipart/form-data">
-      
-      <!-- Student Information Section -->
-      <div class="form-section">
-        <h3>1. Student Information</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" readonly>
+    <div class="form-container">
+      <form
+        action="{{ url_for('submit_medical_withdrawal') }}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <!-- Student Information Section -->
+        <div class="form-section">
+          <h3>1. Student Information</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="last_name">Last Name:</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                value="{{ user.last_name }}"
+                readonly
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="first_name">First Name:</label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                value="{{ user.first_name }}"
+                readonly
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="middle_name">Middle Name:</label>
+              <input type="text" id="middle_name" name="middle_name" />
+            </div>
           </div>
-          
-          <div class="form-group">
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" readonly>
-          </div>
-          
-          <div class="form-group">
-            <label for="middle_name">Middle Name:</label>
-            <input type="text" id="middle_name" name="middle_name">
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="myuh_id">myUH ID:</label>
-            <input type="text" id="myuh_id" name="myuh_id" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="college">College:</label>
-            <input type="text" id="college" name="college" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="plan_degree">Plan/Degree:</label>
-            <input type="text" id="plan_degree" name="plan_degree" required>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Address Section -->
-      <div class="form-section">
-        <h3>2. Current Mailing Address</h3>
-        
-        <div class="form-row">
-          <div class="form-group address-group">
-            <label for="address">Address:</label>
-            <input type="text" id="address" name="address" value="{{ user.address }}" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" value="{{ user.phoneN_ }}" required>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="state">State:</label>
-            <input type="text" id="state" name="state" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="zip">Zip:</label>
-            <input type="text" id="zip" name="zip" required>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Rest of the form remains the same until the signature section -->
-      
-      <!-- Term Information Section -->
-      <div class="form-section">
-        <h3>3. Term Information</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="term_year">Term & Year for Withdrawal:</label>
-            <select id="term_year" name="term_year" required>
-              <option value="" disabled selected>Select Term & Year</option>
-              <option value="Fall 2024">Fall 2024</option>
-              <option value="Spring 2025">Spring 2025</option>
-              <option value="Summer 2025">Summer 2025</option>
-              <option value="Fall 2025">Fall 2025</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Last Date Section -->
-      <div class="form-section">
-        <h3>4. Last Date Attended Classes</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="last_date">Last date you attended classes (for online courses, last date logged in):</label>
-            <input type="date" id="last_date" name="last_date" required>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Reason Section -->
-      <div class="form-section">
-        <h3>5. Reason for Request</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="reason">Reason:</label>
-            <select id="reason" name="reason" required>
-              <option value="" disabled selected>Select a reason</option>
-              <option value="Medical">Medical</option>
-              <option value="Administrative">Administrative</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group full-width">
-            <label for="details">Provide Details:</label>
-            <textarea id="details" name="details" rows="4" required></textarea>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Additional Questions Section -->
-      <div class="form-section">
-        <h3>6. Additional Information</h3>
-        
-        <div class="form-row checkbox-row">
-          <label>Did you receive financial assistance for this semester?</label>
-          <div class="radio-group">
-            <input type="radio" id="financial_yes" name="financial_assistance" value="yes" required>
-            <label for="financial_yes">Yes</label>
-            <input type="radio" id="financial_no" name="financial_assistance" value="no">
-            <label for="financial_no">No</label>
-          </div>
-        </div>
-        
-        <div class="form-row checkbox-row">
-          <label>Do you have UH student health insurance for this semester?</label>
-          <div class="radio-group">
-            <input type="radio" id="insurance_yes" name="health_insurance" value="yes" required>
-            <label for="insurance_yes">Yes</label>
-            <input type="radio" id="insurance_no" name="health_insurance" value="no">
-            <label for="insurance_no">No</label>
-          </div>
-        </div>
-        
-        <div class="form-row checkbox-row">
-          <label>Do you live in campus housing?</label>
-          <div class="radio-group">
-            <input type="radio" id="housing_yes" name="campus_housing" value="yes" required>
-            <label for="housing_yes">Yes</label>
-            <input type="radio" id="housing_no" name="campus_housing" value="no">
-            <label for="housing_no">No</label>
-          </div>
-        </div>
-        
-        <div class="form-row checkbox-row">
-          <label>Do you hold the F1 or J1 Visa?</label>
-          <div class="radio-group">
-            <input type="radio" id="visa_yes" name="visa" value="yes" required>
-            <label for="visa_yes">Yes</label>
-            <input type="radio" id="visa_no" name="visa" value="no">
-            <label for="visa_no">No</label>
-          </div>
-        </div>
-        
-        <div class="form-row checkbox-row">
-          <label>Are you currently utilizing G.I. Bill benefits?</label>
-          <div class="radio-group">
-            <input type="radio" id="gibill_yes" name="gi_bill" value="yes" required>
-            <label for="gibill_yes">Yes</label>
-            <input type="radio" id="gibill_no" name="gi_bill" value="no">
-            <label for="gibill_no">No</label>
-          </div>
-        </div>
-        
-        <div class="important-note">
-          <p><strong>Note:</strong> If you answered yes to any of these questions, you must speak with the appropriate campus office regarding the ramifications of a term withdrawal. A withdrawal is an academic request and may affect finances and other concerns.</p>
-        </div>
-      </div>
-      
-      <!-- Course Section -->
-      <div class="form-section">
-        <h3>7. List all courses and sections to be withdrawn:</h3>
-        
-        <div id="course-container">
-          <div class="course-entry">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Course Subject:</label>
-                <input type="text" name="course_subject[]" placeholder="e.g., ENGL" required>
-              </div>
-              <div class="form-group">
-                <label>Course Number:</label>
-                <input type="text" name="course_number[]" placeholder="e.g., 1301" required>
-              </div>
-              <div class="form-group">
-                <label>Section:</label>
-                <input type="text" name="course_section[]" placeholder="e.g., 001" required>
-              </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="myuh_id">myUH ID:</label>
+              <input type="text" id="myuh_id" name="myuh_id" required />
+            </div>
+
+            <div class="form-group">
+              <label for="college">College:</label>
+              <input type="text" id="college" name="college" required />
+            </div>
+
+            <div class="form-group">
+              <label for="plan_degree">Plan/Degree:</label>
+              <input type="text" id="plan_degree" name="plan_degree" required />
             </div>
           </div>
         </div>
-        
-        <button type="button" id="add-course" class="secondary-button">+ Add Another Course</button>
-      </div>
-      
-      <!-- Acknowledgement Section -->
-      <div class="form-section">
-        <div class="acknowledgement">
-          <p>I understand that a request for a medical or administrative term withdrawal is a request to withdraw from ALL courses I am/was enrolled in for the identified term. The request must be filed no later than 140 days following the close of the semester in which the coursework was taken. The withdrawal, when completed, does not entitle me to a refund if it occurs after State mandated refund periods (<input type="text" name="initial" class="initial-input" required>, I understand). If I am eligible for a refund, it will be applied to any previous balance due, and if I received student financial assistance or a scholarship, I may be required to pay back all or a portion of it. In addition, I certify that the information I have provided is complete and true and I authorize the University of Houston to make any investigation of the facts in this request.</p>
-        </div>
-        
-        <!-- Updated Signature Section with Upload Option -->
-        <div class="form-row signature-row">
-          <div class="form-group">
-            <label for="signature_type">Signature Type:</label>
-            <select id="signature_type" name="signature_type" onchange="toggleSignatureMethod()" required>
-              <option value="" disabled selected>Select signature method</option>
-              <option value="upload">Upload Image</option>
-              <option value="draw">Draw Signature</option>
-              <option value="text">Text Signature</option>
-            </select>
-          </div>
-        </div>
-        
-        <!-- Signature Methods (will be shown/hidden based on selection) -->
-        <div class="form-row signature-methods">
-          <div id="upload-signature" class="signature-method" style="display:none;">
-            <label for="signature_upload">Upload Signature Image:</label>
-            <input type="file" id="signature_upload" name="signature_upload" accept="image/*">
-            <div class="preview-box">
-              <img id="signature-preview" src="#" alt="Your signature will appear here" style="display:none; max-height:100px;">
-            </div>
-          </div>
-          
-          <div id="draw-signature" class="signature-method" style="display:none;">
-            <label>Draw Your Signature:</label>
-            <div class="signature-pad-container">
-              <canvas id="signature-pad" width="400" height="150"></canvas>
-            </div>
-            <button type="button" class="secondary-button" id="clear-signature">Clear</button>
-            <input type="hidden" id="signature_data" name="signature_data">
-          </div>
-          
-          <div id="text-signature" class="signature-method" style="display:none;">
-            <label for="signature_text">Type Your Name:</label>
-            <input type="text" id="signature_text" name="signature_text">
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="signature_date">Date:</label>
-            <input type="date" id="signature_date" name="signature_date" value="{{ today_date }}" readonly>
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email Address:</label>
-            <input type="email" id="email" name="email" value="{{ user.email_ }}" readonly>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Documentation Info Section -->
-      <div class="form-section documentation-section">
-        <h3>Documentation Requirements</h3>
-        <p>A request for withdrawal must include appropriate documentation verifying medical (or for Administrative Withdrawal--extraordinary non-medical) reasons that prevented you from course completion as exampled below:</p>
-        
-        <ul>
-          <li><strong>Medical:</strong> A physician/psychiatrist letter on letterhead, with original signature and license number; must certify dates of treatment; identify medical condition, injury, or treatment that warrants withdrawal; and justify inability to resume or successfully complete studies for the term, in clear support of a medical withdrawal.</li>
-          <li><strong>Primary caregiver:</strong> Physician must certify that immediate family member was being cared for by you; include dates of impediment; bear an original signature and license number.</li>
-          <li><strong>Legal detention:</strong> Legal advisor must certify you were unable to complete coursework due to specific legal issue; include dates of incarceration/court appearance; bear an original signature.</li>
-          <li><strong>Death of immediate family member:</strong> Copy of original death certificate; immediate family member includes mother, father, sister, brother, child, spouse, grandparent.</li>
-          <li><strong>Military deployment:</strong> Copy of the original military orders with active service dates.</li>
-        </ul>
-        
-        <p class="documentation-note">All originals of requested documents must be submitted by the posted deadlines to expedite processing of the approved request. You must submit a statement accepting grade change and loss of completed courses with passing grades, if applicable.</p>
-        
-        <p class="documentation-note">Under a medical withdrawal, an enrollment hold will be placed on your account. In order to lift the hold and return to course enrollment: (a) submit a petition requesting reinstatement, including return from Leave of Absence for doctoral students; and (b) submit a doctor's letter verifying your ability to successfully resume coursework, usually from the same licensed professional who recommended withdrawal. Such documentation for reinstatement from medical withdrawal must be submitted no later than two weeks prior to start of the term of your intended reenrollment. Any future course enrollment will be cancelled unless hold is lifted.</p>
-        
-        <div class="file-upload-section">
-          <label for="documentation">Upload Supporting Documentation:</label>
-          <input type="file" id="documentation" name="documentation" multiple>
-          <p class="file-note">Accepted formats: PDF, JPG, JPEG, PNG (Max size: 10MB)</p>
-        </div>
-      </div>
-      
-      <!-- Form Actions - Updated with draft saving option -->
-      <div class="form-actions">
-        <button type="submit" name="action" value="draft" class="secondary-button">Save as Draft</button>
-        <button type="submit" name="action" value="submit" class="primary-button">Submit for Approval</button>
-        <button type="button" class="secondary-button" onclick="window.location.href='/userhompage'">Cancel</button>
-      </div>
-    </form>
-  </div>
 
-  <footer>
-    <div class="footer-text">
-      <p>University of Houston - Medical/Administrative Term Withdrawal Request Form (Revised 2024)</p>
+        <!-- Address Section -->
+        <div class="form-section">
+          <h3>2. Current Mailing Address</h3>
+
+          <div class="form-row">
+            <div class="form-group address-group">
+              <label for="address">Address:</label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value="{{ user.address }}"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number:</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value="{{ user.phoneN_ }}"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City:</label>
+              <input type="text" id="city" name="city" required />
+            </div>
+
+            <div class="form-group">
+              <label for="state">State:</label>
+              <input type="text" id="state" name="state" required />
+            </div>
+
+            <div class="form-group">
+              <label for="zip">Zip:</label>
+              <input type="text" id="zip" name="zip" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Rest of the form remains the same until the signature section -->
+
+        <!-- Term Information Section -->
+        <div class="form-section">
+          <h3>3. Term Information</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="term_year">Term & Year for Withdrawal:</label>
+              <select id="term_year" name="term_year" required>
+                <option value="" disabled selected>Select Term & Year</option>
+                <option value="Fall 2024">Fall 2024</option>
+                <option value="Spring 2025">Spring 2025</option>
+                <option value="Summer 2025">Summer 2025</option>
+                <option value="Fall 2025">Fall 2025</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Last Date Section -->
+        <div class="form-section">
+          <h3>4. Last Date Attended Classes</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="last_date"
+                >Last date you attended classes (for online courses, last date
+                logged in):</label
+              >
+              <input type="date" id="last_date" name="last_date" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason Section -->
+        <div class="form-section">
+          <h3>5. Reason for Request</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reason">Reason:</label>
+              <select id="reason" name="reason" required>
+                <option value="" disabled selected>Select a reason</option>
+                <option value="Medical">Medical</option>
+                <option value="Administrative">Administrative</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="details">Provide Details:</label>
+              <textarea
+                id="details"
+                name="details"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Questions Section -->
+        <div class="form-section">
+          <h3>6. Additional Information</h3>
+
+          <div class="form-row checkbox-row">
+            <label
+              >Did you receive financial assistance for this semester?</label
+            >
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="financial_yes"
+                name="financial_assistance"
+                value="yes"
+                required
+              />
+              <label for="financial_yes">Yes</label>
+              <input
+                type="radio"
+                id="financial_no"
+                name="financial_assistance"
+                value="no"
+              />
+              <label for="financial_no">No</label>
+            </div>
+          </div>
+
+          <div class="form-row checkbox-row">
+            <label
+              >Do you have UH student health insurance for this semester?</label
+            >
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="insurance_yes"
+                name="health_insurance"
+                value="yes"
+                required
+              />
+              <label for="insurance_yes">Yes</label>
+              <input
+                type="radio"
+                id="insurance_no"
+                name="health_insurance"
+                value="no"
+              />
+              <label for="insurance_no">No</label>
+            </div>
+          </div>
+
+          <div class="form-row checkbox-row">
+            <label>Do you live in campus housing?</label>
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="housing_yes"
+                name="campus_housing"
+                value="yes"
+                required
+              />
+              <label for="housing_yes">Yes</label>
+              <input
+                type="radio"
+                id="housing_no"
+                name="campus_housing"
+                value="no"
+              />
+              <label for="housing_no">No</label>
+            </div>
+          </div>
+
+          <div class="form-row checkbox-row">
+            <label>Do you hold the F1 or J1 Visa?</label>
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="visa_yes"
+                name="visa"
+                value="yes"
+                required
+              />
+              <label for="visa_yes">Yes</label>
+              <input type="radio" id="visa_no" name="visa" value="no" />
+              <label for="visa_no">No</label>
+            </div>
+          </div>
+
+          <div class="form-row checkbox-row">
+            <label>Are you currently utilizing G.I. Bill benefits?</label>
+            <div class="radio-group">
+              <input
+                type="radio"
+                id="gibill_yes"
+                name="gi_bill"
+                value="yes"
+                required
+              />
+              <label for="gibill_yes">Yes</label>
+              <input type="radio" id="gibill_no" name="gi_bill" value="no" />
+              <label for="gibill_no">No</label>
+            </div>
+          </div>
+
+          <div class="important-note">
+            <p>
+              <strong>Note:</strong> If you answered yes to any of these
+              questions, you must speak with the appropriate campus office
+              regarding the ramifications of a term withdrawal. A withdrawal is
+              an academic request and may affect finances and other concerns.
+            </p>
+          </div>
+        </div>
+
+        <!-- Course Section -->
+        <div class="form-section">
+          <h3>7. List all courses and sections to be withdrawn:</h3>
+
+          <div id="course-container">
+            <div class="course-entry">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Course Subject:</label>
+                  <input
+                    type="text"
+                    name="course_subject[]"
+                    placeholder="e.g., ENGL"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Course Number:</label>
+                  <input
+                    type="text"
+                    name="course_number[]"
+                    placeholder="e.g., 1301"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Section:</label>
+                  <input
+                    type="text"
+                    name="course_section[]"
+                    placeholder="e.g., 001"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="add-course" class="secondary-button">
+            + Add Another Course
+          </button>
+        </div>
+
+        <!-- Acknowledgement Section -->
+        <div class="form-section">
+          <div class="acknowledgement">
+            <p>
+              I understand that a request for a medical or administrative term
+              withdrawal is a request to withdraw from ALL courses I am/was
+              enrolled in for the identified term. The request must be filed no
+              later than 140 days following the close of the semester in which
+              the coursework was taken. The withdrawal, when completed, does not
+              entitle me to a refund if it occurs after State mandated refund
+              periods (<input
+                type="text"
+                name="initial"
+                class="initial-input"
+                required
+              />, I understand). If I am eligible for a refund, it will be
+              applied to any previous balance due, and if I received student
+              financial assistance or a scholarship, I may be required to pay
+              back all or a portion of it. In addition, I certify that the
+              information I have provided is complete and true and I authorize
+              the University of Houston to make any investigation of the facts
+              in this request.
+            </p>
+          </div>
+
+          <!-- Updated Signature Section with Upload Option -->
+          <div class="form-row signature-row">
+            <div class="form-group">
+              <label for="signature_type">Signature Type:</label>
+              <select
+                id="signature_type"
+                name="signature_type"
+                onchange="toggleSignatureMethod()"
+                required
+              >
+                <option value="" disabled selected>
+                  Select signature method
+                </option>
+                <option value="upload">Upload Image</option>
+                <option value="draw">Draw Signature</option>
+                <option value="text">Text Signature</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Signature Methods (will be shown/hidden based on selection) -->
+          <div class="form-row signature-methods">
+            <div
+              id="upload-signature"
+              class="signature-method"
+              style="display: none"
+            >
+              <label for="signature_upload">Upload Signature Image:</label>
+              <input
+                type="file"
+                id="signature_upload"
+                name="signature_upload"
+                accept="image/*"
+              />
+              <div class="preview-box">
+                <img
+                  id="signature-preview"
+                  src="#"
+                  alt="Your signature will appear here"
+                  style="display: none; max-height: 100px"
+                />
+              </div>
+            </div>
+
+            <div
+              id="draw-signature"
+              class="signature-method"
+              style="display: none"
+            >
+              <label>Draw Your Signature:</label>
+              <div class="signature-pad-container">
+                <canvas id="signature-pad" width="400" height="150"></canvas>
+              </div>
+              <button
+                type="button"
+                class="secondary-button"
+                id="clear-signature"
+              >
+                Clear
+              </button>
+              <input type="hidden" id="signature_data" name="signature_data" />
+            </div>
+
+            <div
+              id="text-signature"
+              class="signature-method"
+              style="display: none"
+            >
+              <label for="signature_text">Type Your Name:</label>
+              <input type="text" id="signature_text" name="signature_text" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signature_date">Date:</label>
+              <input
+                type="date"
+                id="signature_date"
+                name="signature_date"
+                value="{{ today_date }}"
+                readonly
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ user.email_ }}"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Documentation Info Section -->
+        <div class="form-section documentation-section">
+          <h3>Documentation Requirements</h3>
+          <p>
+            A request for withdrawal must include appropriate documentation
+            verifying medical (or for Administrative Withdrawal--extraordinary
+            non-medical) reasons that prevented you from course completion as
+            exampled below:
+          </p>
+
+          <ul>
+            <li>
+              <strong>Medical:</strong> A physician/psychiatrist letter on
+              letterhead, with original signature and license number; must
+              certify dates of treatment; identify medical condition, injury, or
+              treatment that warrants withdrawal; and justify inability to
+              resume or successfully complete studies for the term, in clear
+              support of a medical withdrawal.
+            </li>
+            <li>
+              <strong>Primary caregiver:</strong> Physician must certify that
+              immediate family member was being cared for by you; include dates
+              of impediment; bear an original signature and license number.
+            </li>
+            <li>
+              <strong>Legal detention:</strong> Legal advisor must certify you
+              were unable to complete coursework due to specific legal issue;
+              include dates of incarceration/court appearance; bear an original
+              signature.
+            </li>
+            <li>
+              <strong>Death of immediate family member:</strong> Copy of
+              original death certificate; immediate family member includes
+              mother, father, sister, brother, child, spouse, grandparent.
+            </li>
+            <li>
+              <strong>Military deployment:</strong> Copy of the original
+              military orders with active service dates.
+            </li>
+          </ul>
+
+          <p class="documentation-note">
+            All originals of requested documents must be submitted by the posted
+            deadlines to expedite processing of the approved request. You must
+            submit a statement accepting grade change and loss of completed
+            courses with passing grades, if applicable.
+          </p>
+
+          <p class="documentation-note">
+            Under a medical withdrawal, an enrollment hold will be placed on
+            your account. In order to lift the hold and return to course
+            enrollment: (a) submit a petition requesting reinstatement,
+            including return from Leave of Absence for doctoral students; and
+            (b) submit a doctor's letter verifying your ability to successfully
+            resume coursework, usually from the same licensed professional who
+            recommended withdrawal. Such documentation for reinstatement from
+            medical withdrawal must be submitted no later than two weeks prior
+            to start of the term of your intended reenrollment. Any future
+            course enrollment will be cancelled unless hold is lifted.
+          </p>
+
+          <div class="file-upload-section">
+            <label for="documentation">Upload Supporting Documentation:</label>
+            <input
+              type="file"
+              id="documentation"
+              name="documentation"
+              multiple
+            />
+            <p class="file-note">
+              Accepted formats: PDF, JPG, JPEG, PNG (Max size: 10MB)
+            </p>
+          </div>
+        </div>
+
+        <!-- Form Actions - Updated with draft saving option -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            name="action"
+            value="draft"
+            class="secondary-button"
+          >
+            Save as Draft
+          </button>
+          <button
+            type="submit"
+            name="action"
+            value="submit"
+            class="primary-button"
+          >
+            Submit for Approval
+          </button>
+          <button
+            type="button"
+            class="secondary-button"
+            onclick="window.location.href='/userhompage'"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
-  </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-  <script>
-    // Date formatting - set today's date as default
-    document.addEventListener('DOMContentLoaded', function() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('signature_date').value = today;
-    });
-    
-    // Signature methods toggle
-    function toggleSignatureMethod() {
-      const method = document.getElementById('signature_type').value;
-      document.getElementById('upload-signature').style.display = 'none';
-      document.getElementById('draw-signature').style.display = 'none';
-      document.getElementById('text-signature').style.display = 'none';
-      
-      if (method) {
-        document.getElementById(method + '-signature').style.display = 'block';
-      }
-      
-      // Initialize signature pad if drawing method is selected
-      if (method === 'draw') {
-        initSignaturePad();
-      }
-    }
-    
-    // Initialize signature pad
-    let signaturePad;
-    function initSignaturePad() {
-      const canvas = document.getElementById('signature-pad');
-      signaturePad = new SignaturePad(canvas, {
-        backgroundColor: 'rgb(255, 255, 255)'
+    <footer>
+      <div class="footer-text">
+        <p>
+          University of Houston - Medical/Administrative Term Withdrawal Request
+          Form (Revised 2024)
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script>
+      // Date formatting - set today's date as default
+      document.addEventListener("DOMContentLoaded", function () {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("signature_date").value = today;
       });
-      
-      // Clear button
-      document.getElementById('clear-signature').addEventListener('click', function() {
-        signaturePad.clear();
-      });
-      
-      // Store signature data on form submit
-      document.querySelector('form').addEventListener('submit', function() {
-        if (document.getElementById('signature_type').value === 'draw') {
-          if (!signaturePad.isEmpty()) {
-            const signatureData = signaturePad.toDataURL();
-            document.getElementById('signature_data').value = signatureData;
+
+      // Signature methods toggle
+      function toggleSignatureMethod() {
+        const method = document.getElementById("signature_type").value;
+        document.getElementById("upload-signature").style.display = "none";
+        document.getElementById("draw-signature").style.display = "none";
+        document.getElementById("text-signature").style.display = "none";
+
+        if (method) {
+          document.getElementById(method + "-signature").style.display =
+            "block";
+        }
+
+        // Initialize signature pad if drawing method is selected
+        if (method === "draw") {
+          initSignaturePad();
+        }
+      }
+
+      // Initialize signature pad
+      let signaturePad;
+      function initSignaturePad() {
+        const canvas = document.getElementById("signature-pad");
+        signaturePad = new SignaturePad(canvas, {
+          backgroundColor: "rgb(255, 255, 255)",
+        });
+
+        // Clear button
+        document
+          .getElementById("clear-signature")
+          .addEventListener("click", function () {
+            signaturePad.clear();
+          });
+
+        // Store signature data on form submit
+        document.querySelector("form").addEventListener("submit", function () {
+          if (document.getElementById("signature_type").value === "draw") {
+            if (!signaturePad.isEmpty()) {
+              const signatureData = signaturePad.toDataURL();
+              document.getElementById("signature_data").value = signatureData;
+            }
           }
-        }
-      });
-    }
-    
-    // Preview uploaded signature image
-    document.getElementById('signature_upload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const img = document.getElementById('signature-preview');
-          img.src = event.target.result;
-          img.style.display = 'block';
-        }
-        reader.readAsDataURL(file);
+        });
       }
-    });
-    
-    // Add course entry functionality
-    document.getElementById('add-course').addEventListener('click', function() {
-      const courseContainer = document.getElementById('course-container');
-      const courseEntry = document.createElement('div');
-      courseEntry.className = 'course-entry';
-      courseEntry.innerHTML = `
+
+      // Preview uploaded signature image
+      document
+        .getElementById("signature_upload")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const img = document.getElementById("signature-preview");
+              img.src = event.target.result;
+              img.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+      // Add course entry functionality
+      document
+        .getElementById("add-course")
+        .addEventListener("click", function () {
+          const courseContainer = document.getElementById("course-container");
+          const courseEntry = document.createElement("div");
+          courseEntry.className = "course-entry";
+          courseEntry.innerHTML = `
         <div class="form-row">
           <div class="form-group">
             <label>Course Subject:</label>
@@ -418,13 +684,15 @@
           <button type="button" class="remove-course" aria-label="Remove course">×</button>
         </div>
       `;
-      courseContainer.appendChild(courseEntry);
-      
-      // Add event listener to the remove button
-      courseEntry.querySelector('.remove-course').addEventListener('click', function() {
-        courseEntry.remove();
-      });
-    });
-  </script>
-</body>
+          courseContainer.appendChild(courseEntry);
+
+          // Add event listener to the remove button
+          courseEntry
+            .querySelector(".remove-course")
+            .addEventListener("click", function () {
+              courseEntry.remove();
+            });
+        });
+    </script>
+  </body>
 </html>
