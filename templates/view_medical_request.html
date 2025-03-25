@@ -232,13 +232,26 @@
         {% endfor %}
       </div>
 
-      {% if request.documentation_files %}
       <div class="section">
-        <h3>Documentation</h3>
-        {% set files = request.documentation_files|from_json %} {% for file in
-        files %}
+        <h3>Files</h3>
+
+        {% if request.generated_pdfs %}
         <div class="info-row">
-          <div class="info-label">File {{ loop.index }}:</div>
+          <div class="info-label">Request PDF:</div>
+          <div class="info-value">
+            <a
+              href="{{ url_for('download_pdf', request_id=request.id, status=request.status) }}"
+              >Download</a
+            >
+          </div>
+        </div>
+        {% endif %} {% if request.documentation_files %} {% set files =
+        request.documentation_files|from_json %} {% for file in files %}
+        <div class="info-row">
+          <div class="info-label">
+            {% if loop.index == 1 %}Signature:{% else %}File {{ loop.index }}:{%
+            endif %}
+          </div>
           <div class="info-value">
             <a
               href="{{ url_for('download_documentation', request_id=request.id, file_index=loop.index0) }}"
@@ -246,37 +259,16 @@
             >
           </div>
         </div>
-        {% endfor %}
+        {% endfor %} {% endif %} {% if not request.generated_pdfs and not
+        request.documentation_files %}
+        <div class="info-row">
+          <div class="info-value">No files available</div>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
 
       <div class="actions">
-        {% if is_admin and request.status == 'pending' %}
-        <form
-          action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}"
-          method="post"
-        >
-          <button type="submit" class="btn">Approve Request</button>
-        </form>
-        <form
-          action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}"
-          method="post"
-        >
-          <button type="submit" class="btn">Reject Request</button>
-        </form>
-        {% endif %} {% if request.generated_pdfs %}
-        <a
-          href="{{ url_for('download_pdf', request_id=request.id, status=request.status) }}"
-          class="btn"
-          >Download PDF</a
-        >
-        {% endif %}
-
-        <a
-          href="{{ url_for('status') if not is_admin else url_for('notification') }}"
-          class="btn btn-back"
-          >Back</a
-        >
+        <a href="{{ url_for('status') }}" class="btn btn-back">Back</a>
       </div>
     </div>
   </body>

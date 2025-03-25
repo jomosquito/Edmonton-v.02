@@ -1,91 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile Form</title>
     <style>
-        /* Global Styles */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
+      /* Global Styles */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        font-family: Arial, sans-serif;
+        margin: 0;
+      }
 
-        /* Form Container */
+      /* Form Container */
+      .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        width: 350px;
+        text-align: center;
+      }
+
+      /* Heading */
+      .form-container h3 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      /* Form Inputs */
+      .form-container input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      /* Password Input */
+      .form-container input[type="password"] {
+        letter-spacing: 1px;
+      }
+
+      /* Submit Button */
+      .form-container button {
+        width: 100%;
+        padding: 12px;
+        background: #2575fc;
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+      }
+
+      .form-container button:hover {
+        background: #6a11cb;
+      }
+
+      /* Error messages */
+      .error-message {
+        color: #f44336;
+        font-size: 14px;
+        text-align: left;
+        margin: 0;
+        height: 18px;
+        display: block;
+      }
+
+      /* Invalid input highlight */
+      .form-container input.invalid {
+        border: 1px solid #f44336;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 400px) {
         .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 350px;
-            text-align: center;
+          width: 90%;
         }
-
-        /* Heading */
-        .form-container h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        /* Form Inputs */
-        .form-container input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        /* Password Input */
-        .form-container input[type="password"] {
-            letter-spacing: 1px;
-        }
-
-        /* Submit Button */
-        .form-container button {
-            width: 100%;
-            padding: 12px;
-            background: #2575fc;
-            border: none;
-            color: white;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease-in-out;
-        }
-
-        .form-container button:hover {
-            background: #6a11cb;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 400px) {
-            .form-container {
-                width: 90%;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="form-container">
-        <h3>Create Account</h3>
-        <form action="/add" method="POST">
-            <input type="text" name="first_name" placeholder="firstname..." required>
-            <input type="text" name="last_name" placeholder="lastname..." required>
-            <input type="text" name="phoneN_" placeholder="phone number" required>
-            <input type="password" name="pass_word" placeholder="Password..." required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password..." required>
-            <input type="address" name="address" placeholder="address..." required>
-            <button type="submit">Add</button>
-        </form>
+      <h3>Create Account</h3>
+      <form
+        action="/add"
+        method="POST"
+        id="profile-form"
+        onsubmit="return validateForm()"
+      >
+        <input
+          type="text"
+          name="first_name"
+          placeholder="firstname..."
+          required
+        />
+        <input
+          type="text"
+          name="last_name"
+          placeholder="lastname..."
+          required
+        />
+
+        <input
+          type="text"
+          name="phoneN_"
+          id="phoneN_"
+          placeholder="Phone number (e.g., 555-123-4567)"
+          pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+          title="Phone format: XXX-XXX-XXXX"
+          required
+        />
+        <span class="error-message" id="phone-error"></span>
+
+        <input
+          type="password"
+          name="pass_word"
+          placeholder="Password..."
+          required
+        />
+        <input
+          type="password"
+          name="confirm_password"
+          id="confirm_password"
+          placeholder="Confirm Password..."
+          required
+        />
+        <span class="error-message" id="password-error"></span>
+
+        <input
+          type="text"
+          name="address"
+          id="address"
+          placeholder="Complete address..."
+          minlength="5"
+          required
+        />
+        <span class="error-message" id="address-error"></span>
+
+        <button type="submit">Add</button>
+      </form>
     </div>
 
-</body>
+    <script>
+      function validateForm() {
+        let isValid = true;
+
+        // Phone validation
+        const phoneInput = document.getElementById("phoneN_");
+        const phoneError = document.getElementById("phone-error");
+        const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+
+        if (!phoneRegex.test(phoneInput.value)) {
+          phoneError.textContent =
+            "Please enter a valid phone number (XXX-XXX-XXXX)";
+          phoneInput.classList.add("invalid");
+          isValid = false;
+        } else {
+          phoneError.textContent = "";
+          phoneInput.classList.remove("invalid");
+        }
+
+        // Address validation
+        const addressInput = document.getElementById("address");
+        const addressError = document.getElementById("address-error");
+
+        if (addressInput.value.trim().length < 5) {
+          addressError.textContent =
+            "Please enter a complete address (at least 5 characters)";
+          addressInput.classList.add("invalid");
+          isValid = false;
+        } else {
+          addressError.textContent = "";
+          addressInput.classList.remove("invalid");
+        }
+
+        // Password confirmation
+        const password = document.querySelector(
+          'input[name="pass_word"]'
+        ).value;
+        const confirmPassword =
+          document.getElementById("confirm_password").value;
+        const passwordError = document.getElementById("password-error");
+
+        if (password !== confirmPassword) {
+          passwordError.textContent = "Passwords do not match";
+          document.getElementById("confirm_password").classList.add("invalid");
+          isValid = false;
+        } else {
+          passwordError.textContent = "";
+          document
+            .getElementById("confirm_password")
+            .classList.remove("invalid");
+        }
+
+        return isValid;
+      }
+
+      // Live validation for phone number formatting
+      document
+        .getElementById("phoneN_")
+        .addEventListener("input", function (e) {
+          let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+          if (value.length > 0) {
+            // Format with dashes
+            if (value.length > 3) {
+              value = value.substring(0, 3) + "-" + value.substring(3);
+            }
+            if (value.length > 7) {
+              value = value.substring(0, 7) + "-" + value.substring(7);
+            }
+            if (value.length > 12) {
+              value = value.substring(0, 12);
+            }
+          }
+          e.target.value = value;
+        });
+    </script>
+  </body>
 </html>

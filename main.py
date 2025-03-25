@@ -348,17 +348,39 @@ def add_profile():
     last_name = request.form.get("last_name")
     phone_number = request.form.get("phoneN_")
     pass_word = request.form.get("pass_word")
+    confirm_password = request.form.get("confirm_password")
     address = request.form.get("address")
     enroll_status = request.form.get("enroll_status")
+    
+    # Validation
+    errors = []
+    
+    # Phone number validation
+    import re
+    phone_pattern = re.compile(r'^\d{3}-\d{3}-\d{4}$')
+    if not phone_pattern.match(phone_number):
+        errors.append("Invalid phone number format. Please use XXX-XXX-XXXX format.")
+    
+    # Address validation
+    if not address or len(address.strip()) < 5:
+        errors.append("Please provide a complete address (minimum 5 characters).")
+    
+    # Password confirmation
+    if pass_word != confirm_password:
+        errors.append("Passwords do not match.")
+    
+    if errors:
+        # If there are validation errors, return to the form with error messages
+        return render_template('add_profile.html', errors=errors)
+    
     if first_name and pass_word:
-        p = Profile(first_name=first_name, last_name=last_name, phoneN_=phone_number)
+        p = Profile(first_name=first_name, last_name=last_name, phoneN_=phone_number, address=address)
         p.set_password(pass_word)
         db.session.add(p)
         db.session.commit()
         return redirect('/stepone')
     else:
-        return render_template('userhompage.html')
-
+        return render_template('add_profile.html', errors=["First name and password are required"])
 
 # Change privileges for a profile
 @app.route('/priv/<int:id>')
