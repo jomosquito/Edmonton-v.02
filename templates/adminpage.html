@@ -85,6 +85,25 @@
             background-color: #14e71b;
         }
 
+        /* Styling for the history button */
+        .history-btn {
+            display: inline-block;
+            background-color: #008CBA;
+            /* purple color */
+            color: #fff;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .history-btn:hover {
+            background-color: #9932cc;
+        }
+
         /* Centering the Return button */
         .button-container {
             text-align: center;
@@ -157,6 +176,8 @@
                     <a href="/update/{{ data.id }}" class="action-btn">Update</a>
                     <!-- Delete profile -->
                     <a href="/delete/{{ data.id }}" class="action-btn">Delete</a>
+                    <!-- View history -->
+                    <a href="/history/{{ data.id }}" class="history-btn">View History</a>
                 </td>
             </tr>
             {% endfor %}
