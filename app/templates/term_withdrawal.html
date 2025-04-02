@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UH Official Term Withdrawal</title>
+  <!-- Import Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2575fc;
+      --secondary-color: #6a11cb;
+      --background-color: #f0f2f5;
+      --card-bg: #fff;
+      --uh-red: #c8102e;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--background-color);
+      color: #333;
+    }
+    
+    header {
+      background: var(--uh-red);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--uh-red);
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+    }
+    
+    .form-section h2 {
+      font-size: 1.3rem;
+      color: var(--secondary-color);
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-col {
+      flex: 1;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    .checkbox-group {
+      margin-bottom: 10px;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    
+    .checkbox-label input {
+      width: auto;
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+    
+    .disclaimer {
+      background-color: #f8f9fa;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-left: 4px solid var(--uh-red);
+      font-size: 0.9rem;
+    }
+    
+    .disclaimer p {
+      margin-bottom: 10px;
+    }
+    
+    .signature-section {
+      margin-top: 30px;
+    }
+    
+    .signature-upload {
+      margin-bottom: 20px;
+    }
+    
+    .signature-preview {
+      width: 100%;
+      height: 150px;
+      border: 1px dashed #ddd;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f9f9f9;
+    }
+    
+    .signature-preview img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .btn-back {
+      background-color: #6c757d;
+    }
+    
+    .btn-submit {
+      background-color: var(--uh-red);
+      font-weight: 600;
+    }
+    
+    .btn-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .form-note {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .required::after {
+      content: "*";
+      color: var(--uh-red);
+      margin-left: 2px;
+    }
+  </style>
+</head>
+<body>
+  <header>University of Houston</header>
+  
+  <div class="form-container">
+    <div class="form-header">
+      <a href="{{ url_for('settings') }}" class="btn btn-back">Back</a>
+      <div class="form-title">Official Term Withdrawal Request</div>
+    </div>
+    
+    <form action="{{ url_for('submit_withdrawal') }}" method="post" enctype="multipart/form-data">
+      <div class="form-section">
+        <h2>Student Information</h2>
+        <div class="form-row">
+          <div class="form-col">
+            <label for="first_name" class="required">First Name:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" readonly>
+          </div>
+          <div class="form-col">
+            <label for="last_name" class="required">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" readonly>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-col">
+            <label for="myuh_id" class="required">myUH ID:</label>
+            <input type="text" id="myuh_id" name="myuh_id" placeholder="Enter your myUH ID" required>
+          </div>
+          <div class="form-col">
+            <label for="phone" class="required">Phone #:</label>
+            <input type="tel" id="phone" name="phone" value="{{ user.phoneN_ }}" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-col">
+            <label for="email" class="required">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email_ }}" readonly>
+          </div>
+          <div class="form-col">
+            <label for="program" class="required">Program/Plan:</label>
+            <input type="text" id="program" name="program" placeholder="e.g. Computer Science, Engineering" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="academic_career" class="required">Academic Career:</label>
+          <select id="academic_career" name="academic_career" required>
+            <option value="" disabled selected>Select your academic career</option>
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Graduate">Graduate</option>
+            <option value="Professional">Professional</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h2>Withdrawal Information</h2>
+        <label class="required">Withdrawal Term:</label>
+        <div class="form-row">
+            <div class="form-col">
+              <div class="checkbox-label">
+                <input type="radio" id="term_fall" name="term" value="Fall" required>
+                <label for="term_fall">Fall</label>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="checkbox-label">
+                <input type="radio" id="term_spring" name="term" value="Spring">
+                <label for="term_spring">Spring</label>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="checkbox-label">
+                <input type="radio" id="term_summer" name="term" value="Summer">
+                <label for="term_summer">Summer</label>
+              </div>
+            </div>
+            <div class="form-col">
+              <label for="year" class="required">Year:</label>
+              <select id="year" name="year" required>
+                <option value="" disabled selected>Select year</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+          </div>
+        
+        <div class="form-group">
+          <label for="reason" class="required">Reason for Withdrawal:</label>
+          <select id="reason" name="reason" required>
+            <option value="" disabled selected>Select primary reason</option>
+            <option value="Medical">Medical</option>
+            <option value="Financial">Financial</option>
+            <option value="Personal">Personal</option>
+            <option value="Academic">Academic</option>
+            <option value="Military">Military</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="details">Additional Details:</label>
+          <textarea id="details" name="details" rows="3" placeholder="Please provide any additional context for your withdrawal request"></textarea>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h2>Acknowledgements</h2>
+        <p class="form-note">Initial all statements that apply to you:</p>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="financial_aid" name="acknowledgements[]" value="financial_aid">
+          <label for="financial_aid"><strong>FINANCIAL AID</strong> — I understand that withdrawing from ALL classes may affect my financial aid, potentially requiring me to pay back funds and impacting future eligibility.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="international" name="acknowledgements[]" value="international">
+          <label for="international"><strong>INTERNATIONAL STUDENTS</strong> — I understand that federal regulations require authorization for reduced course load from ISSSO prior to withdrawing.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="athlete" name="acknowledgements[]" value="athlete">
+          <label for="athlete"><strong>STUDENT-ATHLETES</strong> — I understand I must clear financial holds, return equipment, and meet with Student-Athlete Development and Compliance offices.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="veterans" name="acknowledgements[]" value="veterans">
+          <label for="veterans"><strong>VETERANS</strong> — I understand withdrawal will trigger recalculation of benefits and may require repayment of tuition, fees, and housing as determined by the VA.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="graduate" name="acknowledgements[]" value="graduate">
+          <label for="graduate"><strong>GRADUATE/PROFESSIONAL STUDENTS</strong> — I understand university support will be cancelled and withdrawal after reporting day requires meeting with my Academic Advisor.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="doctoral" name="acknowledgements[]" value="doctoral">
+          <label for="doctoral"><strong>DOCTORAL STUDENTS</strong> — I understand I must file a leave of absence with the Office of Graduate and Professional Studies.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="housing" name="acknowledgements[]" value="housing">
+          <label for="housing"><strong>STUDENT HOUSING</strong> — I understand I need to check out of my room and complete all processes to avoid additional fees.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="dining" name="acknowledgements[]" value="dining">
+          <label for="dining"><strong>DINING SERVICES</strong> — I understand withdrawal doesn't automatically cancel meal plan obligations and I must submit a petition for any available credit.</label>
+        </div>
+        
+        <div class="checkbox-label">
+          <input type="checkbox" id="parking" name="acknowledgements[]" value="parking">
+          <label for="parking"><strong>PARKING AND TRANSPORTATION</strong> — I understand I must return my parking permit to receive any available credit and am responsible for outstanding charges.</label>
+        </div>
+      </div>
+      
+      <div class="disclaimer">
+        <p>THE UNIVERSITY DOES NOT ASSUME RESPONSIBILITY FOR LOST OR REDUCED REFUNDS, LOSS OF FINANCIAL AID OR OTHER ENTITLEMENTS IF YOU FAIL TO SEEK ADVISEMENT FROM THE APPROPRIATE OFFICES.</p>
+        <p>I understand that a withdrawal from ALL classes may have various academic implications including my degree plan, course requirements, prerequisites and other college policies. For more information, I will consult with my academic advisor directly.</p>
+        <p>I understand that I may have an outstanding balance which, if unpaid will prevent me from future enrollment, ordering transcripts or utilizing other university services until paid in full. I understand that additional fees may be applied to any unpaid balance.</p>
+        <p>I further understand that my withdrawal from ALL classes is effective the date this form is processed and my partial refund, if any, will be calculated based on that effective date and in accordance with the published refund schedule.</p>
+        <p>I further understand that I am dropping ALL classes and withdrawing from the university.</p>
+      </div>
+      
+      <div class="signature-section">
+        <div class="signature-upload">
+          <label for="signature" class="required">Student Signature:</label>
+          <p class="form-note">Please upload an image of your signature (PNG, JPG, JPEG, or GIF)</p>
+          <input type="file" id="signature" name="signature" accept=".png,.jpg,.jpeg,.gif" required>
+          <div class="signature-preview" id="signature-preview">
+            <p>Signature preview will appear here</p>
+          </div>
+        </div>
+        
+        <div class="btn-container">
+          <a href="{{ url_for('settings') }}" class="btn btn-back">Cancel</a>
+          <button type="submit" class="btn btn-submit">Submit Term Withdrawal Request</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Display signature preview when a file is selected
+    document.getElementById('signature').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('signature-preview');
+          preview.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+  </script>
+</body>
+</html>
