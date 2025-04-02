@@ -1,0 +1,165 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{enumitem}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=blue,
+  urlcolor=blue,
+}
+
+\setlength{\parindent}{0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+\fancyfoot[C]{University of Houston - Medical/Administrative Term Withdrawal Form - Page \thepage\ of \pageref{LastPage}}
+
+\begin{document}
+
+\begin{center}
+  \textbf{\Large University of Houston}\\[0.2cm]
+  \textbf{\large Medical/Administrative Term Withdrawal Request Form}\\[0.2cm]
+  \textbf{Form ID: FORMID}\\[0.2cm]
+  \textbf{Status: STATUS}
+\end{center}
+
+\hrule
+\vspace{0.5cm}
+
+\noindent\textit{State law requires that you be informed of the following: (1) with few exceptions, you are entitled on request to be informed about the information the university collects about you by use of this form; (2) under sections 552.021 and 552.023 of the Government Code, you are entitled to receiving and review the information; and (3) under section 559.004 of the Government Code, you are entitled to have the university correct information about you that is incorrect.}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+\section*{1. Student Information}
+\begin{tabular}{ll}
+Name: & \textbf{FULLNAME} \\
+myUH ID: & \textbf{MYUHID} \\
+College: & \textbf{COLLEGE} \\
+Plan/Degree: & \textbf{DEGREE} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{2. Current Mailing Address}
+\begin{tabular}{ll}
+Address: & \textbf{ADDRESS} \\
+City, State, Zip: & \textbf{CITY}, \textbf{STATE} \textbf{ZIP} \\
+Phone: & \textbf{PHONE} \\
+Email: & \textbf{EMAIL} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{3. Term Information}
+\begin{tabular}{ll}
+Term \& Year for Withdrawal: & \textbf{TERM\_YEAR} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{4. Last Date Attended Classes}
+\begin{tabular}{ll}
+Last Date: & \textbf{LAST\_DATE} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{5. Reason for Request}
+\begin{tabular}{ll}
+Type: & \textbf{REASON\_TYPE} \\
+\end{tabular}
+
+\noindent\textbf{Details:}\\
+\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{
+\vspace{0.2cm}
+DETAILS
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{6. Additional Information}
+\begin{tabular}{ll}
+Financial Assistance: & \textbf{FINANCIAL\_ASSISTANCE} \\
+UH Student Health Insurance: & \textbf{HEALTH\_INSURANCE} \\
+Campus Housing: & \textbf{CAMPUS\_HOUSING} \\
+F1/J1 Visa: & \textbf{VISA\_STATUS} \\
+G.I. Bill Benefits: & \textbf{GI\_BILL} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{7. Courses to be Withdrawn}
+\begin{tabular}{lll}
+\textbf{Subject} & \textbf{Number} & \textbf{Section} \\
+\hline
+COURSES
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{Acknowledgement}
+\noindent\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule}{
+I understand that a request for a medical or administrative term withdrawal is a request to withdraw from ALL courses I am/was enrolled in for the identified term. The request must be filed no later than 140 days following the close of the semester in which the coursework was taken. The withdrawal, when completed, does not entitle me to a refund if it occurs after State mandated refund periods (\textbf{INITIAL}, I understand). If I am eligible for a refund, it will be applied to any previous balance due, and if I received student financial assistance or a scholarship, I may be required to pay back all or a portion of it. In addition, I certify that the information I have provided is complete and true and I authorize the University of Houston to make any investigation of the facts in this request.
+}}
+
+\vspace{0.5cm}
+
+\section*{Student Signature}
+\begin{tabular}{ll}
+Signature: & \includegraphics[width=5cm]{SIGNATURE_PATH} \\
+Date: & \textbf{SIGNATURE\_DATE} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{Documentation}
+\begin{tabular}{ll}
+Number of Documents Submitted: & \textbf{DOCUMENTATION\_COUNT} \\
+Files: & \textbf{DOCUMENTATION\_FILES} \\
+\end{tabular}
+
+\vspace{0.5cm}
+
+\section*{Request Information}
+\begin{tabular}{ll}
+Date Submitted: & \textbf{CREATED\_DATE} \\
+Request Status: & \textbf{STATUS} \\
+\end{tabular}
+
+ADMIN_SIGNATURE_SECTION
+
+\vspace{2cm}
+
+\hrule
+\vspace{0.5cm}
+\small\textit{For Office Use Only}
+
+\vspace{0.5cm}
+
+\begin{tabular}{llll}
+Department & Signature & Printed Name & Date \\
+\hline
+\\
+Academic Advisor/Committee Chair & \rule{4cm}{0.4pt} & \rule{4cm}{0.4pt} & \rule{2.5cm}{0.4pt} \\
+\\
+Dept Chair/Director of Graduate Studies & \rule{4cm}{0.4pt} & \rule{4cm}{0.4pt} & \rule{2.5cm}{0.4pt} \\
+\\
+Assoc Dean, Graduate Studies & \rule{4cm}{0.4pt} & \rule{4cm}{0.4pt} & \rule{2.5cm}{0.4pt} \\
+\\
+Vice Provost \& Dean, UH Graduate School & \rule{4cm}{0.4pt} & \rule{4cm}{0.4pt} & \rule{2.5cm}{0.4pt} \\
+\end{tabular}
+
+\label{LastPage}
+\end{document}
