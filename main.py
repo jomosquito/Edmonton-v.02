@@ -216,7 +216,7 @@ def index():
 @app.route('/admin')
 def admin():
     profiles = Profile.query.all()  # Retrieve all profiles from the database
-    return render_template('adminpage.html', profiles=profiles)
+    return render_template('adminlogin.html', profiles=profiles)
 
 @app.route('/a')
 def ad():
