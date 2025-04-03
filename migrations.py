@@ -5,6 +5,9 @@ from main import db, app, MedicalWithdrawalRequest, StudentInitiatedDrop
 import sqlalchemy as sa
 
 with app.app_context():
+    # Create all tables if they don't exist
+    db.create_all()
+    
     # Add admin_viewed column to MedicalWithdrawalRequest if it doesn't exist
     with db.engine.connect() as conn:
         inspector = sa.inspect(db.engine)
