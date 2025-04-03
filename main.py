@@ -80,6 +80,19 @@ class StudentInitiatedDrop(db.Model):
     signature = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Add a field for generated PDFs
+    generated_pdfs = db.Column(db.Text, nullable=True)  # JSON array of PDF file paths
+    
+    # Admin viewed field similar to MedicalWithdrawalRequest
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+    
+    def has_admin_viewed(self, admin_id):
+        if not self.admin_viewed:
+            return False
+        viewed_by = json.loads(self.admin_viewed)
+        return str(admin_id) in viewed_by
+    
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -173,13 +186,15 @@ def status():
     medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
 
     # Query student-initiated drop requests for the logged-in user
-    student_drop_requests = StudentInitiatedDrop.query.filter_by(student_id=user_id).all()
+    # Use str(user_id) to match the string stored in the database
+    student_drop_requests = StudentInitiatedDrop.query.filter_by(student_id=str(user_id)).all()
 
     return render_template(
         'status.html',
         medical_requests=medical_requests,
         student_drop_requests=student_drop_requests
     )
+
 @app.route('/notifications')
 def notification():
     # Query pending medical withdrawal requests
@@ -829,14 +844,14 @@ def submit_student_drop():
 
     # Get form data
     student_name = request.form.get('studentName')
-    student_id = request.form.get('studentID')
+    student_id = str(user_id)  # Use the session user_id instead of form input
     course_title = request.form.get('course')
     reason = request.form.get('reason')
     date_str = request.form.get('date')  # Get the date as a string
     signature_type = request.form.get('signature_type')
 
     # Validate form data
-    if not all([student_name, student_id, course_title, reason, date_str, signature_type]):
+    if not all([student_name, course_title, reason, date_str, signature_type]):
         return "All fields are required", 400
 
     # Convert the date string to a Python date object
@@ -846,20 +861,28 @@ def submit_student_drop():
         return "Invalid date format. Please use YYYY-MM-DD.", 400
 
     # Handle signature based on the selected type
+    signature = ""
     if signature_type == 'draw':
         signature_data = request.form.get('signature_data')
         if not signature_data:
             return "Signature is required for the selected option", 400
+        signature = signature_data
     elif signature_type == 'upload':
         signature_upload = request.files.get('signature_upload')
         if not signature_upload:
             return "Signature file is required for the selected option", 400
-        # Save the uploaded file (optional)
-        signature_upload.save(f"uploads/{signature_upload.filename}")
+        # Save the uploaded file
+        filename = secure_filename(f"sig_{user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{signature_upload.filename}")
+        signature_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
+        os.makedirs(signature_dir, exist_ok=True)
+        filepath = os.path.join(signature_dir, filename)
+        signature_upload.save(filepath)
+        signature = filepath
     elif signature_type == 'text':
         signature_text = request.form.get('signature_text')
         if not signature_text:
             return "Typed signature is required for the selected option", 400
+        signature = signature_text
 
     # Save the drop request to the database
     drop_request = StudentInitiatedDrop(
@@ -868,12 +891,13 @@ def submit_student_drop():
         course_title=course_title,
         reason=reason,
         date=date,  # Use the converted Python date object
-        signature=signature_type  # Save the signature type (optional)
+        signature=signature,
+        status='pending'
     )
     db.session.add(drop_request)
     db.session.commit()
 
-    return redirect(url_for('settings'))  # Redirect back to the settings page
+    return redirect(url_for('status'))  # Redirect to the status page
 @app.route('/admin/student_drops')
 def admin_student_drops():
     drop_requests = StudentInitiatedDrop.query.all()
@@ -881,45 +905,171 @@ def admin_student_drops():
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
 def approve_student_drop(request_id):
     """Approve a student-initiated drop request and generate a PDF"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+    
     req_record = StudentInitiatedDrop.query.get(request_id)
-    if req_record:
-        # Get admin signature if available
-        user_id = session.get('user_id')
-        admin = Profile.query.get(user_id)
-        admin_signature = None  # You'd need to implement signature storage for admins
-
-        # Change status to approved
-        req_record.status = 'approved'
-        db.session.commit()  # Commit first to save the status
-
-        # Generate PDF with LaTeX
-        from pdf_utils import generate_student_drop_pdf
-        pdf_path = generate_student_drop_pdf(req_record, admin_signature)
-
-        # Store the PDF path in the request record
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-
-            db.session.commit()
-
+    if not req_record:
+        return "Request not found", 404
+    
+    # Change status to approved
+    req_record.status = 'approved'
+    db.session.commit()
+    
+    # Generate PDF with the updated function
+    from pdf_utils import generate_student_drop_pdf
+    pdf_path = generate_student_drop_pdf(req_record)
+    
+    # Store the PDF path in the request record
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
+            
+        db.session.commit()
+        
     return redirect(url_for('notification'))
+
+
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
 def reject_student_drop(request_id):
+    """Reject a student-initiated drop request and generate a PDF"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+    
     req_record = StudentInitiatedDrop.query.get(request_id)
-    if req_record:
-        req_record.status = 'rejected'
+    if not req_record:
+        return "Request not found", 404
+    
+    # Change status to rejected
+    req_record.status = 'rejected'
+    db.session.commit()
+    
+    # Generate PDF with the updated function
+    from pdf_utils import generate_student_drop_pdf
+    pdf_path = generate_student_drop_pdf(req_record)
+    
+    # Store the PDF path in the request record
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
+            
         db.session.commit()
+        
     return redirect(url_for('notification'))
+
+@app.route('/view-student-drop/<int:request_id>')
+def view_student_drop(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    request_record = StudentInitiatedDrop.query.get(request_id)
+    
+    if not request_record:
+        return "Request not found", 404
+    
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.student_id != str(user_id):
+        return "Unauthorized", 403
+    
+    return render_template('view_student_drop.html', 
+                          request=request_record,
+                          is_admin=is_admin)
+
+
+@app.route('/download_student_drop_pdf/<int:request_id>/<string:status>')
+def download_student_drop_pdf(request_id, status):
+    """Download a generated PDF for a student drop request"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    request_record = StudentInitiatedDrop.query.get(request_id)
+    
+    if not request_record:
+        return "Request not found", 404
+    
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.student_id != str(user_id):
+        return "Unauthorized", 403
+    
+    # If admin is viewing, mark as viewed
+    if is_admin:
+        if not request_record.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(request_record.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        request_record.admin_viewed = json.dumps(admin_viewed)
+        db.session.commit()
+    
+    # Find the most recent PDF with the given status
+    pdf_dir = os.path.join('static', 'pdfs')
+    search_pattern = f"student_drop_{request_id}_{status}_"
+    
+    matching_files = []
+    if os.path.exists(pdf_dir):
+        for filename in os.listdir(pdf_dir):
+            if filename.startswith(search_pattern) and filename.endswith('.pdf'):
+                matching_files.append(os.path.join(pdf_dir, filename))
+    
+    if matching_files:
+        # Sort by creation time, newest first
+        latest_pdf = max(matching_files, key=os.path.getctime)
+        return send_file(latest_pdf, as_attachment=True)
+    elif request_record.generated_pdfs:
+        # Check if we have stored paths in the database
+        pdfs = json.loads(request_record.generated_pdfs)
+        # Find PDFs containing the status in their path
+        status_pdfs = [pdf for pdf in pdfs if status in pdf]
+        if status_pdfs:
+            return send_file(status_pdfs[-1], as_attachment=True)
+    
+    # If no PDF found, generate one on the fly
+    from pdf_utils import generate_student_drop_pdf
+    pdf_path = generate_student_drop_pdf(request_record)
+    if pdf_path and os.path.exists(pdf_path):
+        return send_file(pdf_path, as_attachment=True)
+    
+    return "PDF file not found", 404
+
 @app.route('/student_initiated_drop')
 def student_initiated_drop():
-    return render_template('student_initiated_drop.html')
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    # Add today's date for the form
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    return render_template('student_initiated_drop.html', user=user, today_date=today_date)
+
 
 @app.route('/drafts')
 def drafts():
