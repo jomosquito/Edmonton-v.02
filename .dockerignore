@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+*.egg
+
+# Flask
+instance/site.db
+o365_token.txt
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# LaTeX generated files
+*.aux
+*.log
+*.out
+
+# Editor directories
+.idea
+.vscode
+*.swp
+*.swo
+
+# Documentation
+README.md
+LICENSE
