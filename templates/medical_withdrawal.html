@@ -4,34 +4,320 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Medical/Administrative Term Withdrawal Form</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/medical_withdrawal.css') }}"
-    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* CSS Variables for theme consistency */
+      :root {
+        --primary-color: #2575fc;
+        --secondary-color: #6a11cb;
+        --accent-color: #c8102e; /* UH Red as accent */
+        --background-color: #f0f2f5;
+        --card-bg: #fff;
+        --border-color: #ddd;
+        --text-color: #333;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+      }
+  
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+  
+      body {
+        font-family: 'Poppins', Arial, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--background-color);
+        padding: 0;
+        margin: 0;
+      }
+  
+      header {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+  
+      .form-container {
+        max-width: 1100px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+  
+      .form-section {
+        margin-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 25px;
+      }
+  
+      .form-section:last-child {
+        border-bottom: none;
+      }
+  
+      .form-section h3 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-color);
+      }
+  
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        gap: 15px;
+      }
+  
+      .form-group {
+        flex: 1 1 200px;
+      }
+  
+      .form-group.full-width {
+        flex-basis: 100%;
+      }
+  
+      .address-group {
+        flex: 2 1 400px;
+      }
+  
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+  
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="date"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+  
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--highlight-color);
+        outline: none;
+      }
+  
+      .checkbox-row {
+        align-items: center;
+      }
+  
+      .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+  
+      .radio-group input[type="radio"] {
+        margin-right: 5px;
+      }
+
+      .course-entry {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        position: relative;
+      }
+  
+      .course-entry .form-row {
+        margin-bottom: 0;
+      }
+  
+      .remove-course {
+        background-color: var(--danger-color);
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border: none;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+  
+      .acknowledgement {
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        text-align: justify;
+      }
+  
+      .initial-input {
+        width: 60px !important;
+        display: inline-block;
+        text-align: center;
+        font-weight: bold;
+      }
+  
+      .signature-row {
+        margin-top: 20px;
+      }
+  
+      .documentation-section {
+        background-color: #f8f8f8;
+        padding: 15px;
+        border-radius: 5px;
+      }
+  
+      .documentation-section ul {
+        margin-left: 20px;
+        margin-bottom: 15px;
+      }
+  
+      .documentation-section li {
+        margin-bottom: 8px;
+      }
+  
+      .documentation-note {
+        font-size: 14px;
+        margin-bottom: 15px;
+        text-align: justify;
+      }
+  
+      .file-upload-section {
+        margin-top: 20px;
+        background-color: white;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px dashed var(--border-color);
+      }
+  
+      .file-note {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+  
+      .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+      }
+  
+      .primary-button,
+      .secondary-button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+  
+      .primary-button {
+        background-color: var(--primary-color);
+        color: white;
+      }
+  
+      .primary-button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+  
+      .secondary-button {
+        background-color: #e0e0e0;
+        color: #333;
+      }
+  
+      .secondary-button:hover {
+        background-color: #c7c7c7;
+      }
+  
+      footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-size: 14px;
+        margin-top: 40px;
+      }
+  
+      @media (max-width: 768px) {
+        .form-container {
+          padding: 15px;
+          margin: 10px;
+        }
+        
+        .form-row {
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        .form-actions {
+          flex-direction: column;
+        }
+        
+        .primary-button,
+        .secondary-button {
+          width: 100%;
+        }
+      }
+
+      /* Added styles for the signature methods */
+      .signature-methods {
+        margin-top: 15px;
+      }
+
+      .signature-method {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+
+      #signature-pad {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+
+      .preview-box {
+        margin-top: 10px;
+        border: 1px dashed #ddd;
+        padding: 10px;
+        text-align: center;
+        background-color: #fff;
+      }
+    </style>
   </head>
   <body>
     <header>
-      <div class="header-top">
-        <h1>University of Houston</h1>
-        <h2>Medical/Administrative Term Withdrawal Request Form</h2>
-      </div>
-      <div class="header-notice">
-        <p>
-          State law requires that you be informed of the following: (1) with few
-          exceptions, you are entitled on request to be informed about the
-          information the university collects about you by use of this form; (2)
-          under sections 552.021 and 552.023 of the Government Code, you are
-          entitled to receiving and review the information; and (3) under
-          section 559.004 of the Government Code, you are entitled to have the
-          university correct information about you that is incorrect.
-        </p>
-      </div>
+      <h2>Medical/Administrative Term Withdrawal Request Form</h2>
     </header>
 
     <div class="form-container">
@@ -136,8 +422,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Rest of the form remains the same until the signature section -->
 
         <!-- Term Information Section -->
         <div class="form-section">
@@ -302,15 +586,6 @@
               <label for="gibill_no">No</label>
             </div>
           </div>
-
-          <div class="important-note">
-            <p>
-              <strong>Note:</strong> If you answered yes to any of these
-              questions, you must speak with the appropriate campus office
-              regarding the ramifications of a term withdrawal. A withdrawal is
-              an academic request and may affect finances and other concerns.
-            </p>
-          </div>
         </div>
 
         <!-- Course Section -->
@@ -376,7 +651,7 @@
               financial assistance or a scholarship, I may be required to pay
               back all or a portion of it. In addition, I certify that the
               information I have provided is complete and true and I authorize
-              the University of Houston to make any investigation of the facts
+              the University to make any investigation of the facts
               in this request.
             </p>
           </div>
@@ -586,8 +861,7 @@
     <footer>
       <div class="footer-text">
         <p>
-          University of Houston - Medical/Administrative Term Withdrawal Request
-          Form (Revised 2024)
+          Medical/Administrative Term Withdrawal Request Form (Revised 2025)
         </p>
       </div>
     </footer>
