@@ -660,21 +660,6 @@ Status: ##STATUS##\\
                 courses_content = "Error parsing course data"
         replacements["##COURSES##"] = courses_content
         
-        # Documentation files
-        doc_count = 0
-        doc_files = ""
-        if hasattr(request_data, 'documentation_files') and request_data.documentation_files:
-            try:
-                files = json.loads(request_data.documentation_files)
-                doc_count = len(files)
-                for file_path in files:
-                    doc_files += os.path.basename(file_path) + ", "
-                doc_files = doc_files.rstrip(", ")
-            except (json.JSONDecodeError, TypeError) as e:
-                logger.error(f"Error parsing documentation files: {str(e)}")
-                doc_files = "Error parsing documentation files"
-        replacements["##DOCUMENTATION_COUNT##"] = str(doc_count)
-        replacements["##DOCUMENTATION_FILES##"] = latex_escape(doc_files or "None")
         
         # Admin signature
         admin_sig_section = ""

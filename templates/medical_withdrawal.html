@@ -1,3 +1,4 @@
+.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -186,27 +187,6 @@
         margin-top: 20px;
       }
   
-      .documentation-section {
-        background-color: #f8f8f8;
-        padding: 15px;
-        border-radius: 5px;
-      }
-  
-      .documentation-section ul {
-        margin-left: 20px;
-        margin-bottom: 15px;
-      }
-  
-      .documentation-section li {
-        margin-bottom: 8px;
-      }
-  
-      .documentation-note {
-        font-size: 14px;
-        margin-bottom: 15px;
-        text-align: justify;
-      }
-  
       .file-upload-section {
         margin-top: 20px;
         background-color: white;
@@ -292,7 +272,7 @@
       .signature-methods {
         margin-top: 15px;
       }
-
+      
       .signature-method {
         background-color: #f9f9f9;
         padding: 15px;
@@ -754,81 +734,6 @@
           </div>
         </div>
 
-        <!-- Documentation Info Section -->
-        <div class="form-section documentation-section">
-          <h3>Documentation Requirements</h3>
-          <p>
-            A request for withdrawal must include appropriate documentation
-            verifying medical (or for Administrative Withdrawal--extraordinary
-            non-medical) reasons that prevented you from course completion as
-            exampled below:
-          </p>
-
-          <ul>
-            <li>
-              <strong>Medical:</strong> A physician/psychiatrist letter on
-              letterhead, with original signature and license number; must
-              certify dates of treatment; identify medical condition, injury, or
-              treatment that warrants withdrawal; and justify inability to
-              resume or successfully complete studies for the term, in clear
-              support of a medical withdrawal.
-            </li>
-            <li>
-              <strong>Primary caregiver:</strong> Physician must certify that
-              immediate family member was being cared for by you; include dates
-              of impediment; bear an original signature and license number.
-            </li>
-            <li>
-              <strong>Legal detention:</strong> Legal advisor must certify you
-              were unable to complete coursework due to specific legal issue;
-              include dates of incarceration/court appearance; bear an original
-              signature.
-            </li>
-            <li>
-              <strong>Death of immediate family member:</strong> Copy of
-              original death certificate; immediate family member includes
-              mother, father, sister, brother, child, spouse, grandparent.
-            </li>
-            <li>
-              <strong>Military deployment:</strong> Copy of the original
-              military orders with active service dates.
-            </li>
-          </ul>
-
-          <p class="documentation-note">
-            All originals of requested documents must be submitted by the posted
-            deadlines to expedite processing of the approved request. You must
-            submit a statement accepting grade change and loss of completed
-            courses with passing grades, if applicable.
-          </p>
-
-          <p class="documentation-note">
-            Under a medical withdrawal, an enrollment hold will be placed on
-            your account. In order to lift the hold and return to course
-            enrollment: (a) submit a petition requesting reinstatement,
-            including return from Leave of Absence for doctoral students; and
-            (b) submit a doctor's letter verifying your ability to successfully
-            resume coursework, usually from the same licensed professional who
-            recommended withdrawal. Such documentation for reinstatement from
-            medical withdrawal must be submitted no later than two weeks prior
-            to start of the term of your intended reenrollment. Any future
-            course enrollment will be cancelled unless hold is lifted.
-          </p>
-
-          <div class="file-upload-section">
-            <label for="documentation">Upload Supporting Documentation:</label>
-            <input
-              type="file"
-              id="documentation"
-              name="documentation"
-              multiple
-            />
-            <p class="file-note">
-              Accepted formats: PDF, JPG, JPEG, PNG (Max size: 10MB)
-            </p>
-          </div>
-        </div>
-
         <!-- Form Actions - Updated with draft saving option -->
         <div class="form-actions">
           <button
@@ -955,6 +860,7 @@
             <label>Section:</label>
             <input type="text" name="course_section[]" placeholder="e.g., 001" required>
           </div>
+        </div>
           <button type="button" class="remove-course" aria-label="Remove course">×</button>
         </div>
       `;
