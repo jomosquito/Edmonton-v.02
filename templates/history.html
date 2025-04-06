@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Form Submission History</title>
     <style>
-        
         body {
             background-color: #6a5acd;
             font-family: Arial, sans-serif;
@@ -12,8 +10,6 @@
             padding: 20px;
             color: #fff;
         }
-
-        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -21,19 +17,14 @@
             color: #000;
             margin-top: 20px;
         }
-
-        th,
-        td {
+        th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
-
         th {
             background-color: #f2f2f2;
         }
-
-        /* Styling for the Return button */
         .return-btn {
             display: inline-block;
             background-color: #0c120c;
@@ -45,25 +36,16 @@
             transition: background-color 0.3s ease;
             margin: 20px 0;
         }
-
-        .return-btn:hover {
-            background-color: #8345a0;
-        }
-
-        
         .button-container {
             text-align: center;
         }
-
-        /* Status badges */
-        .status-accepted {
+        .status-approved {
             background-color: #14e71b;
             color: white;
             padding: 6px 12px;
             border-radius: 20px;
             font-weight: bold;
         }
-
         .status-rejected {
             background-color: #ff4444;
             color: white;
@@ -71,21 +53,9 @@
             border-radius: 20px;
             font-weight: bold;
         }
-
-        /* Header styling */
-        .page-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
     </style>
 </head>
-
 <body>
-    <div class="page-header">
-        <h1>Form Submission History</h1>
-        <p>History for {{ user.first_name }} {{ user.last_name }}</p>
-    </div>
-
     <div class="button-container">
         <a href="/admin" class="return-btn">Back to Admin</a>
     </div>
@@ -93,33 +63,30 @@
     <table>
         <thead>
             <tr>
-                <th>Submission Date</th>
+                <th>Date</th>
                 <th>Form Type</th>
                 <th>Status</th>
                 <th>Reviewed By</th>
             </tr>
         </thead>
         <tbody>
-            {% for submission in history %}
+            {% for entry in history %}
             <tr>
-                <td>{{ submission.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ submission.form_type }}</td>
+                <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ entry.form_type }}</td>
                 <td>
-                    {% if submission.status == 'accepted' %}
-                    <span class="status-accepted">Accepted</span>
-                    {% else %}
-                    <span class="status-rejected">Rejected</span>
-                    {% endif %}
+                    <span class="status-{{ entry.status }}">
+                        {{ entry.status|title }}
+                    </span>
                 </td>
-                <td>{{ submission.reviewed_by or 'System' }}</td>
+                <td>{{ entry.reviewed_by }}</td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="4" style="text-align: center;">No submission history found</td>
+                <td colspan="4" style="text-align: center;">No form submissions found</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </body>
-
 </html>
