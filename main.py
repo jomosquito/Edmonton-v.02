@@ -1,4 +1,3 @@
-# Imports
 from flask import Flask, render_template, url_for, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -167,6 +166,19 @@ class MedicalWithdrawalRequest(db.Model):
     @property
     def request_type(self):
         return f"{self.reason_type} Term Withdrawal"
+    
+class WithdrawalHistory(db.Model):
+    __tablename__ = 'withdrawal_history'
+    id = db.Column(db.Integer, primary_key=True)
+    withdrawal_id = db.Column(db.Integer, db.ForeignKey('medical_withdrawal_request.id'))
+    admin_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
+    action = db.Column(db.String(20))  # 'approved', 'rejected'
+    comments = db.Column(db.Text)
+    action_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    withdrawal = db.relationship('MedicalWithdrawalRequest', backref='history_entries')
+    admin = db.relationship('Profile', backref='withdrawal_actions')
 
 # -------------------------------
 # Routes
@@ -682,6 +694,18 @@ def approve_medical_withdrawal(request_id):
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
     
+    # Get comments from form
+    comments = request.form.get('comments', '')
+    
+    # Create history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='approved',
+        comments=comments
+    )
+    db.session.add(history_entry)
+    
     # Change status to approved
     req_record.status = 'approved'
     db.session.commit()
@@ -727,9 +751,40 @@ def reject_medical_withdrawal(request_id):
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before rejecting", 400
     
+    # Get comments from form
+    comments = request.form.get('comments', '')
+    
+    # Create history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='rejected',
+        comments=comments
+    )
+    db.session.add(history_entry)
+    
     # Change status to rejected
     req_record.status = 'rejected'
     db.session.commit()
+    
+    # Generate PDF with LaTeX
+    from pdf_utils import generate_medical_withdrawal_pdf
+    pdf_path = generate_medical_withdrawal_pdf(req_record)
+    
+    # Store the PDF path
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
+            
+        db.session.commit()
+        
+    return redirect(url_for('notification'))
     
     # Generate PDF with LaTeX
     from pdf_utils import generate_medical_withdrawal_pdf
@@ -961,6 +1016,32 @@ def approve_student_drop(request_id):
     return redirect(url_for('notification'))
 
 
+@app.route('/withdrawal_history/<int:request_id>')
+def withdrawal_history(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+    
+    # Get the withdrawal request
+    withdrawal = MedicalWithdrawalRequest.query.get_or_404(request_id)
+    
+    # Get all history entries for this request, ordered by date
+    history_entries = WithdrawalHistory.query.filter_by(
+        withdrawal_id=request_id
+    ).order_by(
+        WithdrawalHistory.action_date.desc()
+    ).all()
+    
+    return render_template(
+        'withdrawal_history.html',
+        withdrawal=withdrawal,
+        history_entries=history_entries
+    )
+
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
 def reject_student_drop(request_id):
     """Reject a student-initiated drop request and generate a PDF"""
@@ -1020,6 +1101,63 @@ def view_student_drop(request_id):
                           request=request_record,
                           is_admin=is_admin)
 
+@app.route('/form_history')
+def form_history():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Get current user (admin viewing the history)
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Combine both types of form submissions
+    history_entries = []
+
+    # Process Medical Withdrawal Requests
+    medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for req in medical_requests:
+        # Get the most recent history entry for this request
+        history = WithdrawalHistory.query.filter_by(
+            withdrawal_id=req.id
+        ).order_by(
+            WithdrawalHistory.action_date.desc()
+        ).first()
+        
+        history_entries.append({
+            'timestamp': req.updated_at,
+            'form_type': 'Medical Withdrawal',
+            'status': req.status,
+            'reviewed_by': history.admin.first_name + ' ' + history.admin.last_name if history else 'System',
+            'original_request': req  # Keep reference if needed
+        })
+
+    # Process Student Drop Requests
+    student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for drop in student_drops:
+        history_entries.append({
+            'timestamp': drop.created_at,  # Using created_at since we don't have updated_at
+            'form_type': 'Student Course Drop',
+            'status': drop.status,
+            'reviewed_by': 'System',  # Modify if you track approvers for drops
+            'original_request': drop  # Keep reference if needed
+        })
+
+    # Sort all entries by timestamp (newest first)
+    history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
+
+    return render_template(
+        'history.html',
+        user=user,
+        history=history_entries
+    )
 
 @app.route('/download_student_drop_pdf/<int:request_id>/<string:status>')
 def download_student_drop_pdf(request_id, status):
@@ -1079,6 +1217,65 @@ def download_student_drop_pdf(request_id, status):
         return send_file(pdf_path, as_attachment=True)
     
     return "PDF file not found", 404
+
+@app.route('/history/<int:user_id>')
+def user_form_history(user_id):
+    # Authentication and authorization checks
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    current_user = Profile.query.get(session['user_id'])
+    if not current_user or current_user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    # Get the user whose history we're viewing
+    user = Profile.query.get_or_404(user_id)
+
+    # Get form history data
+    history_entries = []
+    
+    # Medical Withdrawals
+    medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.user_id == user_id,
+        MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for req in medical_requests:
+        history = WithdrawalHistory.query.filter_by(
+            withdrawal_id=req.id
+        ).order_by(
+            WithdrawalHistory.action_date.desc()
+        ).first()
+        
+        history_entries.append({
+            'timestamp': req.updated_at or req.created_at,  # Use updated_at if available
+            'form_type': 'Medical Withdrawal',
+            'status': req.status,
+            'reviewed_by': f"{history.admin.first_name} {history.admin.last_name}" if history else 'System'
+        })
+
+    # Student Drops (assuming student_id is string)
+    student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.student_id == str(user_id),
+        StudentInitiatedDrop.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for drop in student_drops:
+        history_entries.append({
+            'timestamp': drop.created_at,  # Student drops might not have updated_at
+            'form_type': 'Student Course Drop',
+            'status': drop.status,
+            'reviewed_by': 'System'  # Modify if you track approvers
+        })
+
+    # Sort by timestamp (newest first)
+    history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
+
+    return render_template(
+        'history.html',
+        user=user,
+        history=history_entries
+    )
 
 @app.route('/student_initiated_drop')
 def student_initiated_drop():
