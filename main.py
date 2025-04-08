@@ -71,6 +71,7 @@ class Profile(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
+    
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -1173,6 +1174,35 @@ def user_form_history(user_id):
 def admin_student_drops():
     drop_requests = StudentInitiatedDrop.query.all()
     return render_template('admin_student_drops.html', drop_requests=drop_requests)
+
+@app.route('/mark_student_drop_viewed/<int:request_id>', methods=['POST'])
+def mark_student_drop_viewed(request_id):
+    """Mark a student drop request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+        
+    req_record = StudentInitiatedDrop.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+    
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+    
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+    
+    return {"success": True}
+
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
 def approve_student_drop(request_id):
     """Approve a student-initiated drop request and generate a PDF"""
@@ -1187,6 +1217,10 @@ def approve_student_drop(request_id):
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
+    
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before approving", 400
     
     # Change status to approved
     req_record.status = 'approved'
@@ -1226,6 +1260,10 @@ def reject_student_drop(request_id):
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
+    
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before rejecting", 400
     
     # Change status to rejected
     req_record.status = 'rejected'
