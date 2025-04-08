@@ -5,6 +5,7 @@ from datetime import datetime
 from O365 import Account
 import json
 import os
+from datetime import datetime, timedelta
 from config import client_id, client_secret, SECRET_KEY
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -70,6 +71,7 @@ class Profile(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
+    
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -98,6 +100,21 @@ class StudentInitiatedDrop(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
+
+
+class WithdrawalHistory(db.Model):
+    __tablename__ = 'withdrawal_history'
+    id = db.Column(db.Integer, primary_key=True)
+    withdrawal_id = db.Column(db.Integer, db.ForeignKey('medical_withdrawal_request.id'))
+    admin_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
+    action = db.Column(db.String(20))  # 'approved', 'rejected'
+    comments = db.Column(db.Text)
+    action_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    withdrawal = db.relationship('MedicalWithdrawalRequest', backref='history_entries')
+    admin = db.relationship('Profile', backref='withdrawal_actions')
+
 
 # Medical/Administrative Withdrawal Request Model
 class MedicalWithdrawalRequest(db.Model):
@@ -167,6 +184,14 @@ class MedicalWithdrawalRequest(db.Model):
     @property
     def request_type(self):
         return f"{self.reason_type} Term Withdrawal"
+    
+
+# Helper function to convert UTC to GMT-5
+def utc_to_gmt5(utc_datetime):
+    """Convert UTC datetime to GMT-5 timezone"""
+    if utc_datetime is None:
+        return None
+    return utc_datetime - timedelta(hours=5)
 
 # -------------------------------
 # Routes
@@ -215,8 +240,28 @@ def index():
 # Admin login page and route
 @app.route('/admin')
 def admin():
-    profiles = Profile.query.all()  # Retrieve all profiles from the database
-    return render_template('adminlogin.html', profiles=profiles)
+    # If already logged in as admin, redirect to dashboard
+    if session.get('user_id') and session.get('admin'):
+        return redirect(url_for('ap'))
+    
+    # Otherwise show login page
+    return render_template('adminlogin.html')
+
+@app.route('/adminpage')
+def adminpage():
+    # Authentication check
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all profiles for user management
+    profiles = Profile.query.all()
+    
+    return render_template('adminpage.html', profiles=profiles)
 
 @app.route('/a')
 def ad():
@@ -231,6 +276,7 @@ def profileview():
     user = Profile.query.get(user_id)
     return render_template('profile.html', user=user)
 
+# Update the admin login route
 @app.route('/loginadmin', methods=['GET', 'POST'])
 def loginadmin():
     if request.method == 'POST':
@@ -239,30 +285,27 @@ def loginadmin():
         
         # Hardcoded admin credentials for demo purposes
         if first_name == "admin" and pass_word == "admin123":
-            profiles = Profile.query.all()
-            # Create a session variable to indicate admin status
             session['admin'] = True
-            session['user_id'] = 0  # Special ID for hardcoded admin
-            return render_template('adminpage.html', profiles=profiles)
+            session['user_id'] = -2  # Special ID for hardcoded admin
+            return redirect(url_for('ap'))
         
         # Second hardcoded admin account
         elif first_name == "superadmin" and pass_word == "super123":
-            profiles = Profile.query.all()
-            # Create a session variable to indicate admin status
             session['admin'] = True
             session['user_id'] = -1  # Different special ID for the second hardcoded admin
-            return render_template('adminpage.html', profiles=profiles)
+            return redirect(url_for('ap'))
         
-        # Regular database check
-        profiles = Profile.query.all()
+        # Database check
         user = Profile.query.filter_by(first_name=first_name).first()
         if user and user.check_password(pass_word) and user.privilages_ == "admin":
             session['admin'] = True
             session['user_id'] = user.id
-            return render_template('adminpage.html', profiles=profiles)
+            return redirect(url_for('ap'))
         else:
             return "Invalid username or password!"
-    return render_template('adminlogin.html')
+    
+    # GET request should redirect to admin login page
+    return redirect(url_for('admin'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -319,11 +362,52 @@ def activate(id):
     db.session.commit()
     return redirect('/ap')
 
-# Updated /ap route to return all profiles
 @app.route('/ap')
 def ap():
+    # Authentication check
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    # Special case for hardcoded admin users
+    if user_id == -2 or user_id == -1:
+        if session.get('admin'):
+            # Hardcoded admin is authenticated
+            profiles = Profile.query.all()
+            pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+            pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+            now = datetime.utcnow()
+            
+            return render_template(
+                'admin_dashboard.html', 
+                profiles=profiles,
+                pending_medical_requests=pending_medical_requests,
+                pending_student_drops=pending_student_drops,
+                now=now
+            )
+    
+    # Regular database users
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all profiles for the dashboard
     profiles = Profile.query.all()
-    return render_template('adminpage.html', profiles=profiles)
+    
+    # Get pending requests for the dashboard
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    
+    # Add current server time for the dashboard
+    now = datetime.utcnow()
+    
+    return render_template(
+        'admin_dashboard.html', 
+        profiles=profiles,
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        now=now
+    )
 
 # -------------------------------
 # Microsoft OAuth Endpoints
@@ -496,7 +580,7 @@ def create_profile():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 # -------------------------------
 # Medical Withdrawal Form Routes
@@ -682,6 +766,18 @@ def approve_medical_withdrawal(request_id):
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
     
+    # Get comments from form
+    comments = request.form.get('comments', '')
+    
+    # Create history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='approved',
+        comments=comments
+    )
+    db.session.add(history_entry)
+    
     # Change status to approved
     req_record.status = 'approved'
     db.session.commit()
@@ -691,7 +787,22 @@ def approve_medical_withdrawal(request_id):
     
     # Generate PDF with LaTeX
     from pdf_utils import generate_medical_withdrawal_pdf
-    pdf_path = generate_medical_withdrawal_pdf(req_record, admin_signature)
+    pdf_path = generate_medical_withdrawal_pdf(req_record)
+    
+    # Store the PDF path
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
+            
+        db.session.commit()
+        
+    return redirect(url_for('notification'))
     
     # Store the PDF path in the request record
     if pdf_path:
@@ -726,6 +837,18 @@ def reject_medical_withdrawal(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before rejecting", 400
+    
+    # Get comments from form
+    comments = request.form.get('comments', '')
+    
+    # Create history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='rejected',
+        comments=comments
+    )
+    db.session.add(history_entry)
     
     # Change status to rejected
     req_record.status = 'rejected'
@@ -918,10 +1041,168 @@ def submit_student_drop():
     db.session.commit()
 
     return redirect(url_for('status'))  # Redirect to the status page
+
+# Now let's add a route for viewing form history for all users
+@app.route('/form_history')
+def form_history():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Get current user (admin viewing the history)
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+
+    # Combine both types of form submissions
+    history_entries = []
+
+    # Process Medical Withdrawal Requests
+    medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for req in medical_requests:
+        # Get the most recent history entry for this request
+        history = WithdrawalHistory.query.filter_by(
+            withdrawal_id=req.id
+        ).order_by(
+            WithdrawalHistory.action_date.desc()
+        ).first()
+        
+        history_entries.append({
+            'timestamp': req.updated_at or req.created_at,
+            'form_type': 'Medical Withdrawal',
+            'status': req.status,
+            'reviewed_by': history.admin.first_name + ' ' + history.admin.last_name if history else 'System',
+            'original_request': req  # Keep reference if needed
+        })
+
+    # Process Student Drop Requests
+    student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for drop in student_drops:
+        history_entries.append({
+            'timestamp': drop.created_at,  # Using created_at since we don't have updated_at
+            'form_type': 'Student Course Drop',
+            'status': drop.status,
+            'reviewed_by': 'System',  # Modify if you track approvers for drops
+            'original_request': drop  # Keep reference if needed
+        })
+
+    # Sort all entries by timestamp (newest first)
+    history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    # Get current time in GMT-5
+    now = utc_to_gmt5(datetime.utcnow())
+
+    return render_template(
+        'history.html',
+        user=user,
+        history=history_entries,
+        now=now
+    )
+
+# Add a route for viewing form history for a specific user
+@app.route('/history/<int:user_id>')
+def user_form_history(user_id):
+    # Authentication and authorization checks
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    current_user = Profile.query.get(session['user_id'])
+    if not current_user or current_user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    # Get the user whose history we're viewing
+    user = Profile.query.get_or_404(user_id)
+
+    # Get form history data
+    history_entries = []
+    
+    # Medical Withdrawals
+    medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.user_id == user_id,
+        MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for req in medical_requests:
+        history = WithdrawalHistory.query.filter_by(
+            withdrawal_id=req.id
+        ).order_by(
+            WithdrawalHistory.action_date.desc()
+        ).first()
+        
+        history_entries.append({
+            'timestamp': req.updated_at or req.created_at,  # Use updated_at if available
+            'form_type': 'Medical Withdrawal',
+            'status': req.status,
+            'reviewed_by': f"{history.admin.first_name} {history.admin.last_name}" if history else 'System'
+        })
+
+    # Student Drops (assuming student_id is string)
+    student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.student_id == str(user_id),
+        StudentInitiatedDrop.status.in_(['approved', 'rejected'])
+    ).all()
+    
+    for drop in student_drops:
+        history_entries.append({
+            'timestamp': drop.created_at,  # Student drops might not have updated_at
+            'form_type': 'Student Course Drop',
+            'status': drop.status,
+            'reviewed_by': 'System'  # Modify if you track approvers
+        })
+
+    # Sort by timestamp (newest first)
+    history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
+    
+    # Get current time in GMT-5
+    now = utc_to_gmt5(datetime.utcnow())
+
+    return render_template(
+        'user_form_history.html',  # Use the new template for individual user history
+        user=user,
+        history=history_entries,
+        now=now
+    )
+
+
 @app.route('/admin/student_drops')
 def admin_student_drops():
     drop_requests = StudentInitiatedDrop.query.all()
     return render_template('admin_student_drops.html', drop_requests=drop_requests)
+
+@app.route('/mark_student_drop_viewed/<int:request_id>', methods=['POST'])
+def mark_student_drop_viewed(request_id):
+    """Mark a student drop request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+        
+    req_record = StudentInitiatedDrop.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+    
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+    
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+    
+    return {"success": True}
+
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
 def approve_student_drop(request_id):
     """Approve a student-initiated drop request and generate a PDF"""
@@ -936,6 +1217,10 @@ def approve_student_drop(request_id):
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
+    
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before approving", 400
     
     # Change status to approved
     req_record.status = 'approved'
@@ -975,6 +1260,10 @@ def reject_student_drop(request_id):
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
+    
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before rejecting", 400
     
     # Change status to rejected
     req_record.status = 'rejected'
