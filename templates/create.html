@@ -1,470 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create New User</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
 
-        /* Admin Navigation Bar Styles */
-        .admin-navbar {
-            background-color: #333;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+      /* Admin Navigation Bar Styles */
+      .admin-navbar {
+        background-color: #333;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
 
+      .admin-navbar .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .admin-navbar .logo {
+        color: white;
+        font-weight: bold;
+        font-size: 1.5rem;
+        padding: 14px 0;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+      }
+
+      .admin-navbar .logo i {
+        margin-right: 10px;
+      }
+
+      .admin-navbar .nav-links {
+        display: flex;
+      }
+
+      .admin-navbar .nav-links a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 16px 20px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .admin-navbar .nav-links a:hover {
+        background-color: #555;
+      }
+
+      .admin-navbar .nav-links a.active {
+        background-color: #6a5acd;
+        color: white;
+      }
+
+      .admin-navbar .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      /* Page title and breadcrumb styles */
+      .page-header {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #dee2e6;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .page-header .breadcrumb {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .page-header .breadcrumb li {
+        display: inline;
+        font-size: 0.9rem;
+      }
+
+      .page-header .breadcrumb li:not(:last-child)::after {
+        content: ">";
+        margin: 0 10px;
+        color: #6c757d;
+      }
+
+      .page-header .breadcrumb a {
+        color: #6a5acd;
+        text-decoration: none;
+      }
+
+      .page-header .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+
+      .page-header .breadcrumb .current {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .page-header h2 {
+        margin: 10px 0 0 0;
+        color: #333;
+      }
+
+      /* Form Styles */
+      .form-container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 30px auto;
+      }
+
+      .form-container h2 {
+        color: #6a5acd;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"],
+      input[type="tel"],
+      select {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus,
+      input[type="tel"]:focus,
+      select:focus {
+        border-color: #6a5acd;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.1);
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      button[type="submit"] {
+        background-color: #6a5acd;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+        width: 100%;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #5949b9;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+      }
+
+      .back-link {
+        display: inline-block;
+        background-color: #6c757d;
+        color: white;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        text-align: center;
+      }
+
+      .back-link:hover {
+        background-color: #5a6268;
+      }
+
+      /* Form validation styles */
+      .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+      }
+
+      input.invalid {
+        border-color: #dc3545;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
         .admin-navbar .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+          flex-direction: column;
+          align-items: stretch;
         }
 
-        .admin-navbar .logo {
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
-            padding: 14px 0;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .admin-navbar .logo i {
-            margin-right: 10px;
-        }
-
-        .admin-navbar .nav-links {
-            display: flex;
-        }
-
-        .admin-navbar .nav-links a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 16px 20px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .admin-navbar .nav-links a:hover {
-            background-color: #555;
-        }
-
-        .admin-navbar .nav-links a.active {
-            background-color: #6a5acd;
-            color: white;
+        .admin-navbar .top-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
 
         .admin-navbar .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
+          display: block;
         }
 
-        /* Page title and breadcrumb styles */
-        .page-header {
-            background-color: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 1px solid #dee2e6;
-            max-width: 1200px;
-            margin: 0 auto;
+        .admin-navbar .nav-links {
+          display: none;
+          flex-direction: column;
+          width: 100%;
         }
 
-        .page-header .breadcrumb {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .admin-navbar .nav-links.active {
+          display: flex;
         }
 
-        .page-header .breadcrumb li {
-            display: inline;
-            font-size: 0.9rem;
+        .admin-navbar .nav-links a {
+          text-align: left;
+          padding: 12px 20px;
         }
 
-        .page-header .breadcrumb li:not(:last-child)::after {
-            content: ">";
-            margin: 0 10px;
-            color: #6c757d;
-        }
-
-        .page-header .breadcrumb a {
-            color: #6a5acd;
-            text-decoration: none;
-        }
-
-        .page-header .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        .page-header .breadcrumb .current {
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .page-header h2 {
-            margin: 10px 0 0 0;
-            color: #333;
-        }
-
-        /* Form Styles */
         .form-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 30px auto;
-        }
-
-        .form-container h2 {
-            color: #6a5acd;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"],
-        select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus,
-        input[type="tel"]:focus,
-        select:focus {
-            border-color: #6a5acd;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.1);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        button[type="submit"] {
-            background-color: #6a5acd;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background-color 0.3s;
-            width: 100%;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #5949b9;
+          margin: 20px;
+          padding: 20px;
         }
 
         .form-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
+          flex-direction: column;
+          gap: 10px;
         }
-
-        .back-link {
-            display: inline-block;
-            background-color: #6c757d;
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            text-align: center;
-        }
-
-        .back-link:hover {
-            background-color: #5a6268;
-        }
-
-        /* Form validation styles */
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        input.invalid {
-            border-color: #dc3545;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .admin-navbar .nav-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .admin-navbar .top-bar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .admin-navbar .menu-toggle {
-                display: block;
-            }
-
-            .admin-navbar .nav-links {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .admin-navbar .nav-links.active {
-                display: flex;
-            }
-
-            .admin-navbar .nav-links a {
-                text-align: left;
-                padding: 12px 20px;
-            }
-
-            .form-container {
-                margin: 20px;
-                padding: 20px;
-            }
-
-            .form-actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Admin Navigation Bar -->
     <nav class="admin-navbar">
-        <div class="nav-container">
-            <div class="top-bar">
-                <a href="/ap" class="logo">
-                    <i class="fas fa-shield-alt"></i> Admin Portal
-                </a>
-                <button class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            <div class="nav-links">
-                <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
-                <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-                <a href="/admin/student_drops"><i class="fas fa-file-alt"></i> Student Drops</a>
-                <a href="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
+      <div class="nav-container">
+        <div class="top-bar">
+          <a href="/ap" class="logo">
+            <i class="fas fa-shield-alt"></i> Admin Portal
+          </a>
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
         </div>
+        <div class="nav-links">
+          <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
+          <a href="/admin/student_drops"
+            ><i class="fas fa-file-alt"></i> Student Drops</a
+          >
+          <a href="{{ url_for('logout') }}"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
+        </div>
+      </div>
     </nav>
 
     <!-- Page Header with Breadcrumbs -->
     <div class="page-header">
-        <ul class="breadcrumb">
-            <li><a href="/ap">Admin</a></li>
-            <li class="current">Create User</li>
-        </ul>
-        <h2>Create New User</h2>
+      <ul class="breadcrumb">
+        <li><a href="/ap">Admin</a></li>
+        <li class="current">Create User</li>
+      </ul>
+      <h2>Create New User</h2>
     </div>
 
     <div class="form-container">
-        <h2><i class="fas fa-user-plus"></i> Add New User</h2>
-        <form method="POST" id="create-user-form" onsubmit="return validateForm()">
-            <div class="form-group">
-                <label for="email">Email: <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required>
-                <div id="email-error" class="error-message"></div>
-            </div>
+      <h2><i class="fas fa-user-plus"></i> Add New User</h2>
+      <form
+        method="POST"
+        id="create-user-form"
+        onsubmit="return validateForm()"
+      >
+        <div class="form-group">
+          <label for="email">Email: <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required />
+          <div id="email-error" class="error-message"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="first_name">First Name: <span class="required">*</span></label>
-                <input type="text" id="first_name" name="first_name" required>
-                <div id="first-name-error" class="error-message"></div>
-            </div>
+        <div class="form-group">
+          <label for="first_name"
+            >First Name: <span class="required">*</span></label
+          >
+          <input type="text" id="first_name" name="first_name" required />
+          <div id="first-name-error" class="error-message"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="last_name">Last Name: <span class="required">*</span></label>
-                <input type="text" id="last_name" name="last_name" required>
-                <div id="last-name-error" class="error-message"></div>
-            </div>
+        <div class="form-group">
+          <label for="last_name"
+            >Last Name: <span class="required">*</span></label
+          >
+          <input type="text" id="last_name" name="last_name" required />
+          <div id="last-name-error" class="error-message"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="phone">Phone Number: <span class="required">*</span></label>
-                <input type="tel" id="phone" name="phone" placeholder="Format: 555-123-4567" required>
-                <div id="phone-error" class="error-message"></div>
-            </div>
+        <div class="form-group">
+          <label for="phone"
+            >Phone Number: <span class="required">*</span></label
+          >
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Format: 555-123-4567"
+            required
+          />
+          <div id="phone-error" class="error-message"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="privileges">User Type:</label>
-                <select id="privileges" name="privileges">
-                    <option value="user">Regular User</option>
-                    <option value="admin">Administrator</option>
-                </select>
-            </div>
+        <div class="form-group">
+          <label for="privileges">User Type:</label>
+          <select id="privileges" name="privileges">
+            <option value="user">Regular User</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
 
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="active" name="active" checked>
-                <label for="active">Active Account</label>
-            </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="active" name="active" checked />
+          <label for="active">Active Account</label>
+        </div>
 
-            <div class="form-group">
-                <label for="pass_word">Password: <span class="required">*</span></label>
-                <input type="password" id="pass_word" name="pass_word" required>
-                <div id="password-error" class="error-message"></div>
-            </div>
+        <div class="form-group">
+          <label for="pass_word"
+            >Password: <span class="required">*</span></label
+          >
+          <input type="password" id="pass_word" name="pass_word" required />
+          <div id="password-error" class="error-message"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password: <span class="required">*</span></label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-                <div id="confirm-password-error" class="error-message"></div>
-            </div>
+        <div class="form-group">
+          <label for="confirm_password"
+            >Confirm Password: <span class="required">*</span></label
+          >
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            required
+          />
+          <div id="confirm-password-error" class="error-message"></div>
+        </div>
 
-            <button type="submit"><i class="fas fa-save"></i> Create User</button>
-            
-            <div class="form-actions">
-                <a href="/ap" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-            </div>
-        </form>
+        <button type="submit"><i class="fas fa-save"></i> Create User</button>
+
+        <div class="form-actions">
+          <a href="/ap" class="back-link"
+            ><i class="fas fa-arrow-left"></i> Back to Dashboard</a
+          >
+        </div>
+      </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle mobile menu
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navLinks = document.querySelector('.nav-links');
-            
-            if (menuToggle && navLinks) {
-                menuToggle.addEventListener('click', function() {
-                    navLinks.classList.toggle('active');
-                });
-            }
+      document.addEventListener("DOMContentLoaded", function () {
+        // Toggle mobile menu
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navLinks = document.querySelector(".nav-links");
 
-            // Set active link based on current page
-            const currentPath = window.location.pathname;
-            const navItems = document.querySelectorAll('.nav-links a');
-            
-            navItems.forEach(item => {
-                const href = item.getAttribute('href');
-                if (currentPath === href || 
-                    (href !== '/' && currentPath.startsWith(href))) {
-                    item.classList.add('active');
-                }
-            });
+        if (menuToggle && navLinks) {
+          menuToggle.addEventListener("click", function () {
+            navLinks.classList.toggle("active");
+          });
+        }
 
-            // Phone number formatting
-            const phoneInput = document.getElementById('phone');
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-                    if (value.length > 0) {
-                        // Format with dashes
-                        if (value.length > 3) {
-                            value = value.substring(0, 3) + '-' + value.substring(3);
-                        }
-                        if (value.length > 7) {
-                            value = value.substring(0, 7) + '-' + value.substring(7);
-                        }
-                        if (value.length > 12) {
-                            value = value.substring(0, 12);
-                        }
-                    }
-                    e.target.value = value;
-                });
-            }
+        // Set active link based on current page
+        const currentPath = window.location.pathname;
+        const navItems = document.querySelectorAll(".nav-links a");
+
+        navItems.forEach((item) => {
+          const href = item.getAttribute("href");
+          if (
+            currentPath === href ||
+            (href !== "/" && currentPath.startsWith(href))
+          ) {
+            item.classList.add("active");
+          }
         });
 
-        function validateForm() {
-            let isValid = true;
-            
-            // Reset previous error states
-            document.querySelectorAll('.error-message').forEach(el => {
-                el.style.display = 'none';
-            });
-            document.querySelectorAll('input').forEach(el => {
-                el.classList.remove('invalid');
-            });
-            
-            // Email validation
-            const emailInput = document.getElementById('email');
-            const emailError = document.getElementById('email-error');
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (!emailPattern.test(emailInput.value)) {
-                emailError.textContent = 'Please enter a valid email address';
-                emailError.style.display = 'block';
-                emailInput.classList.add('invalid');
-                isValid = false;
+        // Phone number formatting
+        const phoneInput = document.getElementById("phone");
+        if (phoneInput) {
+          phoneInput.addEventListener("input", function (e) {
+            let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+            if (value.length > 0) {
+              // Format with dashes
+              if (value.length > 3) {
+                value = value.substring(0, 3) + "-" + value.substring(3);
+              }
+              if (value.length > 7) {
+                value = value.substring(0, 7) + "-" + value.substring(7);
+              }
+              if (value.length > 12) {
+                value = value.substring(0, 12);
+              }
             }
-            
-            // Phone validation
-            const phoneInput = document.getElementById('phone');
-            const phoneError = document.getElementById('phone-error');
-            const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
-            
-            if (!phonePattern.test(phoneInput.value)) {
-                phoneError.textContent = 'Please enter a valid phone number (XXX-XXX-XXXX)';
-                phoneError.style.display = 'block';
-                phoneInput.classList.add('invalid');
-                isValid = false;
-            }
-            
-            // Password matching
-            const passwordInput = document.getElementById('pass_word');
-            const confirmPasswordInput = document.getElementById('confirm_password');
-            const confirmPasswordError = document.getElementById('confirm-password-error');
-            
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordError.textContent = 'Passwords do not match';
-                confirmPasswordError.style.display = 'block';
-                confirmPasswordInput.classList.add('invalid');
-                isValid = false;
-            }
-            
-            return isValid;
+            e.target.value = value;
+          });
         }
+      });
+
+      function validateForm() {
+        let isValid = true;
+
+        // Reset previous error states
+        document.querySelectorAll(".error-message").forEach((el) => {
+          el.style.display = "none";
+        });
+        document.querySelectorAll("input").forEach((el) => {
+          el.classList.remove("invalid");
+        });
+
+        // Email validation
+        const emailInput = document.getElementById("email");
+        const emailError = document.getElementById("email-error");
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(emailInput.value)) {
+          emailError.textContent = "Please enter a valid email address";
+          emailError.style.display = "block";
+          emailInput.classList.add("invalid");
+          isValid = false;
+        }
+
+        // Phone validation
+        const phoneInput = document.getElementById("phone");
+        const phoneError = document.getElementById("phone-error");
+        const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+
+        if (!phonePattern.test(phoneInput.value)) {
+          phoneError.textContent =
+            "Please enter a valid phone number (XXX-XXX-XXXX)";
+          phoneError.style.display = "block";
+          phoneInput.classList.add("invalid");
+          isValid = false;
+        }
+
+        // Password matching
+        const passwordInput = document.getElementById("pass_word");
+        const confirmPasswordInput =
+          document.getElementById("confirm_password");
+        const confirmPasswordError = document.getElementById(
+          "confirm-password-error"
+        );
+
+        if (passwordInput.value !== confirmPasswordInput.value) {
+          confirmPasswordError.textContent = "Passwords do not match";
+          confirmPasswordError.style.display = "block";
+          confirmPasswordInput.classList.add("invalid");
+          isValid = false;
+        }
+
+        return isValid;
+      }
     </script>
-</body>
+  </body>
 </html>
