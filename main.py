@@ -285,7 +285,7 @@ def loginadmin():
         # Hardcoded admin credentials for demo purposes
         if first_name == "admin" and pass_word == "admin123":
             session['admin'] = True
-            session['user_id'] = 0  # Special ID for hardcoded admin
+            session['user_id'] = -2  # Special ID for hardcoded admin
             return redirect(url_for('ap'))
         
         # Second hardcoded admin account
@@ -368,6 +368,24 @@ def ap():
     if not user_id:
         return redirect(url_for('login'))
     
+    # Special case for hardcoded admin users
+    if user_id == -2 or user_id == -1:
+        if session.get('admin'):
+            # Hardcoded admin is authenticated
+            profiles = Profile.query.all()
+            pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+            pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+            now = datetime.utcnow()
+            
+            return render_template(
+                'admin_dashboard.html', 
+                profiles=profiles,
+                pending_medical_requests=pending_medical_requests,
+                pending_student_drops=pending_student_drops,
+                now=now
+            )
+    
+    # Regular database users
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
