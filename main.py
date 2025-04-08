@@ -262,7 +262,7 @@ def loginadmin():
             return render_template('adminpage.html', profiles=profiles)
         else:
             return "Invalid username or password!"
-    return render_template('adminlogin.html')
+    return redirect('/ap')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -319,11 +319,16 @@ def activate(id):
     db.session.commit()
     return redirect('/ap')
 
-# Updated /ap route to return all profiles
 @app.route('/ap')
 def ap():
     profiles = Profile.query.all()
-    return render_template('adminpage.html', profiles=profiles)
+    # Get pending requests for the dashboard
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    return render_template('admin_dashboard.html', 
+                           profiles=profiles,
+                           pending_medical_requests=pending_medical_requests,
+                           pending_student_drops=pending_student_drops)
 
 # -------------------------------
 # Microsoft OAuth Endpoints

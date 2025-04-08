@@ -1,78 +1,384 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Update Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
 
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            max-width: 400px;
+        /* Admin Navigation Bar Styles */
+        .admin-navbar {
+            background-color: #333;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-navbar .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .form-container input,
-        .form-container select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .admin-navbar .logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            padding: 14px 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
         }
 
-        .form-container button {
-            background-color: #008CBA;
-            color: #fff;
-            padding: 10px 20px;
+        .admin-navbar .logo i {
+            margin-right: 10px;
+        }
+
+        .admin-navbar .nav-links {
+            display: flex;
+        }
+
+        .admin-navbar .nav-links a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 16px 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .admin-navbar .nav-links a:hover {
+            background-color: #555;
+        }
+
+        .admin-navbar .nav-links a.active {
+            background-color: #6a5acd;
+            color: white;
+        }
+
+        .admin-navbar .menu-toggle {
+            display: none;
+            background: none;
             border: none;
-            border-radius: 4px;
+            color: white;
+            font-size: 1.5rem;
             cursor: pointer;
         }
 
-        .form-container button:hover {
-            background-color: #14e71b;
+        /* Page title and breadcrumb styles */
+        .page-header {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header .breadcrumb {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-header .breadcrumb li {
+            display: inline;
+            font-size: 0.9rem;
+        }
+
+        .page-header .breadcrumb li:not(:last-child)::after {
+            content: ">";
+            margin: 0 10px;
+            color: #6c757d;
+        }
+
+        .page-header .breadcrumb a {
+            color: #6a5acd;
+            text-decoration: none;
+        }
+
+        .page-header .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .page-header .breadcrumb .current {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .page-header h2 {
+            margin: 10px 0 0 0;
+            color: #333;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .form-container h2 {
+            color: #6a5acd;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #6a5acd;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        button[type="submit"] {
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #5949b9;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .back-link {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .back-link:hover {
+            background-color: #5a6268;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .admin-navbar .nav-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .admin-navbar .top-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .admin-navbar .menu-toggle {
+                display: block;
+            }
+
+            .admin-navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .admin-navbar .nav-links.active {
+                display: flex;
+            }
+
+            .admin-navbar .nav-links a {
+                text-align: left;
+                padding: 12px 20px;
+            }
+
+            .form-container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button[type="submit"],
+            .back-link {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
-
 <body>
+    <!-- Admin Navigation Bar -->
+    <nav class="admin-navbar">
+        <div class="nav-container">
+            <div class="top-bar">
+                <a href="/ap" class="logo">
+                    <i class="fas fa-shield-alt"></i> Admin Portal
+                </a>
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="nav-links">
+                <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
+                <a href="/admin/student_drops"><i class="fas fa-file-alt"></i> Student Drops</a>
+                <a href="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header with Breadcrumbs -->
+    <div class="page-header">
+        <ul class="breadcrumb">
+            <li><a href="/ap">Admin</a></li>
+            <li><a href="/ap">User Management</a></li>
+            <li class="current">Update User</li>
+        </ul>
+        <h2>Update User Profile</h2>
+    </div>
+
     <div class="form-container">
-        <h2>Update Profile</h2>
+        <h2>Edit User Information</h2>
         <form method="POST">
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" required>
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" value="{{ profile.first_name }}" required>
+            </div>
 
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" required>
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" value="{{ profile.last_name }}" required>
+            </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ profile.email_ }}" required>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ profile.email_ }}" required>
+            </div>
 
-            <label for="pass_word">New Password:</label>
-            <input type="password" id="pass_word" name="pass_word">
+            <div class="form-group">
+                <label for="pass_word">New Password:</label>
+                <input type="password" id="pass_word" name="pass_word" placeholder="Leave blank to keep current password">
+                <small style="color: #6c757d;">Only fill this if you want to change the password</small>
+            </div>
 
-            <label for="phoneN_">Phone Number:</label>
-            <input type="text" id="phoneN_" name="phoneN_" value="{{ profile.phoneN_ }}" required>
+            <div class="form-group">
+                <label for="phoneN_">Phone Number:</label>
+                <input type="text" id="phoneN_" name="phoneN_" value="{{ profile.phoneN_ }}" required>
+            </div>
 
-            <label for="privileges">Privileges:</label>
-            <select id="privileges" name="privileges">
-                <option value="user" {% if profile.privilages_=="user" %}selected{% endif %}>User</option>
-                <option value="admin" {% if profile.privilages_=="admin" %}selected{% endif %}>Admin</option>
-            </select>
+            <div class="form-group">
+                <label for="privileges">Privileges:</label>
+                <select id="privileges" name="privileges">
+                    <option value="user" {% if profile.privilages_=="user" %}selected{% endif %}>User</option>
+                    <option value="admin" {% if profile.privilages_=="admin" %}selected{% endif %}>Admin</option>
+                </select>
+            </div>
 
-            <label for="active">Active:</label>
-            <input type="checkbox" id="active" name="active" {% if profile.active %}checked{% endif %}>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="active" name="active" {% if profile.active %}checked{% endif %}>
+                <label for="active">Active Account</label>
+            </div>
 
-            <button type="submit">Update</button>
+            <div class="form-actions">
+                <a href="/ap" class="back-link"><i class="fas fa-arrow-left"></i> Back to Users</a>
+                <button type="submit"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
         </form>
     </div>
-</body>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle mobile menu
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+
+            // Set active link based on current page
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-links a');
+            
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (currentPath.includes('/update/')) {
+                    // Since we're on an update page, highlight the dashboard
+                    if (href === '/ap') {
+                        item.classList.add('active');
+                    }
+                } else if (currentPath === href || 
+                    (href !== '/' && currentPath.startsWith(href))) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
 </html>
