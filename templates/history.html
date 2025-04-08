@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Form Submission History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        
+        /* Branch2 styles */
         body {
             background-color: #6a5acd;
             font-family: Arial, sans-serif;
@@ -12,7 +13,6 @@
             padding: 20px;
             color: #fff;
         }
-
         
         table {
             width: 100%;
@@ -21,19 +21,17 @@
             color: #000;
             margin-top: 20px;
         }
-
-        th,
-        td {
+        
+        th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
-
+        
         th {
             background-color: #f2f2f2;
         }
-
-        /* Styling for the Return button */
+        
         .return-btn {
             display: inline-block;
             background-color: #0c120c;
@@ -45,25 +43,23 @@
             transition: background-color 0.3s ease;
             margin: 20px 0;
         }
-
+        
         .return-btn:hover {
             background-color: #8345a0;
         }
-
         
         .button-container {
             text-align: center;
         }
-
-        /* Status badges */
-        .status-accepted {
+        
+        .status-approved {
             background-color: #14e71b;
             color: white;
             padding: 6px 12px;
             border-radius: 20px;
             font-weight: bold;
         }
-
+        
         .status-rejected {
             background-color: #ff4444;
             color: white;
@@ -71,11 +67,52 @@
             border-radius: 20px;
             font-weight: bold;
         }
-
-        /* Header styling */
+        
+        /* Header styles */
         .page-header {
             text-align: center;
             margin-bottom: 30px;
+        }
+
+        /* Server time display */
+        .server-time {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            color: #333;
+        }
+
+        .server-time-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #6a5acd;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .server-time-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-time-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .server-time-value {
+            font-weight: bold;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -83,11 +120,24 @@
 <body>
     <div class="page-header">
         <h1>Form Submission History</h1>
+        {% if user %}
         <p>History for {{ user.first_name }} {{ user.last_name }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Server Time Display -->
+    <div class="server-time">
+        <div class="server-time-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="server-time-text">
+            <div class="server-time-label">Current Server Time (GMT-5)</div>
+            <div class="server-time-value">{{ now.strftime('%Y-%m-%d %H:%M') }}</div>
+        </div>
     </div>
 
     <div class="button-container">
-        <a href="/admin" class="return-btn">Back to Admin</a>
+        <a href="/ap" class="return-btn">Back to Admin</a>
     </div>
 
     <table>
@@ -105,8 +155,8 @@
                 <td>{{ submission.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
                 <td>{{ submission.form_type }}</td>
                 <td>
-                    {% if submission.status == 'accepted' %}
-                    <span class="status-accepted">Accepted</span>
+                    {% if submission.status == 'approved' %}
+                    <span class="status-approved">Approved</span>
                     {% else %}
                     <span class="status-rejected">Rejected</span>
                     {% endif %}

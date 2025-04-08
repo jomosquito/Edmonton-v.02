@@ -326,7 +326,7 @@
                   href="{{ url_for('download_pdf', request_id=request.id, status='pending') }}"
                   class="view-pdf"
                   target="_blank"
-                  onclick="markAsViewed({{ request.id }}, {{ session.get('user_id') }})"
+                  onclick="markAsViewed('{{ request.id }}')"
                 >
                   <i class="fas fa-file-pdf"></i> View PDF
                 </a>
@@ -452,7 +452,7 @@
       });
 
       // Function to handle AJAX update when PDF is viewed
-      function markAsViewed(requestId, adminId) {
+      function markAsViewed(requestId) {
         // After PDF is opened, wait a moment and then update UI
         setTimeout(() => {
           // Enable the buttons

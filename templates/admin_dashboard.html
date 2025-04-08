@@ -5,6 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Dashboard info styling */
+        .dashboard-info {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-info h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dashboard-info h3 i {
+            margin-right: 10px;
+            color: #6a5acd;
+        }
+        
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .info-icon {
+            font-size: 2rem;
+            color: #6a5acd;
+            margin-bottom: 15px;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
         /* Page background styling */
         body {
             background-color: #f4f4f4;
@@ -345,7 +406,7 @@
 
         .user-list-header {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr 0.5fr;
             background-color: #f8f9fa;
             padding: 12px 15px;
             font-weight: 600;
@@ -354,7 +415,7 @@
 
         .user-list-item {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr 0.5fr;
             padding: 12px 15px;
             border-bottom: 1px solid #eee;
             transition: background-color 0.3s ease;
@@ -402,6 +463,24 @@
             background-color: #dc3545;
         }
 
+        .action-icon {
+            color: #6a5acd;
+            margin-right: 5px;
+            font-size: 1.1rem;
+        }
+
+        .history-link {
+            color: #6a5acd;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-link:hover {
+            text-decoration: underline;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .admin-navbar .nav-container {
@@ -443,10 +522,10 @@
             }
 
             .user-list-header, .user-list-item {
-                grid-template-columns: 2fr 1fr 1fr;
+                grid-template-columns: 2fr 1fr 1fr 0.5fr;
             }
 
-            .user-list-header div:last-child, .user-list-item div:last-child {
+            .user-list-header div:nth-child(3), .user-list-item div:nth-child(3) {
                 display: none;
             }
         }
@@ -460,7 +539,10 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            .user-list-header div:nth-child(3), .user-list-item div:nth-child(3) {
+            .user-list-header div:nth-child(3), 
+            .user-list-item div:nth-child(3),
+            .user-list-header div:nth-child(4), 
+            .user-list-item div:nth-child(4) {
                 display: none;
             }
         }
@@ -481,8 +563,9 @@
             <div class="nav-links">
                 <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
                 <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
                 <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-                <a href="/admin/student_drops"><i class="fas fa-file-alt"></i> Student Drops</a>
+                <a href="/form_history"><i class="fas fa-history"></i> Form History</a>
                 <a href="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </div>
@@ -507,26 +590,7 @@
                 <div class="card-title">Total Users</div>
                 <div class="card-value">{{ profiles|length }}</div>
                 <div class="card-link">
-                    <a href="/ap">View All <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div class="card-title">Admin Users</div>
-                <div class="card-value">
-                    {% set admin_count = 0 %}
-                    {% for profile in profiles %}
-                        {% if profile.privilages_ == "admin" %}
-                            {% set admin_count = admin_count + 1 %}
-                        {% endif %}
-                    {% endfor %}
-                    {{ admin_count }}
-                </div>
-                <div class="card-link">
-                    <a href="/ap">View Admins <i class="fas fa-arrow-right"></i></a>
+                    <a href="/adminpage">View All <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
             
@@ -560,7 +624,7 @@
                     {% endif %}
                 </div>
                 <div class="card-link">
-                    <a href="/admin/student_drops">View Drops <i class="fas fa-arrow-right"></i></a>
+                    <a href="/notifications">View Drops <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -577,103 +641,14 @@
                     <i class="fas fa-bell"></i>
                     <span>View Notifications</span>
                 </a>
-                <a href="/admin/student_drops" class="action-button">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Student Drop Requests</span>
+                <a href="/form_history" class="action-button">
+                    <i class="fas fa-history"></i>
+                    <span>View Form History</span>
                 </a>
-                <a href="/ap" class="action-button">
+                <a href="/adminpage" class="action-button">
                     <i class="fas fa-users-cog"></i>
                     <span>Manage Users</span>
                 </a>
-            </div>
-        </section>
-
-        <!-- Recent Activity -->
-        <section class="recent-activity">
-            <h3><i class="fas fa-chart-line"></i> Recent Activity</h3>
-            <ul class="activity-list">
-                {% if pending_medical_requests is defined and pending_medical_requests|length > 0 %}
-                    {% for request in pending_medical_requests[:5] %}
-                    <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-procedures"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">
-                                Medical Withdrawal Request #{{ request.id }}
-                                <span class="activity-status status-pending">Pending</span>
-                            </div>
-                            <div class="activity-description">
-                                {{ request.first_name }} {{ request.last_name }} - {{ request.reason_type }}
-                            </div>
-                            <div class="activity-time">
-                                {{ request.created_at.strftime('%d %b %Y, %H:%M') }}
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
-                {% elif pending_student_drops is defined and pending_student_drops|length > 0 %}
-                    {% for request in pending_student_drops[:5] %}
-                    <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">
-                                Student Drop Request #{{ request.id }}
-                                <span class="activity-status status-pending">Pending</span>
-                            </div>
-                            <div class="activity-description">
-                                {{ request.student_name }} - {{ request.course_title }}
-                            </div>
-                            <div class="activity-time">
-                                {{ request.created_at.strftime('%d %b %Y, %H:%M') }}
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                    <li class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">No recent activities</div>
-                            <div class="activity-description">
-                                There are no pending requests at this time.
-                            </div>
-                        </div>
-                    </li>
-                {% endif %}
-            </ul>
-        </section>
-
-        <!-- User List Section -->
-        <section class="user-list-section">
-            <h3><i class="fas fa-users"></i> Recent Users</h3>
-            <div class="user-list">
-                <div class="user-list-header">
-                    <div>User</div>
-                    <div>Email</div>
-                    <div>Role</div>
-                    <div>Status</div>
-                </div>
-                
-                {% for profile in profiles[:5] %}
-                <div class="user-list-item">
-                    <div>{{ profile.first_name }} {{ profile.last_name }}</div>
-                    <div>{{ profile.email_ }}</div>
-                    <div>
-                        <span class="user-role {% if profile.privilages_ == 'admin' %}role-admin{% else %}role-user{% endif %}">
-                            {{ profile.privilages_|upper }}
-                        </span>
-                    </div>
-                    <div>
-                        <span class="user-status {% if profile.active %}status-active{% else %}status-inactive{% endif %}"></span>
-                        {{ 'Active' if profile.active else 'Inactive' }}
-                    </div>
-                </div>
-                {% endfor %}
             </div>
         </section>
     </div>
