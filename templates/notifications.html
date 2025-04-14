@@ -474,10 +474,12 @@
         <div class="request-actions">
           <!-- View PDF button -->
 
-            href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}"
-            class="view-pdf"
-            target="_blank"
-          >
+          <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}"
+          class="view-pdf"
+          target="_blank"
+        >
+          <i class="fas fa-file-pdf"></i> View PDF
+        </a>
             <i class="fas fa-file-pdf"></i> View PDF
           </a>
 

@@ -406,115 +406,139 @@ def ferpa_form():
 
         # Check if file type is allowed
         if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
-            # Generate a unique name for the image
-            unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
+            try:
+                # Generate a unique name for the image
+                unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
 
-            # Create the signatures directory if it doesn't exist
-            signatures_dir = os.path.join('static', 'uploads', 'signatures')
-            os.makedirs(signatures_dir, exist_ok=True)
+                # Create the signatures directory if it doesn't exist
+                signatures_dir = os.path.join('static', 'uploads', 'signatures')
+                os.makedirs(signatures_dir, exist_ok=True)
 
-            # Save file with new name
-            filepath = os.path.join(signatures_dir, unique_filename)
-            file.save(filepath)
+                # Save file with new name
+                filepath = os.path.join(signatures_dir, unique_filename)
+                file.save(filepath)
 
-            # Use forward slashes for LaTeX compatibility
-            latex_path = filepath.replace("\\", "/")
+                # Use forward slashes for LaTeX compatibility
+                latex_path = filepath.replace("\\", "/")
 
-            # Build data dictionary for the PDF
-            official_choices = form.official_choices.data
-            info_choices = form.info_choices.data
-            release_choices = form.release_choices.data
+                # Build data dictionary for the PDF
+                official_choices = form.official_choices.data
+                info_choices = form.info_choices.data
+                release_choices = form.release_choices.data
 
-            data = {
-                "NAME": form.name.data,
-                "CAMPUS": form.campus.data,
+                data = {
+                    "NAME": form.name.data,
+                    "CAMPUS": form.campus.data,
 
-                "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
-                "OPT_AID": return_choice(official_choices, 'aid'),
-                "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
-                "OPT_UNDERGRAD": return_choice(official_choices, 'undergrad'),
-                "OPT_ADVANCEMENT": return_choice(official_choices, 'advancement'),
-                "OPT_DEAN": return_choice(official_choices, 'dean'),
-                "OPT_OTHER_OFFICIALS": return_choice(official_choices, 'other'),
-                "OTHEROFFICIALS": form.official_other.data,
+                    "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
+                    "OPT_AID": return_choice(official_choices, 'aid'),
+                    "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
+                    "OPT_UNDERGRAD": return_choice(official_choices, 'undergrad'),
+                    "OPT_ADVANCEMENT": return_choice(official_choices, 'advancement'),
+                    "OPT_DEAN": return_choice(official_choices, 'dean'),
+                    "OPT_OTHER_OFFICIALS": return_choice(official_choices, 'other'),
+                    "OTHEROFFICIALS": form.official_other.data,
 
-                "OPT_ACADEMIC_INFO": return_choice(info_choices, 'advising'),
-                "OPT_UNIVERSITY_RECORDS": return_choice(info_choices, 'all_records'),
-                "OPT_ACADEMIC_RECORDS": return_choice(info_choices, 'academics'),
-                "OPT_BILLING": return_choice(info_choices, 'billing'),
-                "OPT_DISCIPLINARY": return_choice(info_choices, 'disciplinary'),
-                "OPT_TRANSCRIPTS": return_choice(info_choices, 'transcripts'),
-                "OPT_HOUSING": return_choice(info_choices, 'housing'),
-                "OPT_PHOTOS": return_choice(info_choices, 'photos'),
-                "OPT_SCHOLARSHIP": return_choice(info_choices, 'scholarship'),
-                "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
-                "OTHERINFO": form.info_other.data,
+                    "OPT_ACADEMIC_INFO": return_choice(info_choices, 'advising'),
+                    "OPT_UNIVERSITY_RECORDS": return_choice(info_choices, 'all_records'),
+                    "OPT_ACADEMIC_RECORDS": return_choice(info_choices, 'academics'),
+                    "OPT_BILLING": return_choice(info_choices, 'billing'),
+                    "OPT_DISCIPLINARY": return_choice(info_choices, 'disciplinary'),
+                    "OPT_TRANSCRIPTS": return_choice(info_choices, 'transcripts'),
+                    "OPT_HOUSING": return_choice(info_choices, 'housing'),
+                    "OPT_PHOTOS": return_choice(info_choices, 'photos'),
+                    "OPT_SCHOLARSHIP": return_choice(info_choices, 'scholarship'),
+                    "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
+                    "OTHERINFO": form.info_other.data,
 
-                "RELEASE": form.release_to.data,
-                "PURPOSE": form.purpose.data,
-                "ADDITIONALS": form.additional_names.data,
+                    "RELEASE": form.release_to.data,
+                    "PURPOSE": form.purpose.data,
+                    "ADDITIONALS": form.additional_names.data,
 
-                "OPT_FAMILY": return_choice(release_choices, 'family'),
-                "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
-                "OPT_HONOR": return_choice(release_choices, 'award'),
-                "OPT_EMPLOYER": return_choice(release_choices, 'employer'),
-                "OPT_PUBLIC": return_choice(release_choices, 'media'),
-                "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
-                "OTHERRELEASE": form.release_other.data,
+                    "OPT_FAMILY": return_choice(release_choices, 'family'),
+                    "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
+                    "OPT_HONOR": return_choice(release_choices, 'award'),
+                    "OPT_EMPLOYER": return_choice(release_choices, 'employer'),
+                    "OPT_PUBLIC": return_choice(release_choices, 'media'),
+                    "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
+                    "OTHERRELEASE": form.release_other.data,
 
-                "PASSWORD": form.password.data,
-                "PEOPLESOFT": form.peoplesoft_id.data,
-                "SIGNATURE": latex_path,
-                "DATE": str(form.date.data)
-            }
+                    "PASSWORD": form.password.data,
+                    "PEOPLESOFT": form.peoplesoft_id.data,
+                    "SIGNATURE": latex_path,
+                    "DATE": str(form.date.data)
+                }
 
-            # Create form directories if they don't exist
-            forms_dir = os.path.join('static', 'forms')
-            os.makedirs(forms_dir, exist_ok=True)
+                # Create form directories if they don't exist
+                forms_dir = os.path.join('static', 'forms')
+                os.makedirs(forms_dir, exist_ok=True)
 
-            # Generate PDF
-            pdf_file = generate_ferpa(data, forms_dir, signatures_dir)
+                # Generate PDF with debug output
+                print(f"Generating FERPA PDF with data: {data}")
+                pdf_file = generate_ferpa(data, forms_dir, signatures_dir)
+                print(f"Generated PDF file: {pdf_file}")
 
-            # Store options as comma-separate string
-            official_choices_str = ",".join(form.official_choices.data)
-            info_choices_str = ",".join(form.info_choices.data)
-            release_choices_str = ",".join(form.release_choices.data)
+                if not pdf_file:
+                    flash('Error generating PDF. Please try again.', 'danger')
+                    return render_template('ferpa_form.html', form=form, user=user)
 
-            # Set status based on draft checkbox
-            status = "draft" if form.is_draft.data else "pending"
+                # Store options as comma-separate string
+                official_choices_str = ",".join(form.official_choices.data)
+                info_choices_str = ",".join(form.info_choices.data)
+                release_choices_str = ",".join(form.release_choices.data)
 
-            # Create new FERPA request
-            new_ferpa_request = FERPARequest(
-                user_id=user_id,
-                status=status,
-                pdf_link=pdf_file,
-                sig_link=unique_filename,
-                name=data['NAME'],
-                campus=data['CAMPUS'],
-                official_choices=official_choices_str,
-                official_other=data['OTHEROFFICIALS'],
-                info_choices=info_choices_str,
-                info_other=data['OTHERINFO'],
-                release_choices=release_choices_str,
-                release_other=data['OTHERRELEASE'],
-                release_to=data['RELEASE'],
-                purpose=data['PURPOSE'],
-                additional_names=data['ADDITIONALS'],
-                password=data['PASSWORD'],
-                peoplesoft_id=data['PEOPLESOFT'],
-                date=data['DATE']
-            )
+                # Set status based on draft checkbox
+                status = "draft" if form.is_draft.data else "pending"
 
-            # Commit FERPA request to database
-            db.session.add(new_ferpa_request)
-            db.session.commit()
+                # Convert string date to DateTime
+                try:
+                    date_obj = datetime.strptime(str(form.date.data), '%Y-%m-%d').date()
+                except ValueError:
+                    date_obj = date.today()
 
-            if form.is_draft.data:
-                flash('FERPA request saved as draft.', 'success')
-            else:
-                flash('FERPA request submitted successfully.', 'success')
+                # Create new FERPA request
+                new_ferpa_request = FERPARequest(
+                    user_id=user_id,
+                    status=status,
+                    pdf_link=pdf_file,
+                    sig_link=unique_filename,
+                    name=data['NAME'],
+                    campus=data['CAMPUS'],
+                    official_choices=official_choices_str,
+                    official_other=data['OTHEROFFICIALS'],
+                    info_choices=info_choices_str,
+                    info_other=data['OTHERINFO'],
+                    release_choices=release_choices_str,
+                    release_other=data['OTHERRELEASE'],
+                    release_to=data['RELEASE'],
+                    purpose=data['PURPOSE'],
+                    additional_names=data['ADDITIONALS'],
+                    password=data['PASSWORD'],
+                    peoplesoft_id=data['PEOPLESOFT'],
+                    date=date_obj
+                )
 
-            return redirect(url_for('status'))
+                # Commit FERPA request to database
+                db.session.add(new_ferpa_request)
+                db.session.commit()
+
+                print(f"Created FERPA request with ID: {new_ferpa_request.id}")
+
+                if form.is_draft.data:
+                    flash('FERPA request saved as draft.', 'success')
+                else:
+                    flash('FERPA request submitted successfully.', 'success')
+
+                return redirect(url_for('status'))
+            except Exception as e:
+                import traceback
+                print(f"Error in FERPA form submission: {str(e)}")
+                print(traceback.format_exc())
+                flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+                return render_template('ferpa_form.html', form=form, user=user)
+        else:
+            flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
+            return render_template('ferpa_form.html', form=form, user=user)
 
     # Set default date to today
     if request.method == 'GET':
@@ -532,110 +556,134 @@ def name_ssn_change():
     form = InfoChangeForm()
 
     if form.validate_on_submit():
-        # Handle file upload for signature
-        if 'signature' not in request.files:
-            flash('Signature was not uploaded.', 'danger')
-            return render_template('name_ssn_change.html', form=form, user=user)
+        try:
+            # Handle file upload for signature
+            if 'signature' not in request.files:
+                flash('Signature was not uploaded.', 'danger')
+                return render_template('name_ssn_change.html', form=form, user=user)
 
-        file = request.files['signature']
-        if file.filename == '':
-            flash('No file selected for signature.', 'danger')
-            return render_template('name_ssn_change.html', form=form, user=user)
+            file = request.files['signature']
+            if file.filename == '':
+                flash('No file selected for signature.', 'danger')
+                return render_template('name_ssn_change.html', form=form, user=user)
 
-        # Check if file type is allowed
-        if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
-            # Generate a unique name for the image
-            unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
+            # Check if file type is allowed
+            if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+                # Generate a unique name for the image
+                unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
 
-            # Create the signatures directory if it doesn't exist
-            signatures_dir = os.path.join('static', 'uploads', 'signatures')
-            os.makedirs(signatures_dir, exist_ok=True)
+                # Create the signatures directory if it doesn't exist
+                signatures_dir = os.path.join('static', 'uploads', 'signatures')
+                os.makedirs(signatures_dir, exist_ok=True)
 
-            # Save file with new name
-            filepath = os.path.join(signatures_dir, unique_filename)
-            file.save(filepath)
+                # Save file with new name
+                filepath = os.path.join(signatures_dir, unique_filename)
+                file.save(filepath)
 
-            # Use forward slashes for LaTeX compatibility
-            latex_path = filepath.replace("\\", "/")
+                # Use forward slashes for LaTeX compatibility
+                latex_path = filepath.replace("\\", "/")
 
-            # Build data dictionary for the PDF
-            choice = form.choice.data
-            name_change_reason = form.name_change_reason.data if form.name_change_reason.data else []
-            ssn_change_reason = form.ssn_change_reason.data if form.ssn_change_reason.data else []
+                # Build data dictionary for the PDF
+                choice = form.choice.data
+                name_change_reason = form.name_change_reason.data if form.name_change_reason.data else []
+                ssn_change_reason = form.ssn_change_reason.data if form.ssn_change_reason.data else []
 
-            data = {
-                "NAME": form.name.data,
-                "PEOPLESOFT": form.peoplesoft_id.data,
-                "EDIT_NAME": return_choice(choice, 'name'),
-                "EDIT_SSN": return_choice(choice, 'ssn'),
-                "FN_OLD": form.first_name_old.data or "",
-                "MN_OLD": form.middle_name_old.data or "",
-                "LN_OLD": form.last_name_old.data or "",
-                "SUF_OLD": form.suffix_old.data or "",
-                "FN_NEW": form.first_name_new.data or "",
-                "MN_NEW": form.middle_name_new.data or "",
-                "LN_NEW": form.last_name_new.data or "",
-                "SUF_NEW": form.suffix_new.data or "",
-                "OPT_MARITAL": return_choice(name_change_reason, 'marriage'),
-                "OPT_COURT": return_choice(name_change_reason, 'court'),
-                "OPT_ERROR_NAME": return_choice(name_change_reason, 'error'),
-                "SSN_OLD": form.ssn_old.data or "",
-                "SSN_NEW": form.ssn_new.data or "",
-                "OPT_ERROR_SSN": return_choice(ssn_change_reason, 'error'),
-                "OPT_ADD_SSN": return_choice(ssn_change_reason, 'addition'),
-                "SIGNATURE": latex_path,
-                "DATE": str(form.date.data)
-            }
+                data = {
+                    "NAME": form.name.data,
+                    "PEOPLESOFT": form.peoplesoft_id.data,
+                    "EDIT_NAME": return_choice(choice, 'name'),
+                    "EDIT_SSN": return_choice(choice, 'ssn'),
+                    "FN_OLD": form.first_name_old.data or "",
+                    "MN_OLD": form.middle_name_old.data or "",
+                    "LN_OLD": form.last_name_old.data or "",
+                    "SUF_OLD": form.suffix_old.data or "",
+                    "FN_NEW": form.first_name_new.data or "",
+                    "MN_NEW": form.middle_name_new.data or "",
+                    "LN_NEW": form.last_name_new.data or "",
+                    "SUF_NEW": form.suffix_new.data or "",
+                    "OPT_MARITAL": return_choice(name_change_reason, 'marriage'),
+                    "OPT_COURT": return_choice(name_change_reason, 'court'),
+                    "OPT_ERROR_NAME": return_choice(name_change_reason, 'error'),
+                    "SSN_OLD": form.ssn_old.data or "",
+                    "SSN_NEW": form.ssn_new.data or "",
+                    "OPT_ERROR_SSN": return_choice(ssn_change_reason, 'error'),
+                    "OPT_ADD_SSN": return_choice(ssn_change_reason, 'addition'),
+                    "SIGNATURE": latex_path,
+                    "DATE": str(form.date.data)
+                }
 
-            # Create form directories if they don't exist
-            forms_dir = os.path.join('static', 'forms')
-            os.makedirs(forms_dir, exist_ok=True)
+                # Create form directories if they don't exist
+                forms_dir = os.path.join('static', 'forms')
+                os.makedirs(forms_dir, exist_ok=True)
 
-            # Generate PDF and store path
-            pdf_file = generate_ssn_name(data, forms_dir, signatures_dir)
+                # Generate PDF and store path with debug output
+                print(f"Generating Name/SSN change PDF with data: {data}")
+                pdf_file = generate_ssn_name(data, forms_dir, signatures_dir)
+                print(f"Generated PDF file: {pdf_file}")
 
-            # Store options as comma-separated strings
-            choice_str = ",".join(form.choice.data)
-            name_change_reason_str = ",".join(name_change_reason)
-            ssn_change_reason_str = ",".join(ssn_change_reason)
+                if not pdf_file:
+                    flash('Error generating PDF. Please try again.', 'danger')
+                    return render_template('name_ssn_change.html', form=form, user=user)
 
-            # Set status based on draft checkbox
-            status = "draft" if form.is_draft.data else "pending"
+                # Store options as comma-separated strings
+                choice_str = ",".join(form.choice.data)
+                name_change_reason_str = ",".join(name_change_reason)
+                ssn_change_reason_str = ",".join(ssn_change_reason)
 
-            # Create new request
-            new_request = InfoChangeRequest(
-                user_id=user_id,
-                status=status,
-                pdf_link=pdf_file,
-                sig_link=unique_filename,
-                name=data['NAME'],
-                peoplesoft_id=data['PEOPLESOFT'],
-                choice=choice_str,
-                fname_old=data['FN_OLD'],
-                mname_old=data['MN_OLD'],
-                lname_old=data['LN_OLD'],
-                sfx_old=data['SUF_OLD'],
-                fname_new=data['FN_NEW'],
-                mname_new=data['MN_NEW'],
-                lname_new=data['LN_NEW'],
-                sfx_new=data['SUF_NEW'],
-                nmchg_reason=name_change_reason_str,
-                ssn_old=data['SSN_OLD'],
-                ssn_new=data['SSN_NEW'],
-                ssnchg_reason=ssn_change_reason_str,
-                date=data['DATE']
-            )
+                # Set status based on draft checkbox
+                status = "draft" if form.is_draft.data else "pending"
 
-            # Commit request to database
-            db.session.add(new_request)
-            db.session.commit()
+                # Convert string date to DateTime
+                try:
+                    date_obj = datetime.strptime(str(form.date.data), '%Y-%m-%d').date()
+                except ValueError:
+                    date_obj = date.today()
 
-            if form.is_draft.data:
-                flash('Name/SSN change request saved as draft.', 'success')
+                # Create new request
+                new_request = InfoChangeRequest(
+                    user_id=user_id,
+                    status=status,
+                    pdf_link=pdf_file,
+                    sig_link=unique_filename,
+                    name=data['NAME'],
+                    peoplesoft_id=data['PEOPLESOFT'],
+                    choice=choice_str,
+                    fname_old=data['FN_OLD'],
+                    mname_old=data['MN_OLD'],
+                    lname_old=data['LN_OLD'],
+                    sfx_old=data['SUF_OLD'],
+                    fname_new=data['FN_NEW'],
+                    mname_new=data['MN_NEW'],
+                    lname_new=data['LN_NEW'],
+                    sfx_new=data['SUF_NEW'],
+                    nmchg_reason=name_change_reason_str,
+                    ssn_old=data['SSN_OLD'],
+                    ssn_new=data['SSN_NEW'],
+                    ssnchg_reason=ssn_change_reason_str,
+                    date=date_obj
+                )
+
+                # Commit request to database
+                db.session.add(new_request)
+                db.session.commit()
+
+                print(f"Created Name/SSN change request with ID: {new_request.id}")
+
+                if form.is_draft.data:
+                    flash('Name/SSN change request saved as draft.', 'success')
+                else:
+                    flash('Name/SSN change request submitted successfully.', 'success')
+
+                return redirect(url_for('status'))
             else:
-                flash('Name/SSN change request submitted successfully.', 'success')
-
-            return redirect(url_for('status'))
+                flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
+                return render_template('name_ssn_change.html', form=form, user=user)
+        except Exception as e:
+            import traceback
+            print(f"Error in Name/SSN change form submission: {str(e)}")
+            print(traceback.format_exc())
+            flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+            return render_template('name_ssn_change.html', form=form, user=user)
 
     # Set default date to today
     if request.method == 'GET':
@@ -661,6 +709,13 @@ def status():
     ferpa_requests = FERPARequest.query.filter_by(user_id=user_id).all()
     infochange_requests = InfoChangeRequest.query.filter_by(user_id=user_id).all()
 
+    # Debug: Print counts to console
+    print(f"Status page for user {user_id}:")
+    print(f"Medical requests: {len(medical_requests)}")
+    print(f"Student drop requests: {len(student_drop_requests)}")
+    print(f"FERPA requests: {len(ferpa_requests)}")
+    print(f"Name/SSN change requests: {len(infochange_requests)}")
+
     return render_template(
         'status.html',
         medical_requests=medical_requests,
@@ -684,14 +739,97 @@ def download_ferpa_pdf(request_id):
         flash('You do not have permission to access this file.', 'danger')
         return redirect(url_for('status'))
 
-    forms_dir = os.path.join('static', 'forms')
+    # Get the absolute path to the forms directory
+    current_dir = os.path.abspath(os.getcwd())
+    forms_dir = os.path.join(current_dir, 'static', 'forms')
     pdf_path = os.path.join(forms_dir, ferpa_request.pdf_link)
 
-    if not os.path.exists(pdf_path):
-        flash('PDF file not found.', 'danger')
-        return redirect(url_for('status'))
+    # Debug output
+    print(f"Looking for FERPA PDF at: {pdf_path}")
+    print(f"File exists: {os.path.exists(pdf_path)}")
 
-    return send_file(pdf_path, as_attachment=True)
+    if not os.path.exists(pdf_path):
+        # Try to regenerate the PDF if it doesn't exist
+        try:
+            # Get signature path
+            sig_path = os.path.join(current_dir, 'static', 'uploads', 'signatures', ferpa_request.sig_link)
+
+            # Extract data from the request object
+            official_choices = ferpa_request.official_choices.split(',') if ferpa_request.official_choices else []
+            info_choices = ferpa_request.info_choices.split(',') if ferpa_request.info_choices else []
+            release_choices = ferpa_request.release_choices.split(',') if ferpa_request.release_choices else []
+
+            # Rebuild data dictionary
+            data = {
+                "NAME": ferpa_request.name,
+                "CAMPUS": ferpa_request.campus,
+                "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
+                "OPT_AID": return_choice(official_choices, 'aid'),
+                "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
+                "OPT_UNDERGRAD": return_choice(official_choices, 'undergrad'),
+                "OPT_ADVANCEMENT": return_choice(official_choices, 'advancement'),
+                "OPT_DEAN": return_choice(official_choices, 'dean'),
+                "OPT_OTHER_OFFICIALS": return_choice(official_choices, 'other'),
+                "OTHEROFFICIALS": ferpa_request.official_other,
+                "OPT_ACADEMIC_INFO": return_choice(info_choices, 'advising'),
+                "OPT_UNIVERSITY_RECORDS": return_choice(info_choices, 'all_records'),
+                "OPT_ACADEMIC_RECORDS": return_choice(info_choices, 'academics'),
+                "OPT_BILLING": return_choice(info_choices, 'billing'),
+                "OPT_DISCIPLINARY": return_choice(info_choices, 'disciplinary'),
+                "OPT_TRANSCRIPTS": return_choice(info_choices, 'transcripts'),
+                "OPT_HOUSING": return_choice(info_choices, 'housing'),
+                "OPT_PHOTOS": return_choice(info_choices, 'photos'),
+                "OPT_SCHOLARSHIP": return_choice(info_choices, 'scholarship'),
+                "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
+                "OTHERINFO": ferpa_request.info_other,
+                "RELEASE": ferpa_request.release_to,
+                "PURPOSE": ferpa_request.purpose,
+                "ADDITIONALS": ferpa_request.additional_names,
+                "OPT_FAMILY": return_choice(release_choices, 'family'),
+                "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
+                "OPT_HONOR": return_choice(release_choices, 'award'),
+                "OPT_EMPLOYER": return_choice(release_choices, 'employer'),
+                "OPT_PUBLIC": return_choice(release_choices, 'media'),
+                "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
+                "OTHERRELEASE": ferpa_request.release_other,
+                "PASSWORD": ferpa_request.password,
+                "PEOPLESOFT": ferpa_request.peoplesoft_id,
+                "SIGNATURE": sig_path,
+                "DATE": str(ferpa_request.date)
+            }
+
+            # Regenerate PDF
+            new_pdf_file = generate_ferpa(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
+
+            if new_pdf_file:
+                # Update the database with the new PDF path
+                ferpa_request.pdf_link = new_pdf_file
+                db.session.commit()
+
+                # Update the pdf_path to the new file
+                pdf_path = os.path.join(forms_dir, new_pdf_file)
+                print(f"Regenerated PDF at: {pdf_path}")
+
+                if not os.path.exists(pdf_path):
+                    flash('PDF file could not be regenerated.', 'danger')
+                    return redirect(url_for('status'))
+            else:
+                flash('PDF file not found and could not be regenerated.', 'danger')
+                return redirect(url_for('status'))
+
+        except Exception as e:
+            import traceback
+            print(f"Error regenerating FERPA PDF: {str(e)}")
+            print(traceback.format_exc())
+            flash('PDF file not found and regeneration failed.', 'danger')
+            return redirect(url_for('status'))
+
+    try:
+        return send_file(pdf_path, as_attachment=True)
+    except Exception as e:
+        print(f"Error sending file: {str(e)}")
+        flash('Error accessing the PDF file.', 'danger')
+        return redirect(url_for('status'))
 
 @app.route('/download_infochange_pdf/<int:request_id>')
 def download_infochange_pdf(request_id):
@@ -707,14 +845,83 @@ def download_infochange_pdf(request_id):
         flash('You do not have permission to access this file.', 'danger')
         return redirect(url_for('status'))
 
-    forms_dir = os.path.join('static', 'forms')
+    # Get the absolute path to the forms directory
+    current_dir = os.path.abspath(os.getcwd())
+    forms_dir = os.path.join(current_dir, 'static', 'forms')
     pdf_path = os.path.join(forms_dir, infochange_request.pdf_link)
 
-    if not os.path.exists(pdf_path):
-        flash('PDF file not found.', 'danger')
-        return redirect(url_for('status'))
+    # Debug output
+    print(f"Looking for Name/SSN PDF at: {pdf_path}")
+    print(f"File exists: {os.path.exists(pdf_path)}")
 
-    return send_file(pdf_path, as_attachment=True)
+    if not os.path.exists(pdf_path):
+        # Try to regenerate the PDF if it doesn't exist
+        try:
+            # Get signature path
+            sig_path = os.path.join(current_dir, 'static', 'uploads', 'signatures', infochange_request.sig_link)
+
+            # Extract data from the request object
+            choice = infochange_request.choice.split(',') if infochange_request.choice else []
+            nmchg_reason = infochange_request.nmchg_reason.split(',') if infochange_request.nmchg_reason else []
+            ssnchg_reason = infochange_request.ssnchg_reason.split(',') if infochange_request.ssnchg_reason else []
+
+            # Rebuild data dictionary
+            data = {
+                "NAME": infochange_request.name,
+                "PEOPLESOFT": infochange_request.peoplesoft_id,
+                "EDIT_NAME": return_choice(choice, 'name'),
+                "EDIT_SSN": return_choice(choice, 'ssn'),
+                "FN_OLD": infochange_request.fname_old or "",
+                "MN_OLD": infochange_request.mname_old or "",
+                "LN_OLD": infochange_request.lname_old or "",
+                "SUF_OLD": infochange_request.sfx_old or "",
+                "FN_NEW": infochange_request.fname_new or "",
+                "MN_NEW": infochange_request.mname_new or "",
+                "LN_NEW": infochange_request.lname_new or "",
+                "SUF_NEW": infochange_request.sfx_new or "",
+                "OPT_MARITAL": return_choice(nmchg_reason, 'marriage'),
+                "OPT_COURT": return_choice(nmchg_reason, 'court'),
+                "OPT_ERROR_NAME": return_choice(nmchg_reason, 'error'),
+                "SSN_OLD": infochange_request.ssn_old or "",
+                "SSN_NEW": infochange_request.ssn_new or "",
+                "OPT_ERROR_SSN": return_choice(ssnchg_reason, 'error'),
+                "OPT_ADD_SSN": return_choice(ssnchg_reason, 'addition'),
+                "SIGNATURE": sig_path,
+                "DATE": str(infochange_request.date)
+            }
+
+            # Regenerate PDF
+            new_pdf_file = generate_ssn_name(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
+
+            if new_pdf_file:
+                # Update the database with the new PDF path
+                infochange_request.pdf_link = new_pdf_file
+                db.session.commit()
+
+                # Update the pdf_path to the new file
+                pdf_path = os.path.join(forms_dir, new_pdf_file)
+                print(f"Regenerated PDF at: {pdf_path}")
+
+                if not os.path.exists(pdf_path):
+                    flash('PDF file could not be regenerated.', 'danger')
+                    return redirect(url_for('status'))
+            else:
+                flash('PDF file not found and could not be regenerated.', 'danger')
+                return redirect(url_for('status'))
+
+        except Exception as e:
+            import traceback
+            print(f"Error regenerating Name/SSN PDF: {str(e)}")
+            print(traceback.format_exc())
+            flash('PDF file not found and regeneration failed.', 'danger')
+            return redirect(url_for('status'))
+
+    try:
+        return send_file(pdf_path, as_attachment=True)
+    except Exception as e:
+        print(f"Error sending file: {str(e)}")
+        flash('Error accessing the PDF file.', 'danger')
+        return redirect(url_for('status'))
 
 # Add admin routes for approving/rejecting FERPA and Info Change requests
 @app.route('/approve_ferpa/<int:request_id>', methods=['POST'])

@@ -12,44 +12,91 @@ def return_choice(choices, keyword):
     return "no"
 
 def generate_ferpa(data, form_folder, upload_folder):
-    # Define template paths
-    templates_folder = os.path.join('static', 'form-templates')
-    os.makedirs(templates_folder, exist_ok=True)
+    try:
+        # Import debugging functions
+        from debug_utils import debug_pdf_generation, ensure_directory_exists
+    except ImportError:
+        # Define them locally if import fails
+        def debug_pdf_generation(function_name, data, output_path, error=None):
+            import logging
+            logging.basicConfig(level=logging.DEBUG, filename='pdf_generation.log')
+            logger = logging.getLogger('pdf_debug')
+            logger.debug(f"Debug for {function_name}: Path={output_path}, Error={error}")
 
-    ferpa_template_path = os.path.join(templates_folder, 'ferpa.tex')
+        def ensure_directory_exists(directory_path):
+            if not os.path.exists(directory_path):
+                os.makedirs(directory_path, exist_ok=True)
 
-    # Create template file if it doesn't exist
-    if not os.path.exists(ferpa_template_path):
-        with open(ferpa_template_path, "w") as file:
-            file.write(FERPA_TEMPLATE)
+    try:
+        # Define template paths - ensure these are absolute paths
+        current_dir = os.path.abspath(os.getcwd())
+        templates_folder = os.path.join(current_dir, 'static', 'form-templates')
+        ensure_directory_exists(templates_folder)
 
-    # Generate unique ID for the PDF
-    unique_id = str(uuid.uuid4())
+        ferpa_template_path = os.path.join(templates_folder, 'ferpa.tex')
 
-    # Unique file paths
-    tex_file_path = os.path.join(form_folder, f"ferpa_form_{unique_id}.tex")
-    pdf_file_path = f"ferpa_form_{unique_id}.pdf"
+        # Create template file if it doesn't exist
+        if not os.path.exists(ferpa_template_path):
+            with open(ferpa_template_path, "w") as file:
+                file.write(FERPA_TEMPLATE)
 
-    # Read the LaTeX template and replace placeholders
-    with open(ferpa_template_path, "r") as file:
-        latex_content = file.read()
+        # Generate unique ID for the PDF
+        unique_id = str(uuid.uuid4())
 
-    for key, value in data.items():
-        latex_content = latex_content.replace(f"{{{{{key}}}}}", str(value))
+        # Create absolute paths for the output files
+        full_form_folder = os.path.join(current_dir, form_folder)
+        ensure_directory_exists(full_form_folder)
 
-    # Save the modified LaTeX file
-    with open(tex_file_path, "w") as file:
-        file.write(latex_content)
+        tex_file_path = os.path.join(full_form_folder, f"ferpa_form_{unique_id}.tex")
+        pdf_file_path = f"ferpa_form_{unique_id}.pdf"
+        full_pdf_path = os.path.join(full_form_folder, pdf_file_path)
 
-    # Ensure output directory exists
-    os.makedirs(form_folder, exist_ok=True)
+        # Read the LaTeX template and replace placeholders
+        with open(ferpa_template_path, "r") as file:
+            latex_content = file.read()
 
-    # Compile
-    subprocess.run(["pdflatex", "-interaction=nonstopmode", "-output-directory", form_folder, tex_file_path],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for key, value in data.items():
+            latex_content = latex_content.replace(f"{{{{{key}}}}}", str(value))
 
-    # Return path to PDF
-    return pdf_file_path
+        # Save the modified LaTeX file
+        with open(tex_file_path, "w") as file:
+            file.write(latex_content)
+
+        # Compile - use full paths and capture output for debugging
+        process = subprocess.run(
+            ["pdflatex", "-interaction=nonstopmode", f"-output-directory={full_form_folder}", tex_file_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        # Check if compilation was successful
+        if process.returncode != 0:
+            debug_pdf_generation("generate_ferpa", data, full_pdf_path,
+                                f"pdflatex error: {process.stderr}")
+
+            # Try running pdflatex a second time
+            process = subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", f"-output-directory={full_form_folder}", tex_file_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+        # Verify the PDF was created
+        if os.path.exists(full_pdf_path):
+            debug_pdf_generation("generate_ferpa", data, full_pdf_path, "PDF generated successfully")
+        else:
+            debug_pdf_generation("generate_ferpa", data, full_pdf_path, "PDF file not found after compilation")
+
+        # Return path to PDF
+        return pdf_file_path
+
+    except Exception as e:
+        debug_pdf_generation("generate_ferpa", data, None, str(e))
+        import traceback
+        debug_pdf_generation("generate_ferpa", data, None, traceback.format_exc())
+        return None
 
 def generate_ssn_name(data, form_folder, upload_folder):
     # Define template paths
@@ -90,6 +137,55 @@ def generate_ssn_name(data, form_folder, upload_folder):
 
     # Return the generated PDF
     return pdf_file_path
+
+def debug_pdf_generation(function_name, data, output_path, error=None):
+    """
+    Log debugging information about PDF generation
+    """
+    import logging
+    import os
+
+    # Setup basic logging if not already configured
+    logging.basicConfig(level=logging.DEBUG,
+                        filename='pdf_generation_debug.log',
+                        format='%(asctime)s - %(levelname)s - %(message)s')
+
+    logger = logging.getLogger('pdf_debug')
+
+    logger.debug(f"===== Starting debug for {function_name} =====")
+    logger.debug(f"Current working directory: {os.getcwd()}")
+
+    # Log important paths
+    templates_folder = os.path.join('static', 'form-templates')
+    form_folder = os.path.join('static', 'forms')
+
+    logger.debug(f"Templates folder path: {os.path.abspath(templates_folder)}")
+    logger.debug(f"Form folder path: {os.path.abspath(form_folder)}")
+
+    # Check if directories exist
+    logger.debug(f"Templates folder exists: {os.path.exists(templates_folder)}")
+    logger.debug(f"Form folder exists: {os.path.exists(form_folder)}")
+
+    # Log output path
+    if output_path:
+        logger.debug(f"Output path: {output_path}")
+        logger.debug(f"Output path exists: {os.path.exists(output_path)}")
+
+    # Log error if any
+    if error:
+        logger.error(f"Error in {function_name}: {str(error)}")
+
+    logger.debug(f"===== End debug for {function_name} =====")
+
+def ensure_directory_exists(directory_path):
+    """
+    Ensure that a directory exists, creating it if necessary
+    """
+    import os
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path, exist_ok=True)
+        return True
+    return False
 
 # LaTeX Templates
 FERPA_TEMPLATE = r"""
