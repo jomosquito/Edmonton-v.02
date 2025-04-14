@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}FERPA Release Form{% endblock %}
+{% block content %}
+<h1 class="mb-3">FERPA Release Form</h1>
+
+<div class="alert alert-info">
+  <p>This form authorizes the University to release your educational records to specified individuals or organizations.</p>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Basic Information</h3>
+    </div>
+    <div class="card-body">
+      <!-- Name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Full Name:</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ user.first_name }} {{ user.last_name }}" required>
+      </div>
+
+      <!-- Campus -->
+      <div class="mb-3">
+        <label for="campus" class="form-label">Campus:</label>
+        <input type="text" class="form-control" id="campus" name="campus" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Authorized Officials</h3>
+    </div>
+    <div class="card-body">
+      <!-- Officials selection -->
+      <div class="mb-3">
+        <label for="official_choices" class="form-label">Authorize officials to disclose information:</label>
+        <select id="official_choices" name="official_choices" class="form-select" multiple required>
+          <option value="registrar">Office of the University Registrar</option>
+          <option value="aid">Scholarships and Financial Aid</option>
+          <option value="financial">Student Financial Services</option>
+          <option value="undergrad">Undergraduate Scholars & US</option>
+          <option value="advancement">University Advancement</option>
+          <option value="dean">Dean of Students Office</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Other officials -->
+      <div class="mb-3">
+        <label for="official_other" class="form-label">Other Officials (if applicable):</label>
+        <input type="text" class="form-control" id="official_other" name="official_other">
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Information to Disclose</h3>
+    </div>
+    <div class="card-body">
+      <!-- Information selection -->
+      <div class="mb-3">
+        <label for="info_choices" class="form-label">Type of information to disclose:</label>
+        <select id="info_choices" name="info_choices" class="form-select" multiple required>
+          <option value="advising">Academic Advising Profile/Information</option>
+          <option value="all_records">All University Records</option>
+          <option value="academics">Academic Records</option>
+          <option value="billing">Billing/Financial Aid</option>
+          <option value="disciplinary">Disciplinary</option>
+          <option value="transcripts">Grades/Transcripts</option>
+          <option value="housing">Housing</option>
+          <option value="photos">Photos</option>
+          <option value="scholarship">Scholarship and/or Honors</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Other information -->
+      <div class="mb-3">
+        <label for="info_other" class="form-label">Other Information Types (if applicable):</label>
+        <input type="text" class="form-control" id="info_other" name="info_other">
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Release Information</h3>
+    </div>
+    <div class="card-body">
+      <!-- Release to -->
+      <div class="mb-3">
+        <label for="release_to" class="form-label">Release Information To:</label>
+        <input type="text" class="form-control" id="release_to" name="release_to" required>
+      </div>
+
+      <!-- Purpose -->
+      <div class="mb-3">
+        <label for="purpose" class="form-label">Purpose of Release:</label>
+        <input type="text" class="form-control" id="purpose" name="purpose" required>
+      </div>
+
+      <!-- Additional names -->
+      <div class="mb-3">
+        <label for="additional_names" class="form-label">Additional Individuals:</label>
+        <input type="text" class="form-control" id="additional_names" name="additional_names">
+      </div>
+
+      <!-- Release categories -->
+      <div class="mb-3">
+        <label for="release_choices" class="form-label">Release Categories:</label>
+        <select id="release_choices" name="release_choices" class="form-select" multiple required>
+          <option value="family">Family</option>
+          <option value="institution">Educational Institution</option>
+          <option value="award">Honor or Award</option>
+          <option value="employer">Employer/Prospective Employer</option>
+          <option value="media">Public or Media of Scholarship</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Other release categories -->
+      <div class="mb-3">
+        <label for="release_other" class="form-label">Other Release Categories (if applicable):</label>
+        <input type="text" class="form-control" id="release_other" name="release_other">
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Security Information</h3>
+    </div>
+    <div class="card-body">
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password (for phone verification):</label>
+        <input type="text" class="form-control" id="password" name="password" required>
+        <div class="form-text">Provide a password that will be used to verify identity over the phone.</div>
+      </div>
+
+      <!-- PeopleSoft ID -->
+      <div class="mb-3">
+        <label for="peoplesoft_id" class="form-label">myUH ID:</label>
+        <input type="text" class="form-control" id="peoplesoft_id" name="peoplesoft_id" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Signature</h3>
+    </div>
+    <div class="card-body">
+      <!-- Signature upload -->
+      <div class="mb-3">
+        <label for="signature" class="form-label">Upload Signature:</label>
+        <input type="file" class="form-control" id="signature" name="signature" accept=".jpg,.jpeg,.png,.gif" required>
+        <div class="form-text">Please upload an image of your signature (.jpg, .png, or .gif).</div>
+      </div>
+
+      <!-- Date -->
+      <div class="mb-3">
+        <label for="date" class="form-label">Date:</label>
+        <input type="date" class="form-control" id="date" name="date" value="{{ today_date }}" required>
+      </div>
+
+      <!-- Draft option -->
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_draft" name="is_draft">
+        <label class="form-check-label" for="is_draft">Save as Draft</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+    <a href="{{ url_for('settings') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Submit FERPA Request</button>
+  </div>
+</form>
+{% endblock %}

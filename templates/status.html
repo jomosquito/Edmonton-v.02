@@ -267,6 +267,87 @@
         </ul>
       </nav>
       <main>
+        <!-- FERPA Requests Section -->
+<div class="card">
+  <h2><i>📝</i> FERPA Requests</h2>
+
+  {% if ferpa_requests %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Submission Date</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for request in ferpa_requests %}
+      <tr>
+        <td>{{ request.id }}</td>
+        <td>
+          <div class="status-badge status-{{ request.status }}">
+            {{ request.status.upper() }}
+          </div>
+        </td>
+        <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
+        <td>
+          <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}" class="view-btn">
+            Download PDF
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="no-requests">
+    <p>You have not submitted any FERPA forms.</p>
+    <a href="{{ url_for('ferpa_form') }}" class="btn">Create New FERPA Request</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Name/SSN Change Requests Section -->
+<div class="card">
+  <h2><i>📝</i> Name/SSN Change Requests</h2>
+
+  {% if infochange_requests %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Submission Date</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for request in infochange_requests %}
+      <tr>
+        <td>{{ request.id }}</td>
+        <td>
+          <div class="status-badge status-{{ request.status }}">
+            {{ request.status.upper() }}
+          </div>
+        </td>
+        <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
+        <td>
+          <a href="{{ url_for('download_infochange_pdf', request_id=request.id) }}" class="view-btn">
+            Download PDF
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="no-requests">
+    <p>You have not submitted any name or SSN change requests.</p>
+    <a href="{{ url_for('name_ssn_change') }}" class="btn">Create New Name/SSN Change Request</a>
+  </div>
+  {% endif %}
+</div>
         <div class="card">
           <h2><i>📝</i> Medical/Administrative Withdrawal Requests</h2>
 
