@@ -71,7 +71,7 @@ class Profile(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
-    
+
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -82,19 +82,19 @@ class StudentInitiatedDrop(db.Model):
     signature = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Add a field for generated PDFs
     generated_pdfs = db.Column(db.Text, nullable=True)  # JSON array of PDF file paths
-    
+
     # Admin viewed field similar to MedicalWithdrawalRequest
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
-    
+
     def has_admin_viewed(self, admin_id):
         if not self.admin_viewed:
             return False
         viewed_by = json.loads(self.admin_viewed)
         return str(admin_id) in viewed_by
-    
+
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
 
@@ -110,7 +110,7 @@ class WithdrawalHistory(db.Model):
     action = db.Column(db.String(20))  # 'approved', 'rejected'
     comments = db.Column(db.Text)
     action_date = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     withdrawal = db.relationship('MedicalWithdrawalRequest', backref='history_entries')
     admin = db.relationship('Profile', backref='withdrawal_actions')
@@ -120,7 +120,7 @@ class WithdrawalHistory(db.Model):
 class MedicalWithdrawalRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
-    
+
     # Student Information
     last_name = db.Column(db.String(100), nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
@@ -128,49 +128,49 @@ class MedicalWithdrawalRequest(db.Model):
     myuh_id = db.Column(db.String(20), nullable=False)
     college = db.Column(db.String(100), nullable=False)
     plan_degree = db.Column(db.String(100), nullable=False)
-    
+
     # Address Information
     address = db.Column(db.String(200), nullable=False)
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(50), nullable=False)
     zip_code = db.Column(db.String(20), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
-    
+
     # Withdrawal Information
     term_year = db.Column(db.String(50), nullable=False)
     last_date = db.Column(db.Date, nullable=False)
     reason_type = db.Column(db.String(50), nullable=False)  # Medical or Administrative
     details = db.Column(db.Text, nullable=False)
-    
+
     # Questions
     financial_assistance = db.Column(db.Boolean, default=False)
     health_insurance = db.Column(db.Boolean, default=False)
     campus_housing = db.Column(db.Boolean, default=False)
     visa_status = db.Column(db.Boolean, default=False)
     gi_bill = db.Column(db.Boolean, default=False)
-    
+
     # Courses as JSON
-    courses = db.Column(db.Text, nullable=False) 
-    
+    courses = db.Column(db.Text, nullable=False)
+
     # Acknowledgment & Signature
     initial = db.Column(db.String(10), nullable=False)
     signature = db.Column(db.String(100), nullable=True)
     signature_date = db.Column(db.Date, nullable=False)
-    
+
     # File paths for uploaded documentation
     documentation_files = db.Column(db.Text, nullable=True)  # JSON array of file paths
-    
+
     # Add a new field to store paths to generated PDFs
     generated_pdfs = db.Column(db.Text, nullable=True)  # JSON array of PDF file paths
-    
+
     # Status and timestamps
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationship to access the requesting user's profile
     user = db.relationship('Profile', backref='medical_withdrawals')
-    
+
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
 
     # Helper method to check if an admin has viewed the request
@@ -179,12 +179,12 @@ class MedicalWithdrawalRequest(db.Model):
             return False
         viewed_by = json.loads(self.admin_viewed)
         return str(admin_id) in viewed_by
-    
+
     # Helper property for display in the admin portal
     @property
     def request_type(self):
         return f"{self.reason_type} Term Withdrawal"
-    
+
 
 # Helper function to convert UTC to GMT-5
 def utc_to_gmt5(utc_datetime):
@@ -224,10 +224,10 @@ def status():
 def notification():
     # Query pending medical withdrawal requests
     pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
-    
+
     # Query pending student drop requests
     pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
-    
+
     return render_template(
         'notifications.html',
         pending_medical_requests=pending_medical_requests,
@@ -243,7 +243,7 @@ def admin():
     # If already logged in as admin, redirect to dashboard
     if session.get('user_id') and session.get('admin'):
         return redirect(url_for('ap'))
-    
+
     # Otherwise show login page
     return render_template('adminlogin.html')
 
@@ -253,14 +253,22 @@ def adminpage():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
+    # Special case for hardcoded admin users
+    if user_id == -2 or user_id == -1:
+        if session.get('admin'):
+            # Hardcoded admin is authenticated
+            profiles = Profile.query.all()
+            return render_template('adminpage.html', profiles=profiles)
+
+    # Regular database users
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
-    
+
     # Get all profiles for user management
     profiles = Profile.query.all()
-    
+
     return render_template('adminpage.html', profiles=profiles)
 
 @app.route('/a')
@@ -282,19 +290,19 @@ def loginadmin():
     if request.method == 'POST':
         first_name = request.form.get("first_name")
         pass_word = request.form.get("pass_word")
-        
+
         # Hardcoded admin credentials for demo purposes
         if first_name == "admin" and pass_word == "admin123":
             session['admin'] = True
             session['user_id'] = -2  # Special ID for hardcoded admin
             return redirect(url_for('ap'))
-        
+
         # Second hardcoded admin account
         elif first_name == "superadmin" and pass_word == "super123":
             session['admin'] = True
             session['user_id'] = -1  # Different special ID for the second hardcoded admin
             return redirect(url_for('ap'))
-        
+
         # Database check
         user = Profile.query.filter_by(first_name=first_name).first()
         if user and user.check_password(pass_word) and user.privilages_ == "admin":
@@ -303,7 +311,7 @@ def loginadmin():
             return redirect(url_for('ap'))
         else:
             return "Invalid username or password!"
-    
+
     # GET request should redirect to admin login page
     return redirect(url_for('admin'))
 
@@ -368,7 +376,7 @@ def ap():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     # Special case for hardcoded admin users
     if user_id == -2 or user_id == -1:
         if session.get('admin'):
@@ -377,32 +385,32 @@ def ap():
             pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
             pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
             now = datetime.utcnow()
-            
+
             return render_template(
-                'admin_dashboard.html', 
+                'admin_dashboard.html',
                 profiles=profiles,
                 pending_medical_requests=pending_medical_requests,
                 pending_student_drops=pending_student_drops,
                 now=now
             )
-    
+
     # Regular database users
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
-    
+
     # Get all profiles for the dashboard
     profiles = Profile.query.all()
-    
+
     # Get pending requests for the dashboard
     pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
     pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
-    
+
     # Add current server time for the dashboard
     now = datetime.utcnow()
-    
+
     return render_template(
-        'admin_dashboard.html', 
+        'admin_dashboard.html',
         profiles=profiles,
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
@@ -479,28 +487,28 @@ def add_profile():
     confirm_password = request.form.get("confirm_password")
     address = request.form.get("address")
     enroll_status = request.form.get("enroll_status")
-    
+
     # Validation
     errors = []
-    
+
     # Phone number validation
     import re
     phone_pattern = re.compile(r'^\d{3}-\d{3}-\d{4}$')
     if not phone_pattern.match(phone_number):
         errors.append("Invalid phone number format. Please use XXX-XXX-XXXX format.")
-    
+
     # Address validation
     if not address or len(address.strip()) < 5:
         errors.append("Please provide a complete address (minimum 5 characters).")
-    
+
     # Password confirmation
     if pass_word != confirm_password:
         errors.append("Passwords do not match.")
-    
+
     if errors:
         # If there are validation errors, return to the form with error messages
         return render_template('add_profile.html', errors=errors)
-    
+
     if first_name and pass_word:
         p = Profile(first_name=first_name, last_name=last_name, phoneN_=phone_number, address=address)
         p.set_password(pass_word)
@@ -601,13 +609,13 @@ def submit_medical_withdrawal():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     try:
         # Extract course data
         course_subjects = request.form.getlist('course_subject[]')
         course_numbers = request.form.getlist('course_number[]')
         course_sections = request.form.getlist('course_section[]')
-        
+
         # Combine course data into JSON
         courses = []
         for i in range(len(course_subjects)):
@@ -617,7 +625,7 @@ def submit_medical_withdrawal():
                     'number': course_numbers[i],
                     'section': course_sections[i]
                 })
-        
+
         # Handle file uploads
         documentation_files = []
         if 'documentation' in request.files:
@@ -630,22 +638,22 @@ def submit_medical_withdrawal():
                     file_path = os.path.join(upload_dir, filename)
                     file.save(file_path)
                     documentation_files.append(file_path)
-        
+
         # Process signature based on chosen method
         signature_type = request.form.get('signature_type')
         signature = None
-        
+
         if signature_type == 'draw':
             signature_data = request.form.get('signature_data')
             if signature_data:
                 # Create signature directory
                 signature_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
                 os.makedirs(signature_dir, exist_ok=True)
-                
+
                 # Generate filename
                 signature_filename = f"sig_{user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.png"
                 signature_path = os.path.join(signature_dir, signature_filename)
-                
+
                 # Save signature image by parsing data URL
                 if signature_data.startswith('data:image'):
                     import base64
@@ -653,22 +661,22 @@ def submit_medical_withdrawal():
                     with open(signature_path, "wb") as f:
                         f.write(base64.b64decode(img_data))
                     signature = signature_path
-        
+
         elif signature_type == 'upload' and 'signature_upload' in request.files:
             sig_file = request.files['signature_upload']
             if sig_file and sig_file.filename:
                 signature_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
                 os.makedirs(signature_dir, exist_ok=True)
-                
+
                 sig_filename = secure_filename(f"sig_{user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{sig_file.filename}")
                 sig_path = os.path.join(signature_dir, sig_filename)
                 sig_file.save(sig_path)
                 signature = sig_path
-        
+
         elif signature_type == 'text':
             # Just store the text as the signature
             signature = request.form.get('signature_text')
-        
+
         # Create new medical withdrawal request
         new_request = MedicalWithdrawalRequest(
             user_id=user_id,
@@ -699,27 +707,27 @@ def submit_medical_withdrawal():
             documentation_files=json.dumps(documentation_files) if documentation_files else None,
             status='pending' if request.form.get('action') == 'submit' else 'draft'
         )
-        
+
         db.session.add(new_request)
         db.session.commit()
-        
+
         # Generate PDF if the form is being submitted (not saved as draft)
         if request.form.get('action') == 'submit':
             # Import the PDF generation function
             from pdf_utils import generate_medical_withdrawal_pdf
-            
+
             # Generate the PDF
             pdf_path = generate_medical_withdrawal_pdf(new_request)
-            
+
             # Store the PDF path in the database
             if pdf_path:
                 new_request.generated_pdfs = json.dumps([pdf_path])
                 db.session.commit()
-            
+
             return redirect(url_for('status'))
         else:
             return redirect(url_for('drafts'))
-            
+
     except Exception as e:
         print(f"Error processing medical withdrawal: {str(e)}")
         db.session.rollback()
@@ -730,19 +738,19 @@ def view_medical_request(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     request_record = MedicalWithdrawalRequest.query.get(request_id)
-    
+
     if not request_record:
         return "Request not found", 404
-    
+
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
     if not is_admin and request_record.user_id != user_id:
         return "Unauthorized", 403
-    
-    return render_template('view_medical_request.html', 
+
+    return render_template('view_medical_request.html',
                           request=request_record,
                           is_admin=is_admin,
                           courses=json.loads(request_record.courses))
@@ -753,22 +761,22 @@ def approve_medical_withdrawal(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     if user.privilages_ != 'admin':
         return "Unauthorized", 403
-        
+
     req_record = MedicalWithdrawalRequest.query.get(request_id)
     if not req_record:
         return "Request not found", 404
-        
+
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
-    
+
     # Get comments from form
     comments = request.form.get('comments', '')
-    
+
     # Create history record
     history_entry = WithdrawalHistory(
         withdrawal_id=request_id,
@@ -777,18 +785,18 @@ def approve_medical_withdrawal(request_id):
         comments=comments
     )
     db.session.add(history_entry)
-    
+
     # Change status to approved
     req_record.status = 'approved'
     db.session.commit()
-    
+
     # Get admin signature if available
     admin_signature = None  # You'd need to implement signature storage for admins
-    
+
     # Generate PDF with LaTeX
     from pdf_utils import generate_medical_withdrawal_pdf
     pdf_path = generate_medical_withdrawal_pdf(req_record)
-    
+
     # Store the PDF path
     if pdf_path:
         # If this is the first generated PDF
@@ -799,11 +807,11 @@ def approve_medical_withdrawal(request_id):
             pdfs = json.loads(req_record.generated_pdfs)
             pdfs.append(pdf_path)
             req_record.generated_pdfs = json.dumps(pdfs)
-            
+
         db.session.commit()
-        
+
     return redirect(url_for('notification'))
-    
+
     # Store the PDF path in the request record
     if pdf_path:
         # If this is the first generated PDF
@@ -814,9 +822,9 @@ def approve_medical_withdrawal(request_id):
             pdfs = json.loads(req_record.generated_pdfs)
             pdfs.append(pdf_path)
             req_record.generated_pdfs = json.dumps(pdfs)
-            
+
         db.session.commit()
-        
+
     return redirect(url_for('notification'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
@@ -825,22 +833,22 @@ def reject_medical_withdrawal(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     if user.privilages_ != 'admin':
         return "Unauthorized", 403
-        
+
     req_record = MedicalWithdrawalRequest.query.get(request_id)
     if not req_record:
         return "Request not found", 404
-        
+
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before rejecting", 400
-    
+
     # Get comments from form
     comments = request.form.get('comments', '')
-    
+
     # Create history record
     history_entry = WithdrawalHistory(
         withdrawal_id=request_id,
@@ -849,15 +857,15 @@ def reject_medical_withdrawal(request_id):
         comments=comments
     )
     db.session.add(history_entry)
-    
+
     # Change status to rejected
     req_record.status = 'rejected'
     db.session.commit()
-    
+
     # Generate PDF with LaTeX
     from pdf_utils import generate_medical_withdrawal_pdf
     pdf_path = generate_medical_withdrawal_pdf(req_record)
-    
+
     # Store the PDF path
     if pdf_path:
         # If this is the first generated PDF
@@ -868,9 +876,9 @@ def reject_medical_withdrawal(request_id):
             pdfs = json.loads(req_record.generated_pdfs)
             pdfs.append(pdf_path)
             req_record.generated_pdfs = json.dumps(pdfs)
-            
+
         db.session.commit()
-        
+
     return redirect(url_for('notification'))
 
 @app.route('/download_pdf/<int:request_id>/<string:status>')
@@ -879,18 +887,18 @@ def download_pdf(request_id, status):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     request_record = MedicalWithdrawalRequest.query.get(request_id)
-    
+
     if not request_record:
         return "Request not found", 404
-    
+
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
     if not is_admin and request_record.user_id != user_id:
         return "Unauthorized", 403
-    
+
     # If admin is viewing, mark as viewed
     if is_admin:
         if not request_record.admin_viewed:
@@ -901,18 +909,18 @@ def download_pdf(request_id, status):
                 admin_viewed.append(str(user_id))
         request_record.admin_viewed = json.dumps(admin_viewed)
         db.session.commit()
-    
+
     # Rest of existing code remains the same
     # Find the most recent PDF with the given status
     pdf_dir = os.path.join('static', 'pdfs')
     search_pattern = f"medical_withdrawal_{request_id}_{status}_"
-    
+
     matching_files = []
     if os.path.exists(pdf_dir):
         for filename in os.listdir(pdf_dir):
             if filename.startswith(search_pattern) and filename.endswith('.pdf'):
                 matching_files.append(os.path.join(pdf_dir, filename))
-    
+
     if matching_files:
         # Sort by creation time, newest first
         latest_pdf = max(matching_files, key=os.path.getctime)
@@ -924,13 +932,13 @@ def download_pdf(request_id, status):
         status_pdfs = [pdf for pdf in pdfs if status in pdf]
         if status_pdfs:
             return send_file(status_pdfs[-1], as_attachment=True)
-    
+
     # If no PDF found, generate one on the fly
     from pdf_utils import generate_medical_withdrawal_pdf
     pdf_path = generate_medical_withdrawal_pdf(request_record)
     if pdf_path and os.path.exists(pdf_path):
         return send_file(pdf_path, as_attachment=True)
-    
+
     return "PDF file not found", 404
 
 @app.route('/download_documentation/<int:request_id>/<int:file_index>')
@@ -938,28 +946,28 @@ def download_documentation(request_id, file_index):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     request_record = MedicalWithdrawalRequest.query.get(request_id)
-    
+
     if not request_record:
         return "Request not found", 404
-    
+
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
     if not is_admin and request_record.user_id != user_id:
         return "Unauthorized", 403
-    
+
     # Get documentation files
     if not request_record.documentation_files:
         return "No documentation files found", 404
-    
+
     files = json.loads(request_record.documentation_files)
     if file_index >= len(files):
         return "File not found", 404
-    
+
     file_path = files[file_index]
-    
+
     # Fix file path - ensure it has the correct path structure
     if not os.path.exists(file_path):
         # Try prefixing with static if the path starts with uploads
@@ -972,11 +980,11 @@ def download_documentation(request_id, file_index):
             fixed_path = os.path.join('static', 'uploads', os.path.basename(file_path))
             if os.path.exists(fixed_path):
                 file_path = fixed_path
-    
+
     # Final check if file exists
     if not os.path.exists(file_path):
         return "File not found at path: " + file_path, 404
-    
+
     return send_file(file_path, as_attachment=True)
 
 @app.route('/submit_student_drop', methods=['POST'])
@@ -1061,7 +1069,7 @@ def form_history():
     medical_requests = MedicalWithdrawalRequest.query.filter(
         MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
     ).all()
-    
+
     for req in medical_requests:
         # Get the most recent history entry for this request
         history = WithdrawalHistory.query.filter_by(
@@ -1069,7 +1077,7 @@ def form_history():
         ).order_by(
             WithdrawalHistory.action_date.desc()
         ).first()
-        
+
         history_entries.append({
             'timestamp': req.updated_at or req.created_at,
             'form_type': 'Medical Withdrawal',
@@ -1082,7 +1090,7 @@ def form_history():
     student_drops = StudentInitiatedDrop.query.filter(
         StudentInitiatedDrop.status.in_(['approved', 'rejected'])
     ).all()
-    
+
     for drop in student_drops:
         history_entries.append({
             'timestamp': drop.created_at,  # Using created_at since we don't have updated_at
@@ -1094,7 +1102,7 @@ def form_history():
 
     # Sort all entries by timestamp (newest first)
     history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
-    
+
     # Get current time in GMT-5
     now = utc_to_gmt5(datetime.utcnow())
 
@@ -1111,7 +1119,7 @@ def user_form_history(user_id):
     # Authentication and authorization checks
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     current_user = Profile.query.get(session['user_id'])
     if not current_user or current_user.privilages_ != 'admin':
         return "Unauthorized", 403
@@ -1121,20 +1129,20 @@ def user_form_history(user_id):
 
     # Get form history data
     history_entries = []
-    
+
     # Medical Withdrawals
     medical_requests = MedicalWithdrawalRequest.query.filter(
         MedicalWithdrawalRequest.user_id == user_id,
         MedicalWithdrawalRequest.status.in_(['approved', 'rejected'])
     ).all()
-    
+
     for req in medical_requests:
         history = WithdrawalHistory.query.filter_by(
             withdrawal_id=req.id
         ).order_by(
             WithdrawalHistory.action_date.desc()
         ).first()
-        
+
         history_entries.append({
             'timestamp': req.updated_at or req.created_at,  # Use updated_at if available
             'form_type': 'Medical Withdrawal',
@@ -1147,7 +1155,7 @@ def user_form_history(user_id):
         StudentInitiatedDrop.student_id == str(user_id),
         StudentInitiatedDrop.status.in_(['approved', 'rejected'])
     ).all()
-    
+
     for drop in student_drops:
         history_entries.append({
             'timestamp': drop.created_at,  # Student drops might not have updated_at
@@ -1158,7 +1166,7 @@ def user_form_history(user_id):
 
     # Sort by timestamp (newest first)
     history_entries.sort(key=lambda x: x['timestamp'], reverse=True)
-    
+
     # Get current time in GMT-5
     now = utc_to_gmt5(datetime.utcnow())
 
@@ -1181,15 +1189,15 @@ def mark_student_drop_viewed(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
         return "Unauthorized", 403
-        
+
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
-    
+
     # Add admin to the viewed list if not already there
     if not req_record.admin_viewed:
         admin_viewed = [str(user_id)]
@@ -1197,10 +1205,10 @@ def mark_student_drop_viewed(request_id):
         admin_viewed = json.loads(req_record.admin_viewed)
         if str(user_id) not in admin_viewed:
             admin_viewed.append(str(user_id))
-    
+
     req_record.admin_viewed = json.dumps(admin_viewed)
     db.session.commit()
-    
+
     return {"success": True}
 
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
@@ -1209,27 +1217,27 @@ def approve_student_drop(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     if user.privilages_ != 'admin':
         return "Unauthorized", 403
-    
+
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
-    
+
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
-    
+
     # Change status to approved
     req_record.status = 'approved'
     db.session.commit()
-    
+
     # Generate PDF with the updated function
     from pdf_utils import generate_student_drop_pdf
     pdf_path = generate_student_drop_pdf(req_record)
-    
+
     # Store the PDF path in the request record
     if pdf_path:
         # If this is the first generated PDF
@@ -1240,9 +1248,9 @@ def approve_student_drop(request_id):
             pdfs = json.loads(req_record.generated_pdfs)
             pdfs.append(pdf_path)
             req_record.generated_pdfs = json.dumps(pdfs)
-            
+
         db.session.commit()
-        
+
     return redirect(url_for('notification'))
 
 
@@ -1252,27 +1260,27 @@ def reject_student_drop(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     if user.privilages_ != 'admin':
         return "Unauthorized", 403
-    
+
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
-    
+
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before rejecting", 400
-    
+
     # Change status to rejected
     req_record.status = 'rejected'
     db.session.commit()
-    
+
     # Generate PDF with the updated function
     from pdf_utils import generate_student_drop_pdf
     pdf_path = generate_student_drop_pdf(req_record)
-    
+
     # Store the PDF path in the request record
     if pdf_path:
         # If this is the first generated PDF
@@ -1283,9 +1291,9 @@ def reject_student_drop(request_id):
             pdfs = json.loads(req_record.generated_pdfs)
             pdfs.append(pdf_path)
             req_record.generated_pdfs = json.dumps(pdfs)
-            
+
         db.session.commit()
-        
+
     return redirect(url_for('notification'))
 
 @app.route('/view-student-drop/<int:request_id>')
@@ -1293,19 +1301,19 @@ def view_student_drop(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     request_record = StudentInitiatedDrop.query.get(request_id)
-    
+
     if not request_record:
         return "Request not found", 404
-    
+
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
     if not is_admin and request_record.student_id != str(user_id):
         return "Unauthorized", 403
-    
-    return render_template('view_student_drop.html', 
+
+    return render_template('view_student_drop.html',
                           request=request_record,
                           is_admin=is_admin)
 
@@ -1316,18 +1324,18 @@ def download_student_drop_pdf(request_id, status):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     user = Profile.query.get(user_id)
     request_record = StudentInitiatedDrop.query.get(request_id)
-    
+
     if not request_record:
         return "Request not found", 404
-    
+
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
     if not is_admin and request_record.student_id != str(user_id):
         return "Unauthorized", 403
-    
+
     # If admin is viewing, mark as viewed
     if is_admin:
         if not request_record.admin_viewed:
@@ -1338,17 +1346,17 @@ def download_student_drop_pdf(request_id, status):
                 admin_viewed.append(str(user_id))
         request_record.admin_viewed = json.dumps(admin_viewed)
         db.session.commit()
-    
+
     # Find the most recent PDF with the given status
     pdf_dir = os.path.join('static', 'pdfs')
     search_pattern = f"student_drop_{request_id}_{status}_"
-    
+
     matching_files = []
     if os.path.exists(pdf_dir):
         for filename in os.listdir(pdf_dir):
             if filename.startswith(search_pattern) and filename.endswith('.pdf'):
                 matching_files.append(os.path.join(pdf_dir, filename))
-    
+
     if matching_files:
         # Sort by creation time, newest first
         latest_pdf = max(matching_files, key=os.path.getctime)
@@ -1360,13 +1368,13 @@ def download_student_drop_pdf(request_id, status):
         status_pdfs = [pdf for pdf in pdfs if status in pdf]
         if status_pdfs:
             return send_file(status_pdfs[-1], as_attachment=True)
-    
+
     # If no PDF found, generate one on the fly
     from pdf_utils import generate_student_drop_pdf
     pdf_path = generate_student_drop_pdf(request_record)
     if pdf_path and os.path.exists(pdf_path):
         return send_file(pdf_path, as_attachment=True)
-    
+
     return "PDF file not found", 404
 
 @app.route('/student_initiated_drop')
@@ -1386,7 +1394,7 @@ def drafts():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    
+
     draft_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id, status='draft').all()
     return render_template('drafts.html', draft_requests=draft_requests)
 
