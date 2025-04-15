@@ -1475,7 +1475,7 @@ def auth_step_two_callback():
         if user.privilages_ == "admin":
             return redirect(url_for('adminpage'))  # Admin page
         else:
-            return redirect(url_for('user_home'))  # User homepage
+            return redirect(url_for('userhompage'))  # User homepage
 
     return "Authentication failed", 400
 # -------------------------------
