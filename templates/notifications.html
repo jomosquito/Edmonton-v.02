@@ -451,8 +451,8 @@
         </tbody>
       </table>
 
-<!-- FERPA Requests Section -->
-<h3 style="margin-top: 30px;"><i class="fas fa-file-alt"></i> FERPA Requests</h3>
+<!-- FERPA Requests Section - Updated with proper view/approve/reject functionality -->
+<h3 style="margin-top: 30px;"><i class="fas fa-lock"></i> FERPA Requests</h3>
 <table>
   <thead>
     <tr>
@@ -465,17 +465,18 @@
   </thead>
   <tbody>
     {% for request in pending_ferpa_requests %}
-    <tr id="ferpa-request-{{ request.id }}">
+    <tr id="ferpa-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
       <td>{{ request.id }}</td>
       <td>{{ request.name }}</td>
       <td>{{ request.status }}</td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
-          <!-- View PDF button - FIXED -->
+          <!-- View PDF button -->
           <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}"
              class="view-pdf"
-             target="_blank">
+             target="_blank"
+             onclick="markFERPAViewed('{{ request.id }}')">
             <i class="fas fa-file-pdf"></i> View PDF
           </a>
 
@@ -485,7 +486,8 @@
             method="post"
             style="display: inline"
           >
-            <button type="submit" class="approve">
+            <button type="submit" class="approve" id="approve-ferpa-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-check"></i> Approve
             </button>
           </form>
@@ -495,10 +497,18 @@
             method="post"
             style="display: inline"
           >
-            <button type="submit" class="reject">
+            <button type="submit" class="reject" id="reject-ferpa-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-times"></i> Reject
             </button>
           </form>
+
+          <!-- Status message -->
+          <span id="status-ferpa-{{ request.id }}" class="tooltip">
+            {% if not request.has_admin_viewed(session.get('user_id')) %}
+            <span class="tooltiptext">View PDF first</span>
+            {% endif %}
+          </span>
         </div>
       </td>
     </tr>
@@ -524,17 +534,18 @@
   </thead>
   <tbody>
     {% for request in pending_infochange_requests %}
-    <tr id="infochange-request-{{ request.id }}">
+    <tr id="infochange-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
       <td>{{ request.id }}</td>
       <td>{{ request.name }}</td>
       <td>{{ request.status }}</td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
-          <!-- View PDF button - FIXED -->
+          <!-- View PDF button -->
           <a href="{{ url_for('download_infochange_pdf', request_id=request.id) }}"
              class="view-pdf"
-             target="_blank">
+             target="_blank"
+             onclick="markInfoChangeViewed('{{ request.id }}')">
             <i class="fas fa-file-pdf"></i> View PDF
           </a>
 
@@ -544,7 +555,8 @@
             method="post"
             style="display: inline"
           >
-            <button type="submit" class="approve">
+            <button type="submit" class="approve" id="approve-infochange-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-check"></i> Approve
             </button>
           </form>
@@ -554,10 +566,18 @@
             method="post"
             style="display: inline"
           >
-            <button type="submit" class="reject">
+            <button type="submit" class="reject" id="reject-infochange-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-times"></i> Reject
             </button>
           </form>
+
+          <!-- Status message -->
+          <span id="status-infochange-{{ request.id }}" class="tooltip">
+            {% if not request.has_admin_viewed(session.get('user_id')) %}
+            <span class="tooltiptext">View PDF first</span>
+            {% endif %}
+          </span>
         </div>
       </td>
     </tr>
@@ -568,8 +588,6 @@
     {% endfor %}
   </tbody>
 </table>
-
-    </div>
 
 
     <script>
@@ -596,6 +614,72 @@
               }
           });
       });
+
+      // Function to handle AJAX update when FERPA PDF is viewed
+function markFERPAViewed(requestId) {
+  // After PDF is opened, wait a moment and then update UI
+  setTimeout(() => {
+    // Enable the buttons
+    document.getElementById(`approve-ferpa-${requestId}`).disabled = false;
+    document.getElementById(`reject-ferpa-${requestId}`).disabled = false;
+
+    // Add viewed class to row
+    document.getElementById(`ferpa-request-${requestId}`).classList.add('request-row-viewed');
+
+    // Remove tooltip
+    document.getElementById(`status-ferpa-${requestId}`).innerHTML = '';
+
+    // Add visual feedback
+    let statusElem = document.getElementById(`status-ferpa-${requestId}`);
+    statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+    // After showing confirmation for 3 seconds, remove it
+    setTimeout(() => {
+      statusElem.innerHTML = '';
+    }, 3000);
+
+    // Make AJAX call to update server-side state
+    fetch(`/mark_ferpa_viewed/${requestId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }, 2000); // Wait 2 seconds to simulate viewing the PDF
+}
+
+// Function to handle AJAX update when Name/SSN Change PDF is viewed
+function markInfoChangeViewed(requestId) {
+  // After PDF is opened, wait a moment and then update UI
+  setTimeout(() => {
+    // Enable the buttons
+    document.getElementById(`approve-infochange-${requestId}`).disabled = false;
+    document.getElementById(`reject-infochange-${requestId}`).disabled = false;
+
+    // Add viewed class to row
+    document.getElementById(`infochange-request-${requestId}`).classList.add('request-row-viewed');
+
+    // Remove tooltip
+    document.getElementById(`status-infochange-${requestId}`).innerHTML = '';
+
+    // Add visual feedback
+    let statusElem = document.getElementById(`status-infochange-${requestId}`);
+    statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+    // After showing confirmation for 3 seconds, remove it
+    setTimeout(() => {
+      statusElem.innerHTML = '';
+    }, 3000);
+
+    // Make AJAX call to update server-side state
+    fetch(`/mark_infochange_viewed/${requestId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }, 2000); // Wait 2 seconds to simulate viewing the PDF
+}
 
       // Function to handle AJAX update when Medical Withdrawal PDF is viewed
       function markAsViewed(requestId) {

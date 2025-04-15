@@ -39,6 +39,16 @@ with app.app_context():
     with db.engine.connect() as conn:
         inspector = sa.inspect(db.engine)
 
+         # Add admin_viewed column to FERPARequest if it doesn't exist
+        columns = inspector.get_columns('ferpa_request')
+        if 'admin_viewed' not in [col['name'] for col in columns]:
+            conn.execute(sa.text('ALTER TABLE ferpa_request ADD COLUMN admin_viewed TEXT'))
+
+        # Add admin_viewed column to InfoChangeRequest if it doesn't exist
+        columns = inspector.get_columns('info_change_request')
+        if 'admin_viewed' not in [col['name'] for col in columns]:
+            conn.execute(sa.text('ALTER TABLE info_change_request ADD COLUMN admin_viewed TEXT'))
+
         # Check FERPARequest table
         tables = inspector.get_table_names()
         if 'ferpa_request' in tables:

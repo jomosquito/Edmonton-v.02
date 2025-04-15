@@ -229,6 +229,17 @@ class FERPARequest(db.Model):
     # Relationship to User model
     user = db.relationship('Profile', backref='ferpa_requests')
 
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+
+    def has_admin_viewed(self, admin_id):
+        """Check if an admin has viewed this request"""
+        if not self.admin_viewed:
+            return False
+        try:
+            viewed_by = json.loads(self.admin_viewed)
+            return str(admin_id) in viewed_by
+        except:
+            return False
 class InfoChangeRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -272,6 +283,19 @@ class InfoChangeRequest(db.Model):
 
     # Relationship to User model
     user = db.relationship('Profile', backref='infochange_requests')
+
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+
+    def has_admin_viewed(self, admin_id):
+        """Check if an admin has viewed this request"""
+        if not self.admin_viewed:
+            return False
+        try:
+            viewed_by = json.loads(self.admin_viewed)
+            return str(admin_id) in viewed_by
+        except:
+            return False
+
 
 ### V3 Integration of New Forms ###
 
@@ -378,6 +402,8 @@ class InfoChangeForm(FlaskForm):
     submit = SubmitField('Submit Name/SSN Change')
 
 ##### V3 Form Classes #####
+
+
 
 
 # -------------------------------
@@ -747,8 +773,8 @@ def status():
         infochange_requests=infochange_requests
     )
 
-# Add routes for downloading FERPA and Info Change PDFs
-# Fixed PDF download routes
+# Modified routes for FERPA and Name/SSN PDF downloads
+
 @app.route('/download_ferpa_pdf/<int:request_id>')
 def download_ferpa_pdf(request_id):
     user_id = session.get('user_id')
@@ -949,6 +975,7 @@ def download_infochange_pdf(request_id):
         flash('Error accessing the PDF file.', 'danger')
         return redirect(url_for('status'))
 
+
 # Add admin routes for approving/rejecting FERPA and Info Change requests
 @app.route('/approve_ferpa/<int:request_id>', methods=['POST'])
 def approve_ferpa(request_id):
@@ -964,6 +991,17 @@ def approve_ferpa(request_id):
 
     ferpa_request = FERPARequest.query.get_or_404(request_id)
     ferpa_request.status = 'approved'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(ferpa_request, 'admin_viewed'):
+        if not ferpa_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(ferpa_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        ferpa_request.admin_viewed = json.dumps(admin_viewed)
+
     db.session.commit()
 
     flash('FERPA request approved.', 'success')
@@ -983,6 +1021,17 @@ def reject_ferpa(request_id):
 
     ferpa_request = FERPARequest.query.get_or_404(request_id)
     ferpa_request.status = 'rejected'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(ferpa_request, 'admin_viewed'):
+        if not ferpa_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(ferpa_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        ferpa_request.admin_viewed = json.dumps(admin_viewed)
+
     db.session.commit()
 
     flash('FERPA request rejected.', 'success')
@@ -1002,6 +1051,17 @@ def approve_infochange(request_id):
 
     infochange_request = InfoChangeRequest.query.get_or_404(request_id)
     infochange_request.status = 'approved'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(infochange_request, 'admin_viewed'):
+        if not infochange_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(infochange_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        infochange_request.admin_viewed = json.dumps(admin_viewed)
+
     db.session.commit()
 
     flash('Name/SSN change request approved.', 'success')
@@ -1021,11 +1081,78 @@ def reject_infochange(request_id):
 
     infochange_request = InfoChangeRequest.query.get_or_404(request_id)
     infochange_request.status = 'rejected'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(infochange_request, 'admin_viewed'):
+        if not infochange_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(infochange_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        infochange_request.admin_viewed = json.dumps(admin_viewed)
+
     db.session.commit()
 
     flash('Name/SSN change request rejected.', 'success')
     return redirect(url_for('notifications'))
 
+# Add routes for marking FERPA and Name/SSN forms as viewed by admin
+@app.route('/mark_ferpa_viewed/<int:request_id>', methods=['POST'])
+def mark_ferpa_viewed(request_id):
+    """Mark a FERPA request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req_record = FERPARequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+
+    return {"success": True}
+
+@app.route('/mark_infochange_viewed/<int:request_id>', methods=['POST'])
+def mark_infochange_viewed(request_id):
+    """Mark a Name/SSN change request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req_record = InfoChangeRequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+
+    return {"success": True}
 
 # -------------------------------
 # V3 Routes
@@ -1047,28 +1174,6 @@ def utc_to_gmt5(utc_datetime):
 def home():
     return render_template('login.html')
 
-
-@app.route('/notifications')
-def notification():
-    # Query pending medical withdrawal requests
-    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
-
-    # Query pending student drop requests
-    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
-
-    # Query pending FERPA requests
-    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
-
-    # Query pending Info Change requests
-    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
-
-    return render_template(
-        'notifications.html',
-        pending_medical_requests=pending_medical_requests,
-        pending_student_drops=pending_student_drops,
-        pending_ferpa_requests=pending_ferpa_requests,
-        pending_infochange_requests=pending_infochange_requests
-    )
 @app.route('/creat')
 def index():
     return render_template('add_profile.html')
@@ -1220,6 +1325,8 @@ def ap():
             profiles = Profile.query.all()
             pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
             pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+            pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+            pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
             now = datetime.utcnow()
 
             return render_template(
@@ -1227,6 +1334,8 @@ def ap():
                 profiles=profiles,
                 pending_medical_requests=pending_medical_requests,
                 pending_student_drops=pending_student_drops,
+                pending_ferpa_requests=pending_ferpa_requests,
+                pending_infochange_requests=pending_infochange_requests,
                 now=now
             )
 
@@ -1241,6 +1350,8 @@ def ap():
     # Get pending requests for the dashboard
     pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
     pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
 
     # Add current server time for the dashboard
     now = datetime.utcnow()
@@ -1250,7 +1361,31 @@ def ap():
         profiles=profiles,
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests,
         now=now
+    )
+
+@app.route('/notifications')
+def notifications():
+    # Query pending medical withdrawal requests
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+
+    # Query pending student drop requests
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+
+    # Query pending FERPA requests
+    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+
+    # Query pending Info Change requests
+    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
+
+    return render_template(
+        'notifications.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests
     )
 
 # -------------------------------
@@ -1898,7 +2033,7 @@ def form_history():
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
-    # Combine both types of form submissions
+    # Combine all types of form submissions
     history_entries = []
 
     # Process Medical Withdrawal Requests
@@ -1934,6 +2069,38 @@ def form_history():
             'status': drop.status,
             'reviewed_by': 'System',  # Modify if you track approvers for drops
             'original_request': drop  # Keep reference if needed
+        })
+
+    # Process FERPA Requests
+    ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in ferpa_requests:
+        history_entries.append({
+            'timestamp': req.time,  # Using time field as timestamp
+            'form_type': 'FERPA Release',
+            'status': req.status,
+            'reviewed_by': 'Admin',  # Could be enhanced if you track which admin made the approval/rejection
+            'original_request': req
+        })
+
+    # Process Name/SSN Change Requests
+    infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in infochange_requests:
+        request_type = "Name Change" if "name" in req.choice else "SSN Change"
+        if "name" in req.choice and "ssn" in req.choice:
+            request_type = "Name & SSN Change"
+
+        history_entries.append({
+            'timestamp': req.time,  # Using time field as timestamp
+            'form_type': request_type,
+            'status': req.status,
+            'reviewed_by': 'Admin',  # Could be enhanced if you track which admin made the approval/rejection
+            'original_request': req
         })
 
     # Sort all entries by timestamp (newest first)
@@ -1980,7 +2147,7 @@ def user_form_history(user_id):
         ).first()
 
         history_entries.append({
-            'timestamp': req.updated_at or req.created_at,  # Use updated_at if available
+            'timestamp': req.updated_at or req.created_at,
             'form_type': 'Medical Withdrawal',
             'status': req.status,
             'reviewed_by': f"{history.admin.first_name} {history.admin.last_name}" if history else 'System'
@@ -1994,10 +2161,42 @@ def user_form_history(user_id):
 
     for drop in student_drops:
         history_entries.append({
-            'timestamp': drop.created_at,  # Student drops might not have updated_at
+            'timestamp': drop.created_at,
             'form_type': 'Student Course Drop',
             'status': drop.status,
-            'reviewed_by': 'System'  # Modify if you track approvers
+            'reviewed_by': 'System'
+        })
+
+    # FERPA Requests
+    ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.user_id == user_id,
+        FERPARequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in ferpa_requests:
+        history_entries.append({
+            'timestamp': req.time,
+            'form_type': 'FERPA Release',
+            'status': req.status,
+            'reviewed_by': 'Admin'
+        })
+
+    # Name/SSN Change Requests
+    infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.user_id == user_id,
+        InfoChangeRequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in infochange_requests:
+        request_type = "Name Change" if "name" in req.choice else "SSN Change"
+        if "name" in req.choice and "ssn" in req.choice:
+            request_type = "Name & SSN Change"
+
+        history_entries.append({
+            'timestamp': req.time,
+            'form_type': request_type,
+            'status': req.status,
+            'reviewed_by': 'Admin'
         })
 
     # Sort by timestamp (newest first)
