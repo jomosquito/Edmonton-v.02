@@ -1309,7 +1309,7 @@ def activate(id):
         return redirect('/ap')
     profile.active = not profile.active
     db.session.commit()
-    return redirect('/ap')
+    return redirect(url_for('adminpage'))
 
 @app.route('/ap')
 def ap():
@@ -1534,7 +1534,7 @@ def change_privileges(id):
     else:
         data.privilages_ = "user"
     db.session.commit()
-    return redirect('/ap')
+    return redirect(url_for('adminpage'))
 
 # Delete a profile
 @app.route('/delete/<int:id>')
@@ -1543,7 +1543,7 @@ def erase(id):
     if data:
         db.session.delete(data)
         db.session.commit()
-    return redirect('/ap')
+    return redirect(url_for('adminpage'))
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update_user(id):
@@ -1567,7 +1567,7 @@ def update_user(id):
         if new_password:
             user.set_password(new_password)
         db.session.commit()
-        return redirect('/ap')
+        return redirect(url_for('adminpage'))
     return render_template('update.html', profile=user)
 
 @app.route("/create", methods=["GET", "POST"])
