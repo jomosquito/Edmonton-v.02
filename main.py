@@ -59,7 +59,7 @@ def deserialize(flow_str):
 # Updated Profile Model with new fields for optional token claims
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(20), nullable=False)
+    first_name = db.Column(db.String(20), nullable=True)
     last_name = db.Column(db.String(20), nullable=True)
     active = db.Column(db.Boolean, default=True, nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
@@ -1176,7 +1176,7 @@ def home():
 
 @app.route('/creat')
 def index():
-    return render_template('add_profile.html')
+    return  redirect(url_for('auth_step_one'))
 
 # Admin login page and route
 @app.route('/admin')
@@ -1418,7 +1418,23 @@ def auth_step_one():
 
     return redirect(url)
 
-# Microsoft OAuth Step Two Callback
+    account = Account(credentials)
+
+    my_saved_flow_str = my_db.get_flow()
+
+    if not my_saved_flow_str:
+        return "Flow state not found. Restart authentication.", 400
+
+    my_saved_flow = deserialize(my_saved_flow_str)
+    requested_url = request.url  # Get current URL with auth code
+    result = account.con.request_token(requested_url, flow=my_saved_flow)
+    email, idtoken = open1()
+
+    if result:
+      
+        return redirect('/')
+
+    return "Authentication failed", 400
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
@@ -1431,17 +1447,35 @@ def auth_step_two_callback():
     my_saved_flow = deserialize(my_saved_flow_str)
     requested_url = request.url  # Get current URL with auth code
     result = account.con.request_token(requested_url, flow=my_saved_flow)
-    email, idtoken=open1()
-
+    email, idtoken = open1()
 
     if result:
-        profile = Profile.query.order_by(Profile.id.desc()).first()
-        if profile:
-            profile.email_ = email  # Update the email field
-            profile.usertokenid = idtoken
-            db.session.commit()
-        return redirect('/')
+        # Check if the user already exists in the database
+        user = Profile.query.filter_by(email_=email).first()
 
+        if not user:
+            # Check if this is the first account being created
+            is_first_account = Profile.query.count() == 0
+
+            # Create a new profile
+            user = Profile(
+                first_name=email,  # Use email as the username
+                email_=email,
+                pass_word=generate_password_hash(idtoken),  # Hash the idtoken for security
+                privilages_="admin" if is_first_account else "user"  # Make the first account an admin
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        # Set session variables
+        session['user_id'] = user.id
+        session['admin'] = user.privilages_ == "admin"
+
+        # Redirect based on privileges
+        if user.privilages_ == "admin":
+            return redirect(url_for('adminpage'))  # Admin page
+        else:
+            return redirect(url_for('user_home'))  # User homepage
 
     return "Authentication failed", 400
 # -------------------------------
