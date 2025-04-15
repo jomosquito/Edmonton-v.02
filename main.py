@@ -562,20 +562,21 @@ def name_ssn_change():
     user = Profile.query.get(user_id)
     form = InfoChangeForm()
 
+    # Process form submission...
     if form.validate_on_submit():
-        try:
-            # Handle file upload for signature
-            if 'signature' not in request.files:
-                flash('Signature was not uploaded.', 'danger')
-                return render_template('name_ssn_change.html', form=form, user=user)
+        # Handle file upload for signature
+        if 'signature' not in request.files:
+            flash('Signature was not uploaded.', 'danger')
+            return redirect(url_for('status'))
 
-            file = request.files['signature']
-            if file.filename == '':
-                flash('No file selected for signature.', 'danger')
-                return render_template('name_ssn_change.html', form=form, user=user)
+        file = request.files['signature']
+        if file.filename == '':
+            flash('No file selected for signature.', 'danger')
+            return render_template('name_ssn_change.html', form=form, user=user, today_date=date.today().strftime('%Y-%m-%d'))
 
-            # Check if file type is allowed
-            if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+        # Check if file type is allowed
+        if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+            try:
                 # Generate a unique name for the image
                 unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
 
@@ -591,15 +592,15 @@ def name_ssn_change():
                 latex_path = filepath.replace("\\", "/")
 
                 # Build data dictionary for the PDF
-                choice = form.choice.data
-                name_change_reason = form.name_change_reason.data if form.name_change_reason.data else []
-                ssn_change_reason = form.ssn_change_reason.data if form.ssn_change_reason.data else []
+                choice_options = form.choice.data
+                name_change_reason = form.name_change_reason.data if 'name' in choice_options else []
+                ssn_change_reason = form.ssn_change_reason.data if 'ssn' in choice_options else []
 
                 data = {
                     "NAME": form.name.data,
                     "PEOPLESOFT": form.peoplesoft_id.data,
-                    "EDIT_NAME": return_choice(choice, 'name'),
-                    "EDIT_SSN": return_choice(choice, 'ssn'),
+                    "EDIT_NAME": return_choice(choice_options, 'name'),
+                    "EDIT_SSN": return_choice(choice_options, 'ssn'),
                     "FN_OLD": form.first_name_old.data or "",
                     "MN_OLD": form.middle_name_old.data or "",
                     "LN_OLD": form.last_name_old.data or "",
@@ -623,19 +624,19 @@ def name_ssn_change():
                 forms_dir = os.path.join('static', 'forms')
                 os.makedirs(forms_dir, exist_ok=True)
 
-                # Generate PDF and store path with debug output
-                print(f"Generating Name/SSN change PDF with data: {data}")
+                # Generate PDF with debug output
+                print(f"Generating Name/SSN Change PDF with data: {data}")
                 pdf_file = generate_ssn_name(data, forms_dir, signatures_dir)
                 print(f"Generated PDF file: {pdf_file}")
 
                 if not pdf_file:
                     flash('Error generating PDF. Please try again.', 'danger')
-                    return render_template('name_ssn_change.html', form=form, user=user)
+                    return render_template('name_ssn_change.html', form=form, user=user, today_date=date.today().strftime('%Y-%m-%d'))
 
-                # Store options as comma-separated strings
+                # Store options as comma-separate string
                 choice_str = ",".join(form.choice.data)
-                name_change_reason_str = ",".join(name_change_reason)
-                ssn_change_reason_str = ",".join(ssn_change_reason)
+                name_change_reason_str = ",".join(form.name_change_reason.data) if form.name_change_reason.data else ""
+                ssn_change_reason_str = ",".join(form.ssn_change_reason.data) if form.ssn_change_reason.data else ""
 
                 # Set status based on draft checkbox
                 status = "draft" if form.is_draft.data else "pending"
@@ -646,8 +647,8 @@ def name_ssn_change():
                 except ValueError:
                     date_obj = date.today()
 
-                # Create new request
-                new_request = InfoChangeRequest(
+                # Create new info change request
+                new_infochange_request = InfoChangeRequest(
                     user_id=user_id,
                     status=status,
                     pdf_link=pdf_file,
@@ -670,11 +671,11 @@ def name_ssn_change():
                     date=date_obj
                 )
 
-                # Commit request to database
-                db.session.add(new_request)
+                # Commit info change request to database
+                db.session.add(new_infochange_request)
                 db.session.commit()
 
-                print(f"Created Name/SSN change request with ID: {new_request.id}")
+                print(f"Created Info Change request with ID: {new_infochange_request.id}")
 
                 if form.is_draft.data:
                     flash('Name/SSN change request saved as draft.', 'success')
@@ -682,16 +683,28 @@ def name_ssn_change():
                     flash('Name/SSN change request submitted successfully.', 'success')
 
                 return redirect(url_for('status'))
-            else:
-                flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
-                return render_template('name_ssn_change.html', form=form, user=user)
-        except Exception as e:
-            import traceback
-            print(f"Error in Name/SSN change form submission: {str(e)}")
-            print(traceback.format_exc())
-            flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+            except Exception as e:
+                import traceback
+                print(f"Error in Name/SSN change form submission: {str(e)}")
+                print(traceback.format_exc())
+                flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+                today_date = date.today().strftime('%Y-%m-%d')
+                return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+        else:
+            flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
             today_date = date.today().strftime('%Y-%m-%d')
             return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+
+    if request.method == 'POST':
+        print("Form submitted")
+
+    if not form.validate():
+        print(f"Form validation errors: {form.errors}")
+        flash(f"Form validation errors: {form.errors}", "danger")
+
+        # Return the form with validation errors
+        today_date = date.today().strftime('%Y-%m-%d')
+        return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
 
     # Set default date to today
     if request.method == 'GET':
@@ -702,7 +715,9 @@ def name_ssn_change():
             form.first_name_old.data = user.first_name
             form.last_name_old.data = user.last_name
 
-    return render_template('name_ssn_change.html', form=form, user=user)
+    # Always pass today_date variable to the template
+    today_date = date.today().strftime('%Y-%m-%d')
+    return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
 
 # Update the status route to include the new request types
 @app.route('/status')
