@@ -16,6 +16,7 @@
 {% endwith %}
 
 <form method="POST" enctype="multipart/form-data">
+  {{ form.csrf_token }}
   <div class="card mb-4">
     <div class="card-header">
       <h3>Basic Information</h3>
@@ -38,8 +39,8 @@
       <div class="mb-3">
         <label for="choice" class="form-label">Change Request Type:</label>
         <select id="choice" name="choice" class="form-select" multiple required>
-          <option value="name" {% if 'name' in form.choice.data %}selected{% endif %}>Update Name (Complete Section A)</option>
-          <option value="ssn" {% if 'ssn' in form.choice.data %}selected{% endif %}>Update SSN (Complete Section B)</option>
+          <option value="name" {% if form.choice.data and 'name' in form.choice.data %}selected{% endif %}>Update Name (Complete Section A)</option>
+          <option value="ssn" {% if form.choice.data and 'ssn' in form.choice.data %}selected{% endif %}>Update SSN (Complete Section B)</option>
         </select>
       </div>
     </div>
@@ -95,9 +96,9 @@
       <div class="mb-3">
         <label for="name_change_reason" class="form-label">Reason for Name Change:</label>
         <select id="name_change_reason" name="name_change_reason" class="form-select" multiple>
-          <option value="marriage" {% if 'marriage' in form.name_change_reason.data %}selected{% endif %}>Marriage/Divorce</option>
-          <option value="court" {% if 'court' in form.name_change_reason.data %}selected{% endif %}>Court Order</option>
-          <option value="error" {% if 'error' in form.name_change_reason.data %}selected{% endif %}>Correction of Error</option>
+          <option value="marriage" {% if form.name_change_reason.data and 'marriage' in form.name_change_reason.data %}selected{% endif %}>Marriage/Divorce</option>
+          <option value="court" {% if form.name_change_reason.data and 'court' in form.name_change_reason.data %}selected{% endif %}>Court Order</option>
+          <option value="error" {% if form.name_change_reason.data and 'error' in form.name_change_reason.data %}selected{% endif %}>Correction of Error</option>
         </select>
         <div class="form-text">Please select all that apply.</div>
       </div>
@@ -130,8 +131,8 @@
       <div class="mb-3">
         <label for="ssn_change_reason" class="form-label">Reason for SSN Change:</label>
         <select id="ssn_change_reason" name="ssn_change_reason" class="form-select" multiple>
-          <option value="error" {% if 'error' in form.ssn_change_reason.data %}selected{% endif %}>Correction of Error</option>
-          <option value="addition" {% if 'addition' in form.ssn_change_reason.data %}selected{% endif %}>Addition of SSN to University Records</option>
+          <option value="error" {% if form.ssn_change_reason.data and 'error' in form.ssn_change_reason.data %}selected{% endif %}>Correction of Error</option>
+          <option value="addition" {% if form.ssn_change_reason.data and 'addition' in form.ssn_change_reason.data %}selected{% endif %}>Addition of SSN to University Records</option>
         </select>
         <div class="form-text">Please select all that apply.</div>
       </div>

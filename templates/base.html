@@ -1,5 +1,5 @@
-\templates\base.html -->
-<!DOCTYPE html>
+<!-- This is the base template for the application. It includes the common layout and structure for V3 Forms. -->
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -45,7 +45,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+
                 {% endfor %}
             {% endif %}
         {% endwith %}

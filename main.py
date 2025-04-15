@@ -618,9 +618,9 @@ def name_ssn_change():
                 latex_path = filepath.replace("\\", "/")
 
                 # Build data dictionary for the PDF
-                choice_options = form.choice.data
-                name_change_reason = form.name_change_reason.data if 'name' in choice_options else []
-                ssn_change_reason = form.ssn_change_reason.data if 'ssn' in choice_options else []
+                choice_options = form.choice.data if form.choice.data else []  # Add this check
+                name_change_reason = form.name_change_reason.data if form.name_change_reason.data else []  # And this check
+                ssn_change_reason = form.ssn_change_reason.data if form.ssn_change_reason.data else []  # And this check
 
                 data = {
                     "NAME": form.name.data,
@@ -660,7 +660,7 @@ def name_ssn_change():
                     return render_template('name_ssn_change.html', form=form, user=user, today_date=date.today().strftime('%Y-%m-%d'))
 
                 # Store options as comma-separate string
-                choice_str = ",".join(form.choice.data)
+                choice_str = ",".join(form.choice.data) if form.choice.data else ""
                 name_change_reason_str = ",".join(form.name_change_reason.data) if form.name_change_reason.data else ""
                 ssn_change_reason_str = ",".join(form.ssn_change_reason.data) if form.ssn_change_reason.data else ""
 
@@ -1272,7 +1272,7 @@ def login():
     return render_template('log.html')
 
 @app.route('/userhompage')
-def user_home():
+def userhompage():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
