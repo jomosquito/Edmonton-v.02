@@ -451,7 +451,7 @@
         </tbody>
       </table>
 
-      <!-- FERPA Requests Section -->
+<!-- FERPA Requests Section -->
 <h3 style="margin-top: 30px;"><i class="fas fa-file-alt"></i> FERPA Requests</h3>
 <table>
   <thead>
@@ -472,14 +472,10 @@
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
-          <!-- View PDF button -->
-
+          <!-- View PDF button - FIXED -->
           <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}"
-          class="view-pdf"
-          target="_blank"
-        >
-          <i class="fas fa-file-pdf"></i> View PDF
-        </a>
+             class="view-pdf"
+             target="_blank">
             <i class="fas fa-file-pdf"></i> View PDF
           </a>
 
@@ -535,12 +531,10 @@
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
-          <!-- View PDF button -->
-
-            href="{{ url_for('download_infochange_pdf', request_id=request.id) }}"
-            class="view-pdf"
-            target="_blank"
-          >
+          <!-- View PDF button - FIXED -->
+          <a href="{{ url_for('download_infochange_pdf', request_id=request.id) }}"
+             class="view-pdf"
+             target="_blank">
             <i class="fas fa-file-pdf"></i> View PDF
           </a>
 

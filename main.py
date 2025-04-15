@@ -325,7 +325,7 @@ class FERPAForm(FlaskForm):
     release_other = StringField('Other Releases', validators=[Optional()])
 
     password = StringField('Password', validators=[DataRequired(), Length(min=5, max=16)])
-    peoplesoft_id = StringField('PSID', validators=[DataRequired(), Length(min=6, max=6)])
+    peoplesoft_id = StringField('PSID', validators=[DataRequired(), Length(min=7, max=7)])
 
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
 
@@ -397,7 +397,7 @@ def ferpa_form():
         # Handle file upload for signature
         if 'signature' not in request.files:
             flash('Signature was not uploaded.', 'danger')
-            return render_template('ferpa_form.html', form=form, user=user)
+            return redirect(url_for('status'))  # Make sure this is correct
 
         file = request.files['signature']
         if file.filename == '':
@@ -522,6 +522,8 @@ def ferpa_form():
                 db.session.add(new_ferpa_request)
                 db.session.commit()
 
+
+
                 print(f"Created FERPA request with ID: {new_ferpa_request.id}")
 
                 if form.is_draft.data:
@@ -540,11 +542,16 @@ def ferpa_form():
             flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
             return render_template('ferpa_form.html', form=form, user=user)
 
-    # Set default date to today
-    if request.method == 'GET':
-        form.date.data = date.today()
+    if request.method == 'POST':
+        print("Form submitted")
 
-    return render_template('ferpa_form.html', form=form, user=user)
+    if not form.validate():
+        print(f"Form validation errors: {form.errors}")
+        flash(f"Form validation errors: {form.errors}", "danger")
+
+        # Return the form with validation errors
+        today_date = date.today().strftime('%Y-%m-%d')
+        return render_template('ferpa_form.html', form=form, user=user, today_date=today_date)
 
 @app.route('/name-ssn-change', methods=['GET', 'POST'])
 def name_ssn_change():
@@ -683,7 +690,8 @@ def name_ssn_change():
             print(f"Error in Name/SSN change form submission: {str(e)}")
             print(traceback.format_exc())
             flash(f'An error occurred while processing your request: {str(e)}', 'danger')
-            return render_template('name_ssn_change.html', form=form, user=user)
+            today_date = date.today().strftime('%Y-%m-%d')
+            return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
 
     # Set default date to today
     if request.method == 'GET':
@@ -725,6 +733,7 @@ def status():
     )
 
 # Add routes for downloading FERPA and Info Change PDFs
+# Fixed PDF download routes
 @app.route('/download_ferpa_pdf/<int:request_id>')
 def download_ferpa_pdf(request_id):
     user_id = session.get('user_id')
@@ -799,6 +808,7 @@ def download_ferpa_pdf(request_id):
             }
 
             # Regenerate PDF
+            os.makedirs(forms_dir, exist_ok=True)
             new_pdf_file = generate_ferpa(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
 
             if new_pdf_file:
@@ -891,6 +901,7 @@ def download_infochange_pdf(request_id):
             }
 
             # Regenerate PDF
+            os.makedirs(forms_dir, exist_ok=True)
             new_pdf_file = generate_ssn_name(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
 
             if new_pdf_file:

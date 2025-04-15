@@ -1,182 +1,439 @@
-{% extends 'base.html' %}
-{% block title %}FERPA Release Form{% endblock %}
-{% block content %}
-<h1 class="mb-3">FERPA Release Form</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FERPA Release Form</title>
+  <!-- Import Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Variables for theme consistency */
+    :root {
+      --primary-color: #2575fc;
+      --secondary-color: #6a11cb;
+      --accent-color: #c8102e; /* UH Red as accent */
+      --background-color: #f0f2f5;
+      --card-bg: #fff;
+      --border-color: #ddd;
+      --text-color: #333;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
 
-<div class="alert alert-info">
-  <p>This form authorizes the University to release your educational records to specified individuals or organizations.</p>
-</div>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<form method="POST" enctype="multipart/form-data">
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Basic Information</h3>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background-color);
+      padding: 0;
+      margin: 0;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container {
+      max-width: 1100px;
+      margin: 20px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-alert {
+      background-color: #cce5ff;
+      border-left: 4px solid #0d6efd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 25px;
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+    }
+
+    .form-section h3 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+      gap: 15px;
+    }
+
+    .form-group {
+      flex: 1 1 200px;
+    }
+
+    .form-group.full-width {
+      flex-basis: 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--highlight-color);
+      outline: none;
+    }
+
+    select[multiple] {
+      height: auto;
+      min-height: 100px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .primary-button {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .primary-button:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .secondary-button {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .secondary-button:hover {
+      background-color: #c7c7c7;
+    }
+
+    .alert {
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+    }
+
+    .help-text {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 15px;
+        margin: 10px;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .primary-button,
+      .secondary-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>FERPA Release Form</header>
+
+  <div class="form-container">
+    <div class="info-alert">
+      <p>This form authorizes the University to release your educational records to specified individuals or organizations.</p>
     </div>
-    <div class="card-body">
-      <!-- Name -->
-      <div class="mb-3">
-        <label for="name" class="form-label">Full Name:</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ user.first_name }} {{ user.last_name }}" required>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+    <form method="POST" enctype="multipart/form-data">
+      {{ form.csrf_token }}
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3>1. Basic Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" value="{{ form.name.data or user.first_name ~ ' ' ~ user.last_name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="campus">Campus:</label>
+            <input type="text" id="campus" name="campus" value="{{ form.campus.data or '' }}" required>
+          </div>
+        </div>
       </div>
 
-      <!-- Campus -->
-      <div class="mb-3">
-        <label for="campus" class="form-label">Campus:</label>
-        <input type="text" class="form-control" id="campus" name="campus" required>
+      <!-- Authorized Officials Section -->
+      <div class="form-section">
+        <h3>2. Authorized Officials</h3>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="official_choices">Authorize officials to disclose information (select all that apply):</label>
+            <select id="official_choices" name="official_choices" multiple required>
+              <option value="registrar" {% if form.official_choices.data and 'registrar' in form.official_choices.data %}selected{% endif %}>Office of the University Registrar</option>
+              <option value="aid" {% if form.official_choices.data and 'aid' in form.official_choices.data %}selected{% endif %}>Scholarships and Financial Aid</option>
+              <option value="financial" {% if form.official_choices.data and 'financial' in form.official_choices.data %}selected{% endif %}>Student Financial Services</option>
+              <option value="undergrad" {% if form.official_choices.data and 'undergrad' in form.official_choices.data %}selected{% endif %}>Undergraduate Scholars & US</option>
+              <option value="advancement" {% if form.official_choices.data and 'advancement' in form.official_choices.data %}selected{% endif %}>University Advancement</option>
+              <option value="dean" {% if form.official_choices.data and 'dean' in form.official_choices.data %}selected{% endif %}>Dean of Students Office</option>
+              <option value="other" {% if form.official_choices.data and 'other' in form.official_choices.data %}selected{% endif %}>Other</option>
+            </select>
+            <div class="help-text">Hold Ctrl (or Cmd on Mac) to select multiple options</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="official_other">Other Officials (if applicable):</label>
+            <input type="text" id="official_other" name="official_other" value="{{ form.official_other.data or '' }}">
+          </div>
+        </div>
       </div>
-    </div>
+
+      <!-- Information to Disclose Section -->
+      <div class="form-section">
+        <h3>3. Information to Disclose</h3>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="info_choices">Type of information to disclose (select all that apply):</label>
+            <select id="info_choices" name="info_choices" multiple required>
+              <option value="advising" {% if form.info_choices.data and 'advising' in form.info_choices.data %}selected{% endif %}>Academic Advising Profile/Information</option>
+              <option value="all_records" {% if form.info_choices.data and 'all_records' in form.info_choices.data %}selected{% endif %}>All University Records</option>
+              <option value="academics" {% if form.info_choices.data and 'academics' in form.info_choices.data %}selected{% endif %}>Academic Records</option>
+              <option value="billing" {% if form.info_choices.data and 'billing' in form.info_choices.data %}selected{% endif %}>Billing/Financial Aid</option>
+              <option value="disciplinary" {% if form.info_choices.data and 'disciplinary' in form.info_choices.data %}selected{% endif %}>Disciplinary</option>
+              <option value="transcripts" {% if form.info_choices.data and 'transcripts' in form.info_choices.data %}selected{% endif %}>Grades/Transcripts</option>
+              <option value="housing" {% if form.info_choices.data and 'housing' in form.info_choices.data %}selected{% endif %}>Housing</option>
+              <option value="photos" {% if form.info_choices.data and 'photos' in form.info_choices.data %}selected{% endif %}>Photos</option>
+              <option value="scholarship" {% if form.info_choices.data and 'scholarship' in form.info_choices.data %}selected{% endif %}>Scholarship and/or Honors</option>
+              <option value="other" {% if form.info_choices.data and 'other' in form.info_choices.data %}selected{% endif %}>Other</option>
+            </select>
+            <div class="help-text">Hold Ctrl (or Cmd on Mac) to select multiple options</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="info_other">Other Information Types (if applicable):</label>
+            <input type="text" id="info_other" name="info_other" value="{{ form.info_other.data or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Release Information Section -->
+      <div class="form-section">
+        <h3>4. Release Information</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="release_to">Release Information To:</label>
+            <input type="text" id="release_to" name="release_to" value="{{ form.release_to.data or '' }}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="purpose">Purpose of Release:</label>
+            <input type="text" id="purpose" name="purpose" value="{{ form.purpose.data or '' }}" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="additional_names">Additional Individuals (if applicable):</label>
+            <input type="text" id="additional_names" name="additional_names" value="{{ form.additional_names.data or '' }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="release_choices">Release Categories (select all that apply):</label>
+            <select id="release_choices" name="release_choices" multiple required>
+              <option value="family" {% if form.release_choices.data and 'family' in form.release_choices.data %}selected{% endif %}>Family</option>
+              <option value="institution" {% if form.release_choices.data and 'institution' in form.release_choices.data %}selected{% endif %}>Educational Institution</option>
+              <option value="award" {% if form.release_choices.data and 'award' in form.release_choices.data %}selected{% endif %}>Honor or Award</option>
+              <option value="employer" {% if form.release_choices.data and 'employer' in form.release_choices.data %}selected{% endif %}>Employer/Prospective Employer</option>
+              <option value="media" {% if form.release_choices.data and 'media' in form.release_choices.data %}selected{% endif %}>Public or Media of Scholarship</option>
+              <option value="other" {% if form.release_choices.data and 'other' in form.release_choices.data %}selected{% endif %}>Other</option>
+            </select>
+            <div class="help-text">Hold Ctrl (or Cmd on Mac) to select multiple options</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="release_other">Other Release Categories (if applicable):</label>
+            <input type="text" id="release_other" name="release_other" value="{{ form.release_other.data or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Information Section -->
+      <div class="form-section">
+        <h3>5. Security Information</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password (for phone verification):</label>
+            <input type="text" id="password" name="password" value="{{ form.password.data or '' }}" required>
+            <div class="help-text">Provide a password that will be used to verify identity over the phone.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="peoplesoft_id">myUH ID:</label>
+            <input type="text" id="peoplesoft_id" name="peoplesoft_id" pattern="[0-9]{7}" maxlength="7" value="{{ form.peoplesoft_id.data or '' }}" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="form-section">
+        <h3>6. Signature</h3>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="signature">Upload Signature:</label>
+            <input type="file" id="signature" name="signature" accept=".jpg,.jpeg,.png,.gif" required>
+            <div class="help-text">Please upload an image of your signature (.jpg, .png, or .gif).</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ form.date.data.strftime('%Y-%m-%d') if form.date.data else today_date }}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="is_draft" class="checkbox-label">
+              <input type="checkbox" id="is_draft" name="is_draft" {% if form.is_draft.data %}checked{% endif %}>
+              Save as Draft
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="secondary-button" onclick="window.location.href='{{ url_for('settings') }}';">
+          <span>Cancel</span>
+        </button>
+        <button type="submit" name="action" value="submit" class="primary-button">
+          Submit FERPA Request
+        </button>
+      </div>
+    </form>
   </div>
 
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Authorized Officials</h3>
-    </div>
-    <div class="card-body">
-      <!-- Officials selection -->
-      <div class="mb-3">
-        <label for="official_choices" class="form-label">Authorize officials to disclose information:</label>
-        <select id="official_choices" name="official_choices" class="form-select" multiple required>
-          <option value="registrar">Office of the University Registrar</option>
-          <option value="aid">Scholarships and Financial Aid</option>
-          <option value="financial">Student Financial Services</option>
-          <option value="undergrad">Undergraduate Scholars & US</option>
-          <option value="advancement">University Advancement</option>
-          <option value="dean">Dean of Students Office</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <!-- Other officials -->
-      <div class="mb-3">
-        <label for="official_other" class="form-label">Other Officials (if applicable):</label>
-        <input type="text" class="form-control" id="official_other" name="official_other">
-      </div>
-    </div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Information to Disclose</h3>
-    </div>
-    <div class="card-body">
-      <!-- Information selection -->
-      <div class="mb-3">
-        <label for="info_choices" class="form-label">Type of information to disclose:</label>
-        <select id="info_choices" name="info_choices" class="form-select" multiple required>
-          <option value="advising">Academic Advising Profile/Information</option>
-          <option value="all_records">All University Records</option>
-          <option value="academics">Academic Records</option>
-          <option value="billing">Billing/Financial Aid</option>
-          <option value="disciplinary">Disciplinary</option>
-          <option value="transcripts">Grades/Transcripts</option>
-          <option value="housing">Housing</option>
-          <option value="photos">Photos</option>
-          <option value="scholarship">Scholarship and/or Honors</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <!-- Other information -->
-      <div class="mb-3">
-        <label for="info_other" class="form-label">Other Information Types (if applicable):</label>
-        <input type="text" class="form-control" id="info_other" name="info_other">
-      </div>
-    </div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Release Information</h3>
-    </div>
-    <div class="card-body">
-      <!-- Release to -->
-      <div class="mb-3">
-        <label for="release_to" class="form-label">Release Information To:</label>
-        <input type="text" class="form-control" id="release_to" name="release_to" required>
-      </div>
-
-      <!-- Purpose -->
-      <div class="mb-3">
-        <label for="purpose" class="form-label">Purpose of Release:</label>
-        <input type="text" class="form-control" id="purpose" name="purpose" required>
-      </div>
-
-      <!-- Additional names -->
-      <div class="mb-3">
-        <label for="additional_names" class="form-label">Additional Individuals:</label>
-        <input type="text" class="form-control" id="additional_names" name="additional_names">
-      </div>
-
-      <!-- Release categories -->
-      <div class="mb-3">
-        <label for="release_choices" class="form-label">Release Categories:</label>
-        <select id="release_choices" name="release_choices" class="form-select" multiple required>
-          <option value="family">Family</option>
-          <option value="institution">Educational Institution</option>
-          <option value="award">Honor or Award</option>
-          <option value="employer">Employer/Prospective Employer</option>
-          <option value="media">Public or Media of Scholarship</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <!-- Other release categories -->
-      <div class="mb-3">
-        <label for="release_other" class="form-label">Other Release Categories (if applicable):</label>
-        <input type="text" class="form-control" id="release_other" name="release_other">
-      </div>
-    </div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Security Information</h3>
-    </div>
-    <div class="card-body">
-      <!-- Password -->
-      <div class="mb-3">
-        <label for="password" class="form-label">Password (for phone verification):</label>
-        <input type="text" class="form-control" id="password" name="password" required>
-        <div class="form-text">Provide a password that will be used to verify identity over the phone.</div>
-      </div>
-
-      <!-- PeopleSoft ID -->
-      <div class="mb-3">
-        <label for="peoplesoft_id" class="form-label">myUH ID:</label>
-        <input type="text" class="form-control" id="peoplesoft_id" name="peoplesoft_id" required>
-      </div>
-    </div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Signature</h3>
-    </div>
-    <div class="card-body">
-      <!-- Signature upload -->
-      <div class="mb-3">
-        <label for="signature" class="form-label">Upload Signature:</label>
-        <input type="file" class="form-control" id="signature" name="signature" accept=".jpg,.jpeg,.png,.gif" required>
-        <div class="form-text">Please upload an image of your signature (.jpg, .png, or .gif).</div>
-      </div>
-
-      <!-- Date -->
-      <div class="mb-3">
-        <label for="date" class="form-label">Date:</label>
-        <input type="date" class="form-control" id="date" name="date" value="{{ today_date }}" required>
-      </div>
-
-      <!-- Draft option -->
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="is_draft" name="is_draft">
-        <label class="form-check-label" for="is_draft">Save as Draft</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
-    <a href="{{ url_for('settings') }}" class="btn btn-secondary">Cancel</a>
-    <button type="submit" class="btn btn-primary">Submit FERPA Request</button>
-  </div>
-</form>
-{% endblock %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set up date picker default if empty
+      const dateField = document.getElementById('date');
+      if (!dateField.value) {
+        dateField.value = new Date().toISOString().split('T')[0];
+      }
+    });
+  </script>
+</body>
+</html>
