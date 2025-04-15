@@ -1,14 +1,19 @@
 # Imports
-from flask import Flask, render_template, url_for, request, redirect, session, send_file
+from flask import Flask, render_template, url_for, request, redirect, session, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from O365 import Account
-import json
-import os
-from datetime import datetime, timedelta
-from config import client_id, client_secret, SECRET_KEY
+from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from wtforms import StringField, SubmitField, SelectMultipleField, BooleanField, TextAreaField, DateField, FileField
+from wtforms.validators import DataRequired, Length, Email, Optional
+from O365 import Account
+from datetime import datetime, timedelta, date
+from config import client_id, client_secret, SECRET_KEY
+from form_utils import allowed_file, return_choice, generate_ferpa, generate_ssn_name
+import json
+import os
+import re
+import uuid
 import jwt
 
 app = Flask(__name__)
@@ -186,6 +191,974 @@ class MedicalWithdrawalRequest(db.Model):
         return f"{self.reason_type} Term Withdrawal"
 
 
+##### V3 Integration of New Forms #####
+class FERPARequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    status = db.Column(db.String(10), nullable=False)
+    time = db.Column(db.DateTime, server_default=db.func.now())
+    pdf_link = db.Column(db.String(100), nullable=False)
+    sig_link = db.Column(db.String(100))
+
+    # Name and campus
+    name = db.Column(db.String(25))
+    campus = db.Column(db.String(25))
+
+    # Officials
+    official_choices = db.Column(db.String(100))  # comma-separated string
+    official_other = db.Column(db.String(100))
+
+    # Information
+    info_choices = db.Column(db.String(100))  # comma-separated string
+    info_other = db.Column(db.String(100))
+
+    # Release
+    release_choices = db.Column(db.String(100))  # comma-separated string
+    release_other = db.Column(db.String(100))
+
+    # Release and purpose
+    release_to = db.Column(db.String(50))
+    purpose = db.Column(db.String(25))
+    additional_names = db.Column(db.String(50))
+
+    # Essential info
+    password = db.Column(db.String(25), nullable=False)
+    peoplesoft_id = db.Column(db.String(25), nullable=False)
+    date = db.Column(db.Date(), nullable=False)
+
+    # Relationship to User model
+    user = db.relationship('Profile', backref='ferpa_requests')
+
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+
+    def has_admin_viewed(self, admin_id):
+        """Check if an admin has viewed this request"""
+        if not self.admin_viewed:
+            return False
+        try:
+            viewed_by = json.loads(self.admin_viewed)
+            return str(admin_id) in viewed_by
+        except:
+            return False
+class InfoChangeRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Meta data
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    status = db.Column(db.String(10), nullable=False)
+    time = db.Column(db.DateTime, server_default=db.func.now())
+    pdf_link = db.Column(db.String(100), nullable=False)
+    sig_link = db.Column(db.String(100))
+
+    # Name and ID
+    name = db.Column(db.String(25), nullable=False)
+    peoplesoft_id = db.Column(db.String(6), nullable=False)
+
+    # Choice for Name/SSN
+    choice = db.Column(db.String(25), nullable=False)
+
+    # Section A: Name Change
+    fname_old = db.Column(db.String(25))
+    mname_old = db.Column(db.String(25))
+    lname_old = db.Column(db.String(25))
+    sfx_old = db.Column(db.String(25))
+
+    fname_new = db.Column(db.String(25))
+    mname_new = db.Column(db.String(25))
+    lname_new = db.Column(db.String(25))
+    sfx_new = db.Column(db.String(25))
+
+    # Reason for name change
+    nmchg_reason = db.Column(db.String(25))
+
+    # Section B: SSN Change
+    ssn_old = db.Column(db.String(11))
+    ssn_new = db.Column(db.String(11))
+
+    # Reason for SSN change
+    ssnchg_reason = db.Column(db.String(25))
+
+    # Signature/Date
+    date = db.Column(db.Date(), nullable=False)
+
+    # Relationship to User model
+    user = db.relationship('Profile', backref='infochange_requests')
+
+    admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
+
+    def has_admin_viewed(self, admin_id):
+        """Check if an admin has viewed this request"""
+        if not self.admin_viewed:
+            return False
+        try:
+            viewed_by = json.loads(self.admin_viewed)
+            return str(admin_id) in viewed_by
+        except:
+            return False
+
+
+### V3 Integration of New Forms ###
+
+##### V3 Form Classes #####
+
+class FERPAForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=25)])
+    campus = StringField('Campus', validators=[DataRequired(), Length(min=2, max=25)])
+
+    official_choices = SelectMultipleField("Select Officials", choices=[
+        ('registrar', 'Office of the University Registrar'),
+        ('aid', 'Scholarships and Financial Aid'),
+        ('financial', 'Student Financial Services'),
+        ('undergrad', 'Undergraduate Scholars & US (formally USD)'),
+        ('advancement', 'University Advancement'),
+        ('dean', 'Dean of Students Office'),
+        ('other', 'Other')
+    ], validators=[DataRequired()])
+
+    official_other = StringField('Other Officials', validators=[Optional()])
+
+    info_choices = SelectMultipleField("Select Info", choices=[
+        ('advising', 'Academic Advising Profile/Information'),
+        ('all_records', 'All University Records'),
+        ('academics', 'Academic Records'),
+        ('billing', 'Billing/Financial Aid'),
+        ('disciplinary', 'Disciplinary'),
+        ('transcripts', 'Grades/Transcripts'),
+        ('housing', 'Housing'),
+        ('photos', 'Photos'),
+        ('scholarship', 'Scholarship and/or Honors'),
+        ('other', 'Other')
+    ], validators=[DataRequired()])
+
+    info_other = StringField('Other Info', validators=[Optional()])
+
+    release_to = StringField('Release to', validators=[DataRequired(), Length(max=25)])
+    purpose = StringField('Purpose', validators=[DataRequired(), Length(max=25)])
+
+    additional_names = StringField('Additional Individuals', validators=[Optional(), Length(max=25)])
+
+    release_choices = SelectMultipleField('Select People', choices=[
+        ('family', 'Family'),
+        ('institution', 'Educational Institution'),
+        ('award', 'Honor or Award'),
+        ('employer', 'Employer/Prospective Employer'),
+        ('media', 'Public or Media of Scholarship'),
+        ('other', 'Other')
+    ], validators=[DataRequired()])
+
+    release_other = StringField('Other Releases', validators=[Optional()])
+
+    password = StringField('Password', validators=[DataRequired(), Length(min=5, max=16)])
+    peoplesoft_id = StringField('PSID', validators=[DataRequired(), Length(min=7, max=7)])
+
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+
+    is_draft = BooleanField('Save as Draft?')
+
+    submit = SubmitField('Submit FERPA')
+
+class InfoChangeForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(max=25)])
+    peoplesoft_id = StringField('UH ID', validators=[DataRequired(), Length(min=6, max=6)])
+
+    choice = SelectMultipleField("Choose", choices=[
+        ('name', 'Update Name (Complete Section A)'),
+        ('ssn', 'Update SSN (Complete Section B)')
+    ], validators=[DataRequired()])
+
+    # Section A: Name Change
+    first_name_old = StringField('Old Name', validators=[Optional(), Length(max=25)])
+    middle_name_old = StringField('Old Mid. Name', validators=[Optional(), Length(max=25)])
+    last_name_old = StringField('Old Last Name', validators=[Optional(), Length(max=25)])
+    suffix_old = StringField('Old Suffix', validators=[Optional(), Length(max=10)])
+
+    first_name_new = StringField('New Name', validators=[Optional(), Length(max=25)])
+    middle_name_new = StringField('New Mid. Name', validators=[Optional(), Length(max=25)])
+    last_name_new = StringField('New Last Name', validators=[Optional(), Length(max=25)])
+    suffix_new = StringField('New Suffix', validators=[Optional(), Length(max=10)])
+
+    # Reason for name change checkbox
+    name_change_reason = SelectMultipleField("Reason for Name Change", choices=[
+        ('marriage', 'Marriage/Divorce'),
+        ('court', 'Court Order'),
+        ('error', 'Correction of Error')
+    ], validators=[Optional()])
+
+    # Section B: SSN Change
+    ssn_old = StringField('Old SSN', validators=[Optional(), Length(max=11)])
+    ssn_new = StringField('New SSN', validators=[Optional(), Length(max=11)])
+
+    # Reason for SSN change checkbox
+    ssn_change_reason = SelectMultipleField("Reason for SSN Change", choices=[
+        ('error', 'Correction of Error'),
+        ('addition', 'Addition of SSN to University Records')
+    ], validators=[Optional()])
+
+    # Signature and date
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+
+    is_draft = BooleanField('Save as Draft?')
+
+    submit = SubmitField('Submit Name/SSN Change')
+
+##### V3 Form Classes #####
+
+
+
+
+# -------------------------------
+# V3 Routes
+# -------------------------------
+
+@app.route('/ferpa-form', methods=['GET', 'POST'])
+def ferpa_form():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    form = FERPAForm()
+
+    if form.validate_on_submit():
+        # Handle file upload for signature
+        if 'signature' not in request.files:
+            flash('Signature was not uploaded.', 'danger')
+            return redirect(url_for('status'))  # Make sure this is correct
+
+        file = request.files['signature']
+        if file.filename == '':
+            flash('No file selected for signature.', 'danger')
+            return render_template('ferpa_form.html', form=form, user=user)
+
+        # Check if file type is allowed
+        if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+            try:
+                # Generate a unique name for the image
+                unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
+
+                # Create the signatures directory if it doesn't exist
+                signatures_dir = os.path.join('static', 'uploads', 'signatures')
+                os.makedirs(signatures_dir, exist_ok=True)
+
+                # Save file with new name
+                filepath = os.path.join(signatures_dir, unique_filename)
+                file.save(filepath)
+
+                # Use forward slashes for LaTeX compatibility
+                latex_path = filepath.replace("\\", "/")
+
+                # Build data dictionary for the PDF
+                official_choices = form.official_choices.data
+                info_choices = form.info_choices.data
+                release_choices = form.release_choices.data
+
+                data = {
+                    "NAME": form.name.data,
+                    "CAMPUS": form.campus.data,
+
+                    "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
+                    "OPT_AID": return_choice(official_choices, 'aid'),
+                    "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
+                    "OPT_UNDERGRAD": return_choice(official_choices, 'undergrad'),
+                    "OPT_ADVANCEMENT": return_choice(official_choices, 'advancement'),
+                    "OPT_DEAN": return_choice(official_choices, 'dean'),
+                    "OPT_OTHER_OFFICIALS": return_choice(official_choices, 'other'),
+                    "OTHEROFFICIALS": form.official_other.data,
+
+                    "OPT_ACADEMIC_INFO": return_choice(info_choices, 'advising'),
+                    "OPT_UNIVERSITY_RECORDS": return_choice(info_choices, 'all_records'),
+                    "OPT_ACADEMIC_RECORDS": return_choice(info_choices, 'academics'),
+                    "OPT_BILLING": return_choice(info_choices, 'billing'),
+                    "OPT_DISCIPLINARY": return_choice(info_choices, 'disciplinary'),
+                    "OPT_TRANSCRIPTS": return_choice(info_choices, 'transcripts'),
+                    "OPT_HOUSING": return_choice(info_choices, 'housing'),
+                    "OPT_PHOTOS": return_choice(info_choices, 'photos'),
+                    "OPT_SCHOLARSHIP": return_choice(info_choices, 'scholarship'),
+                    "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
+                    "OTHERINFO": form.info_other.data,
+
+                    "RELEASE": form.release_to.data,
+                    "PURPOSE": form.purpose.data,
+                    "ADDITIONALS": form.additional_names.data,
+
+                    "OPT_FAMILY": return_choice(release_choices, 'family'),
+                    "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
+                    "OPT_HONOR": return_choice(release_choices, 'award'),
+                    "OPT_EMPLOYER": return_choice(release_choices, 'employer'),
+                    "OPT_PUBLIC": return_choice(release_choices, 'media'),
+                    "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
+                    "OTHERRELEASE": form.release_other.data,
+
+                    "PASSWORD": form.password.data,
+                    "PEOPLESOFT": form.peoplesoft_id.data,
+                    "SIGNATURE": latex_path,
+                    "DATE": str(form.date.data)
+                }
+
+                # Create form directories if they don't exist
+                forms_dir = os.path.join('static', 'forms')
+                os.makedirs(forms_dir, exist_ok=True)
+
+                # Generate PDF with debug output
+                print(f"Generating FERPA PDF with data: {data}")
+                pdf_file = generate_ferpa(data, forms_dir, signatures_dir)
+                print(f"Generated PDF file: {pdf_file}")
+
+                if not pdf_file:
+                    flash('Error generating PDF. Please try again.', 'danger')
+                    return render_template('ferpa_form.html', form=form, user=user)
+
+                # Store options as comma-separate string
+                official_choices_str = ",".join(form.official_choices.data)
+                info_choices_str = ",".join(form.info_choices.data)
+                release_choices_str = ",".join(form.release_choices.data)
+
+                # Set status based on draft checkbox
+                status = "draft" if form.is_draft.data else "pending"
+
+                # Convert string date to DateTime
+                try:
+                    date_obj = datetime.strptime(str(form.date.data), '%Y-%m-%d').date()
+                except ValueError:
+                    date_obj = date.today()
+
+                # Create new FERPA request
+                new_ferpa_request = FERPARequest(
+                    user_id=user_id,
+                    status=status,
+                    pdf_link=pdf_file,
+                    sig_link=unique_filename,
+                    name=data['NAME'],
+                    campus=data['CAMPUS'],
+                    official_choices=official_choices_str,
+                    official_other=data['OTHEROFFICIALS'],
+                    info_choices=info_choices_str,
+                    info_other=data['OTHERINFO'],
+                    release_choices=release_choices_str,
+                    release_other=data['OTHERRELEASE'],
+                    release_to=data['RELEASE'],
+                    purpose=data['PURPOSE'],
+                    additional_names=data['ADDITIONALS'],
+                    password=data['PASSWORD'],
+                    peoplesoft_id=data['PEOPLESOFT'],
+                    date=date_obj
+                )
+
+                # Commit FERPA request to database
+                db.session.add(new_ferpa_request)
+                db.session.commit()
+
+
+
+                print(f"Created FERPA request with ID: {new_ferpa_request.id}")
+
+                if form.is_draft.data:
+                    flash('FERPA request saved as draft.', 'success')
+                else:
+                    flash('FERPA request submitted successfully.', 'success')
+
+                return redirect(url_for('status'))
+            except Exception as e:
+                import traceback
+                print(f"Error in FERPA form submission: {str(e)}")
+                print(traceback.format_exc())
+                flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+                return render_template('ferpa_form.html', form=form, user=user)
+        else:
+            flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
+            return render_template('ferpa_form.html', form=form, user=user)
+
+    if request.method == 'POST':
+        print("Form submitted")
+
+    if not form.validate():
+        print(f"Form validation errors: {form.errors}")
+        flash(f"Form validation errors: {form.errors}", "danger")
+
+        # Return the form with validation errors
+        today_date = date.today().strftime('%Y-%m-%d')
+        return render_template('ferpa_form.html', form=form, user=user, today_date=today_date)
+
+@app.route('/name-ssn-change', methods=['GET', 'POST'])
+def name_ssn_change():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    form = InfoChangeForm()
+
+    # Process form submission...
+    if form.validate_on_submit():
+        # Handle file upload for signature
+        if 'signature' not in request.files:
+            flash('Signature was not uploaded.', 'danger')
+            return redirect(url_for('status'))
+
+        file = request.files['signature']
+        if file.filename == '':
+            flash('No file selected for signature.', 'danger')
+            return render_template('name_ssn_change.html', form=form, user=user, today_date=date.today().strftime('%Y-%m-%d'))
+
+        # Check if file type is allowed
+        if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+            try:
+                # Generate a unique name for the image
+                unique_filename = str(uuid.uuid4()) + '.' + file.filename.rsplit('.', 1)[1].lower()
+
+                # Create the signatures directory if it doesn't exist
+                signatures_dir = os.path.join('static', 'uploads', 'signatures')
+                os.makedirs(signatures_dir, exist_ok=True)
+
+                # Save file with new name
+                filepath = os.path.join(signatures_dir, unique_filename)
+                file.save(filepath)
+
+                # Use forward slashes for LaTeX compatibility
+                latex_path = filepath.replace("\\", "/")
+
+                # Build data dictionary for the PDF
+                choice_options = form.choice.data
+                name_change_reason = form.name_change_reason.data if 'name' in choice_options else []
+                ssn_change_reason = form.ssn_change_reason.data if 'ssn' in choice_options else []
+
+                data = {
+                    "NAME": form.name.data,
+                    "PEOPLESOFT": form.peoplesoft_id.data,
+                    "EDIT_NAME": return_choice(choice_options, 'name'),
+                    "EDIT_SSN": return_choice(choice_options, 'ssn'),
+                    "FN_OLD": form.first_name_old.data or "",
+                    "MN_OLD": form.middle_name_old.data or "",
+                    "LN_OLD": form.last_name_old.data or "",
+                    "SUF_OLD": form.suffix_old.data or "",
+                    "FN_NEW": form.first_name_new.data or "",
+                    "MN_NEW": form.middle_name_new.data or "",
+                    "LN_NEW": form.last_name_new.data or "",
+                    "SUF_NEW": form.suffix_new.data or "",
+                    "OPT_MARITAL": return_choice(name_change_reason, 'marriage'),
+                    "OPT_COURT": return_choice(name_change_reason, 'court'),
+                    "OPT_ERROR_NAME": return_choice(name_change_reason, 'error'),
+                    "SSN_OLD": form.ssn_old.data or "",
+                    "SSN_NEW": form.ssn_new.data or "",
+                    "OPT_ERROR_SSN": return_choice(ssn_change_reason, 'error'),
+                    "OPT_ADD_SSN": return_choice(ssn_change_reason, 'addition'),
+                    "SIGNATURE": latex_path,
+                    "DATE": str(form.date.data)
+                }
+
+                # Create form directories if they don't exist
+                forms_dir = os.path.join('static', 'forms')
+                os.makedirs(forms_dir, exist_ok=True)
+
+                # Generate PDF with debug output
+                print(f"Generating Name/SSN Change PDF with data: {data}")
+                pdf_file = generate_ssn_name(data, forms_dir, signatures_dir)
+                print(f"Generated PDF file: {pdf_file}")
+
+                if not pdf_file:
+                    flash('Error generating PDF. Please try again.', 'danger')
+                    return render_template('name_ssn_change.html', form=form, user=user, today_date=date.today().strftime('%Y-%m-%d'))
+
+                # Store options as comma-separate string
+                choice_str = ",".join(form.choice.data)
+                name_change_reason_str = ",".join(form.name_change_reason.data) if form.name_change_reason.data else ""
+                ssn_change_reason_str = ",".join(form.ssn_change_reason.data) if form.ssn_change_reason.data else ""
+
+                # Set status based on draft checkbox
+                status = "draft" if form.is_draft.data else "pending"
+
+                # Convert string date to DateTime
+                try:
+                    date_obj = datetime.strptime(str(form.date.data), '%Y-%m-%d').date()
+                except ValueError:
+                    date_obj = date.today()
+
+                # Create new info change request
+                new_infochange_request = InfoChangeRequest(
+                    user_id=user_id,
+                    status=status,
+                    pdf_link=pdf_file,
+                    sig_link=unique_filename,
+                    name=data['NAME'],
+                    peoplesoft_id=data['PEOPLESOFT'],
+                    choice=choice_str,
+                    fname_old=data['FN_OLD'],
+                    mname_old=data['MN_OLD'],
+                    lname_old=data['LN_OLD'],
+                    sfx_old=data['SUF_OLD'],
+                    fname_new=data['FN_NEW'],
+                    mname_new=data['MN_NEW'],
+                    lname_new=data['LN_NEW'],
+                    sfx_new=data['SUF_NEW'],
+                    nmchg_reason=name_change_reason_str,
+                    ssn_old=data['SSN_OLD'],
+                    ssn_new=data['SSN_NEW'],
+                    ssnchg_reason=ssn_change_reason_str,
+                    date=date_obj
+                )
+
+                # Commit info change request to database
+                db.session.add(new_infochange_request)
+                db.session.commit()
+
+                print(f"Created Info Change request with ID: {new_infochange_request.id}")
+
+                if form.is_draft.data:
+                    flash('Name/SSN change request saved as draft.', 'success')
+                else:
+                    flash('Name/SSN change request submitted successfully.', 'success')
+
+                return redirect(url_for('status'))
+            except Exception as e:
+                import traceback
+                print(f"Error in Name/SSN change form submission: {str(e)}")
+                print(traceback.format_exc())
+                flash(f'An error occurred while processing your request: {str(e)}', 'danger')
+                today_date = date.today().strftime('%Y-%m-%d')
+                return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+        else:
+            flash('Invalid file type. Please upload a PNG, JPG, or GIF image.', 'danger')
+            today_date = date.today().strftime('%Y-%m-%d')
+            return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+
+    if request.method == 'POST':
+        print("Form submitted")
+
+    if not form.validate():
+        print(f"Form validation errors: {form.errors}")
+        flash(f"Form validation errors: {form.errors}", "danger")
+
+        # Return the form with validation errors
+        today_date = date.today().strftime('%Y-%m-%d')
+        return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+
+    # Set default date to today
+    if request.method == 'GET':
+        form.date.data = date.today()
+        # Pre-populate with user's name if available
+        if user.first_name:
+            form.name.data = f"{user.first_name} {user.last_name}"
+            form.first_name_old.data = user.first_name
+            form.last_name_old.data = user.last_name
+
+    # Always pass today_date variable to the template
+    today_date = date.today().strftime('%Y-%m-%d')
+    return render_template('name_ssn_change.html', form=form, user=user, today_date=today_date)
+
+# Update the status route to include the new request types
+@app.route('/status')
+def status():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Query all types of requests for the logged-in user
+    medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
+    student_drop_requests = StudentInitiatedDrop.query.filter_by(student_id=str(user_id)).all()
+    ferpa_requests = FERPARequest.query.filter_by(user_id=user_id).all()
+    infochange_requests = InfoChangeRequest.query.filter_by(user_id=user_id).all()
+
+    # Debug: Print counts to console
+    print(f"Status page for user {user_id}:")
+    print(f"Medical requests: {len(medical_requests)}")
+    print(f"Student drop requests: {len(student_drop_requests)}")
+    print(f"FERPA requests: {len(ferpa_requests)}")
+    print(f"Name/SSN change requests: {len(infochange_requests)}")
+
+    return render_template(
+        'status.html',
+        medical_requests=medical_requests,
+        student_drop_requests=student_drop_requests,
+        ferpa_requests=ferpa_requests,
+        infochange_requests=infochange_requests
+    )
+
+# Modified routes for FERPA and Name/SSN PDF downloads
+
+@app.route('/download_ferpa_pdf/<int:request_id>')
+def download_ferpa_pdf(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    ferpa_request = FERPARequest.query.get_or_404(request_id)
+
+    # Check if user is owner of the request or an admin
+    user = Profile.query.get(user_id)
+    if ferpa_request.user_id != user_id and user.privilages_ != 'admin':
+        flash('You do not have permission to access this file.', 'danger')
+        return redirect(url_for('status'))
+
+    # Get the absolute path to the forms directory
+    current_dir = os.path.abspath(os.getcwd())
+    forms_dir = os.path.join(current_dir, 'static', 'forms')
+    pdf_path = os.path.join(forms_dir, ferpa_request.pdf_link)
+
+    # Debug output
+    print(f"Looking for FERPA PDF at: {pdf_path}")
+    print(f"File exists: {os.path.exists(pdf_path)}")
+
+    if not os.path.exists(pdf_path):
+        # Try to regenerate the PDF if it doesn't exist
+        try:
+            # Get signature path
+            sig_path = os.path.join(current_dir, 'static', 'uploads', 'signatures', ferpa_request.sig_link)
+
+            # Extract data from the request object
+            official_choices = ferpa_request.official_choices.split(',') if ferpa_request.official_choices else []
+            info_choices = ferpa_request.info_choices.split(',') if ferpa_request.info_choices else []
+            release_choices = ferpa_request.release_choices.split(',') if ferpa_request.release_choices else []
+
+            # Rebuild data dictionary
+            data = {
+                "NAME": ferpa_request.name,
+                "CAMPUS": ferpa_request.campus,
+                "OPT_REGISTRAR": return_choice(official_choices, 'registrar'),
+                "OPT_AID": return_choice(official_choices, 'aid'),
+                "OPT_FINANCIAL": return_choice(official_choices, 'financial'),
+                "OPT_UNDERGRAD": return_choice(official_choices, 'undergrad'),
+                "OPT_ADVANCEMENT": return_choice(official_choices, 'advancement'),
+                "OPT_DEAN": return_choice(official_choices, 'dean'),
+                "OPT_OTHER_OFFICIALS": return_choice(official_choices, 'other'),
+                "OTHEROFFICIALS": ferpa_request.official_other,
+                "OPT_ACADEMIC_INFO": return_choice(info_choices, 'advising'),
+                "OPT_UNIVERSITY_RECORDS": return_choice(info_choices, 'all_records'),
+                "OPT_ACADEMIC_RECORDS": return_choice(info_choices, 'academics'),
+                "OPT_BILLING": return_choice(info_choices, 'billing'),
+                "OPT_DISCIPLINARY": return_choice(info_choices, 'disciplinary'),
+                "OPT_TRANSCRIPTS": return_choice(info_choices, 'transcripts'),
+                "OPT_HOUSING": return_choice(info_choices, 'housing'),
+                "OPT_PHOTOS": return_choice(info_choices, 'photos'),
+                "OPT_SCHOLARSHIP": return_choice(info_choices, 'scholarship'),
+                "OPT_OTHER_INFO": return_choice(info_choices, 'other'),
+                "OTHERINFO": ferpa_request.info_other,
+                "RELEASE": ferpa_request.release_to,
+                "PURPOSE": ferpa_request.purpose,
+                "ADDITIONALS": ferpa_request.additional_names,
+                "OPT_FAMILY": return_choice(release_choices, 'family'),
+                "OPT_INSTITUTION": return_choice(release_choices, 'institution'),
+                "OPT_HONOR": return_choice(release_choices, 'award'),
+                "OPT_EMPLOYER": return_choice(release_choices, 'employer'),
+                "OPT_PUBLIC": return_choice(release_choices, 'media'),
+                "OPT_OTHER_RELEASE": return_choice(release_choices, 'other'),
+                "OTHERRELEASE": ferpa_request.release_other,
+                "PASSWORD": ferpa_request.password,
+                "PEOPLESOFT": ferpa_request.peoplesoft_id,
+                "SIGNATURE": sig_path,
+                "DATE": str(ferpa_request.date)
+            }
+
+            # Regenerate PDF
+            os.makedirs(forms_dir, exist_ok=True)
+            new_pdf_file = generate_ferpa(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
+
+            if new_pdf_file:
+                # Update the database with the new PDF path
+                ferpa_request.pdf_link = new_pdf_file
+                db.session.commit()
+
+                # Update the pdf_path to the new file
+                pdf_path = os.path.join(forms_dir, new_pdf_file)
+                print(f"Regenerated PDF at: {pdf_path}")
+
+                if not os.path.exists(pdf_path):
+                    flash('PDF file could not be regenerated.', 'danger')
+                    return redirect(url_for('status'))
+            else:
+                flash('PDF file not found and could not be regenerated.', 'danger')
+                return redirect(url_for('status'))
+
+        except Exception as e:
+            import traceback
+            print(f"Error regenerating FERPA PDF: {str(e)}")
+            print(traceback.format_exc())
+            flash('PDF file not found and regeneration failed.', 'danger')
+            return redirect(url_for('status'))
+
+    try:
+        return send_file(pdf_path, as_attachment=True)
+    except Exception as e:
+        print(f"Error sending file: {str(e)}")
+        flash('Error accessing the PDF file.', 'danger')
+        return redirect(url_for('status'))
+
+@app.route('/download_infochange_pdf/<int:request_id>')
+def download_infochange_pdf(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
+
+    # Check if user is owner of the request or an admin
+    user = Profile.query.get(user_id)
+    if infochange_request.user_id != user_id and user.privilages_ != 'admin':
+        flash('You do not have permission to access this file.', 'danger')
+        return redirect(url_for('status'))
+
+    # Get the absolute path to the forms directory
+    current_dir = os.path.abspath(os.getcwd())
+    forms_dir = os.path.join(current_dir, 'static', 'forms')
+    pdf_path = os.path.join(forms_dir, infochange_request.pdf_link)
+
+    # Debug output
+    print(f"Looking for Name/SSN PDF at: {pdf_path}")
+    print(f"File exists: {os.path.exists(pdf_path)}")
+
+    if not os.path.exists(pdf_path):
+        # Try to regenerate the PDF if it doesn't exist
+        try:
+            # Get signature path
+            sig_path = os.path.join(current_dir, 'static', 'uploads', 'signatures', infochange_request.sig_link)
+
+            # Extract data from the request object
+            choice = infochange_request.choice.split(',') if infochange_request.choice else []
+            nmchg_reason = infochange_request.nmchg_reason.split(',') if infochange_request.nmchg_reason else []
+            ssnchg_reason = infochange_request.ssnchg_reason.split(',') if infochange_request.ssnchg_reason else []
+
+            # Rebuild data dictionary
+            data = {
+                "NAME": infochange_request.name,
+                "PEOPLESOFT": infochange_request.peoplesoft_id,
+                "EDIT_NAME": return_choice(choice, 'name'),
+                "EDIT_SSN": return_choice(choice, 'ssn'),
+                "FN_OLD": infochange_request.fname_old or "",
+                "MN_OLD": infochange_request.mname_old or "",
+                "LN_OLD": infochange_request.lname_old or "",
+                "SUF_OLD": infochange_request.sfx_old or "",
+                "FN_NEW": infochange_request.fname_new or "",
+                "MN_NEW": infochange_request.mname_new or "",
+                "LN_NEW": infochange_request.lname_new or "",
+                "SUF_NEW": infochange_request.sfx_new or "",
+                "OPT_MARITAL": return_choice(nmchg_reason, 'marriage'),
+                "OPT_COURT": return_choice(nmchg_reason, 'court'),
+                "OPT_ERROR_NAME": return_choice(nmchg_reason, 'error'),
+                "SSN_OLD": infochange_request.ssn_old or "",
+                "SSN_NEW": infochange_request.ssn_new or "",
+                "OPT_ERROR_SSN": return_choice(ssnchg_reason, 'error'),
+                "OPT_ADD_SSN": return_choice(ssnchg_reason, 'addition'),
+                "SIGNATURE": sig_path,
+                "DATE": str(infochange_request.date)
+            }
+
+            # Regenerate PDF
+            os.makedirs(forms_dir, exist_ok=True)
+            new_pdf_file = generate_ssn_name(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
+
+            if new_pdf_file:
+                # Update the database with the new PDF path
+                infochange_request.pdf_link = new_pdf_file
+                db.session.commit()
+
+                # Update the pdf_path to the new file
+                pdf_path = os.path.join(forms_dir, new_pdf_file)
+                print(f"Regenerated PDF at: {pdf_path}")
+
+                if not os.path.exists(pdf_path):
+                    flash('PDF file could not be regenerated.', 'danger')
+                    return redirect(url_for('status'))
+            else:
+                flash('PDF file not found and could not be regenerated.', 'danger')
+                return redirect(url_for('status'))
+
+        except Exception as e:
+            import traceback
+            print(f"Error regenerating Name/SSN PDF: {str(e)}")
+            print(traceback.format_exc())
+            flash('PDF file not found and regeneration failed.', 'danger')
+            return redirect(url_for('status'))
+
+    try:
+        return send_file(pdf_path, as_attachment=True)
+    except Exception as e:
+        print(f"Error sending file: {str(e)}")
+        flash('Error accessing the PDF file.', 'danger')
+        return redirect(url_for('status'))
+
+
+# Add admin routes for approving/rejecting FERPA and Info Change requests
+@app.route('/approve_ferpa/<int:request_id>', methods=['POST'])
+def approve_ferpa(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    ferpa_request = FERPARequest.query.get_or_404(request_id)
+    ferpa_request.status = 'approved'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(ferpa_request, 'admin_viewed'):
+        if not ferpa_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(ferpa_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        ferpa_request.admin_viewed = json.dumps(admin_viewed)
+
+    db.session.commit()
+
+    flash('FERPA request approved.', 'success')
+    return redirect(url_for('notifications'))
+
+@app.route('/reject_ferpa/<int:request_id>', methods=['POST'])
+def reject_ferpa(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to reject requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    ferpa_request = FERPARequest.query.get_or_404(request_id)
+    ferpa_request.status = 'rejected'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(ferpa_request, 'admin_viewed'):
+        if not ferpa_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(ferpa_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        ferpa_request.admin_viewed = json.dumps(admin_viewed)
+
+    db.session.commit()
+
+    flash('FERPA request rejected.', 'success')
+    return redirect(url_for('notifications'))
+
+@app.route('/approve_infochange/<int:request_id>', methods=['POST'])
+def approve_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
+    infochange_request.status = 'approved'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(infochange_request, 'admin_viewed'):
+        if not infochange_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(infochange_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        infochange_request.admin_viewed = json.dumps(admin_viewed)
+
+    db.session.commit()
+
+    flash('Name/SSN change request approved.', 'success')
+    return redirect(url_for('notifications'))
+
+@app.route('/reject_infochange/<int:request_id>', methods=['POST'])
+def reject_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to reject requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
+    infochange_request.status = 'rejected'
+
+    # If the model has an admin_viewed field, handle the admin viewing
+    if hasattr(infochange_request, 'admin_viewed'):
+        if not infochange_request.admin_viewed:
+            admin_viewed = [str(user_id)]
+        else:
+            admin_viewed = json.loads(infochange_request.admin_viewed)
+            if str(user_id) not in admin_viewed:
+                admin_viewed.append(str(user_id))
+        infochange_request.admin_viewed = json.dumps(admin_viewed)
+
+    db.session.commit()
+
+    flash('Name/SSN change request rejected.', 'success')
+    return redirect(url_for('notifications'))
+
+# Add routes for marking FERPA and Name/SSN forms as viewed by admin
+@app.route('/mark_ferpa_viewed/<int:request_id>', methods=['POST'])
+def mark_ferpa_viewed(request_id):
+    """Mark a FERPA request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req_record = FERPARequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+
+    return {"success": True}
+
+@app.route('/mark_infochange_viewed/<int:request_id>', methods=['POST'])
+def mark_infochange_viewed(request_id):
+    """Mark a Name/SSN change request as viewed by the current admin"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req_record = InfoChangeRequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Add admin to the viewed list if not already there
+    if not req_record.admin_viewed:
+        admin_viewed = [str(user_id)]
+    else:
+        admin_viewed = json.loads(req_record.admin_viewed)
+        if str(user_id) not in admin_viewed:
+            admin_viewed.append(str(user_id))
+
+    req_record.admin_viewed = json.dumps(admin_viewed)
+    db.session.commit()
+
+    return {"success": True}
+
+# -------------------------------
+# V3 Routes
+# -------------------------------
+
+
 # Helper function to convert UTC to GMT-5
 def utc_to_gmt5(utc_datetime):
     """Convert UTC datetime to GMT-5 timezone"""
@@ -201,38 +1174,6 @@ def utc_to_gmt5(utc_datetime):
 def home():
     return render_template('login.html')
 
-@app.route('/status')
-def status():
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))  # Redirect to login if the user is not logged in
-
-    # Query medical withdrawal requests for the logged-in user
-    medical_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id).all()
-
-    # Query student-initiated drop requests for the logged-in user
-    # Use str(user_id) to match the string stored in the database
-    student_drop_requests = StudentInitiatedDrop.query.filter_by(student_id=str(user_id)).all()
-
-    return render_template(
-        'status.html',
-        medical_requests=medical_requests,
-        student_drop_requests=student_drop_requests
-    )
-
-@app.route('/notifications')
-def notification():
-    # Query pending medical withdrawal requests
-    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
-
-    # Query pending student drop requests
-    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
-
-    return render_template(
-        'notifications.html',
-        pending_medical_requests=pending_medical_requests,
-        pending_student_drops=pending_student_drops
-    )
 @app.route('/creat')
 def index():
     return render_template('add_profile.html')
@@ -384,6 +1325,8 @@ def ap():
             profiles = Profile.query.all()
             pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
             pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+            pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+            pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
             now = datetime.utcnow()
 
             return render_template(
@@ -391,6 +1334,8 @@ def ap():
                 profiles=profiles,
                 pending_medical_requests=pending_medical_requests,
                 pending_student_drops=pending_student_drops,
+                pending_ferpa_requests=pending_ferpa_requests,
+                pending_infochange_requests=pending_infochange_requests,
                 now=now
             )
 
@@ -405,6 +1350,8 @@ def ap():
     # Get pending requests for the dashboard
     pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
     pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
 
     # Add current server time for the dashboard
     now = datetime.utcnow()
@@ -414,7 +1361,31 @@ def ap():
         profiles=profiles,
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests,
         now=now
+    )
+
+@app.route('/notifications')
+def notifications():
+    # Query pending medical withdrawal requests
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+
+    # Query pending student drop requests
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+
+    # Query pending FERPA requests
+    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+
+    # Query pending Info Change requests
+    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
+
+    return render_template(
+        'notifications.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests
     )
 
 # -------------------------------
@@ -1062,7 +2033,7 @@ def form_history():
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
-    # Combine both types of form submissions
+    # Combine all types of form submissions
     history_entries = []
 
     # Process Medical Withdrawal Requests
@@ -1098,6 +2069,38 @@ def form_history():
             'status': drop.status,
             'reviewed_by': 'System',  # Modify if you track approvers for drops
             'original_request': drop  # Keep reference if needed
+        })
+
+    # Process FERPA Requests
+    ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in ferpa_requests:
+        history_entries.append({
+            'timestamp': req.time,  # Using time field as timestamp
+            'form_type': 'FERPA Release',
+            'status': req.status,
+            'reviewed_by': 'Admin',  # Could be enhanced if you track which admin made the approval/rejection
+            'original_request': req
+        })
+
+    # Process Name/SSN Change Requests
+    infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in infochange_requests:
+        request_type = "Name Change" if "name" in req.choice else "SSN Change"
+        if "name" in req.choice and "ssn" in req.choice:
+            request_type = "Name & SSN Change"
+
+        history_entries.append({
+            'timestamp': req.time,  # Using time field as timestamp
+            'form_type': request_type,
+            'status': req.status,
+            'reviewed_by': 'Admin',  # Could be enhanced if you track which admin made the approval/rejection
+            'original_request': req
         })
 
     # Sort all entries by timestamp (newest first)
@@ -1144,7 +2147,7 @@ def user_form_history(user_id):
         ).first()
 
         history_entries.append({
-            'timestamp': req.updated_at or req.created_at,  # Use updated_at if available
+            'timestamp': req.updated_at or req.created_at,
             'form_type': 'Medical Withdrawal',
             'status': req.status,
             'reviewed_by': f"{history.admin.first_name} {history.admin.last_name}" if history else 'System'
@@ -1158,10 +2161,42 @@ def user_form_history(user_id):
 
     for drop in student_drops:
         history_entries.append({
-            'timestamp': drop.created_at,  # Student drops might not have updated_at
+            'timestamp': drop.created_at,
             'form_type': 'Student Course Drop',
             'status': drop.status,
-            'reviewed_by': 'System'  # Modify if you track approvers
+            'reviewed_by': 'System'
+        })
+
+    # FERPA Requests
+    ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.user_id == user_id,
+        FERPARequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in ferpa_requests:
+        history_entries.append({
+            'timestamp': req.time,
+            'form_type': 'FERPA Release',
+            'status': req.status,
+            'reviewed_by': 'Admin'
+        })
+
+    # Name/SSN Change Requests
+    infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.user_id == user_id,
+        InfoChangeRequest.status.in_(['approved', 'rejected'])
+    ).all()
+
+    for req in infochange_requests:
+        request_type = "Name Change" if "name" in req.choice else "SSN Change"
+        if "name" in req.choice and "ssn" in req.choice:
+            request_type = "Name & SSN Change"
+
+        history_entries.append({
+            'timestamp': req.time,
+            'form_type': request_type,
+            'status': req.status,
+            'reviewed_by': 'Admin'
         })
 
     # Sort by timestamp (newest first)

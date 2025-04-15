@@ -175,6 +175,25 @@
             >Complete Form</a
           >
         </div>
+
+        <div class="card">
+          <h2>FERPA Release Form</h2>
+          <p>
+            The Family Educational Rights and Privacy Act (FERPA) form allows you to authorize the university
+            to release your educational records to specific individuals or organizations.
+          </p>
+          <a href="{{ url_for('ferpa_form') }}" class="button">Complete Form</a>
+        </div>
+
+        <div class="card">
+          <h2>Name/SSN Change Request</h2>
+          <p>
+            Use this form to request changes to your name or Social Security Number in the university records.
+            Supporting documentation will be required.
+          </p>
+          <a href="{{ url_for('name_ssn_change') }}" class="button">Complete Form</a>
+        </div>
+
       </main>
     </div>
   </body>

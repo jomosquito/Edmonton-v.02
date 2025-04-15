@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Name/SSN Change Request{% endblock %}
+{% block content %}
+<h1 class="mb-3">Name/SSN Change Request</h1>
+
+<div class="alert alert-info">
+  <p>Use this form to request changes to your name or Social Security Number in the university records.</p>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Basic Information</h3>
+    </div>
+    <div class="card-body">
+      <!-- Name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Full Name:</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ form.name.data or user.first_name ~ ' ' ~ user.last_name }}" required>
+      </div>
+
+      <!-- UH ID -->
+      <div class="mb-3">
+        <label for="peoplesoft_id" class="form-label">myUH ID:</label>
+        <input type="text" class="form-control" id="peoplesoft_id" name="peoplesoft_id" pattern="[0-9]{6}" maxlength="6" value="{{ form.peoplesoft_id.data or '' }}" required>
+        <div class="form-text">Please enter your 6-digit myUH ID.</div>
+      </div>
+
+      <!-- Request Type -->
+      <div class="mb-3">
+        <label for="choice" class="form-label">Change Request Type:</label>
+        <select id="choice" name="choice" class="form-select" multiple required>
+          <option value="name" {% if 'name' in form.choice.data %}selected{% endif %}>Update Name (Complete Section A)</option>
+          <option value="ssn" {% if 'ssn' in form.choice.data %}selected{% endif %}>Update SSN (Complete Section B)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4" id="name-section">
+    <div class="card-header">
+      <h3>Section A: Name Change</h3>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h4>Current Name</h4>
+          <div class="mb-3">
+            <label for="first_name_old" class="form-label">First Name:</label>
+            <input type="text" class="form-control" id="first_name_old" name="first_name_old" value="{{ form.first_name_old.data or user.first_name }}">
+          </div>
+          <div class="mb-3">
+            <label for="middle_name_old" class="form-label">Middle Name:</label>
+            <input type="text" class="form-control" id="middle_name_old" name="middle_name_old" value="{{ form.middle_name_old.data or '' }}">
+          </div>
+          <div class="mb-3">
+            <label for="last_name_old" class="form-label">Last Name:</label>
+            <input type="text" class="form-control" id="last_name_old" name="last_name_old" value="{{ form.last_name_old.data or user.last_name }}">
+          </div>
+          <div class="mb-3">
+            <label for="suffix_old" class="form-label">Suffix:</label>
+            <input type="text" class="form-control" id="suffix_old" name="suffix_old" value="{{ form.suffix_old.data or '' }}">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h4>New Name</h4>
+          <div class="mb-3">
+            <label for="first_name_new" class="form-label">First Name:</label>
+            <input type="text" class="form-control" id="first_name_new" name="first_name_new" value="{{ form.first_name_new.data or '' }}">
+          </div>
+          <div class="mb-3">
+            <label for="middle_name_new" class="form-label">Middle Name:</label>
+            <input type="text" class="form-control" id="middle_name_new" name="middle_name_new" value="{{ form.middle_name_new.data or '' }}">
+          </div>
+          <div class="mb-3">
+            <label for="last_name_new" class="form-label">Last Name:</label>
+            <input type="text" class="form-control" id="last_name_new" name="last_name_new" value="{{ form.last_name_new.data or '' }}">
+          </div>
+          <div class="mb-3">
+            <label for="suffix_new" class="form-label">Suffix:</label>
+            <input type="text" class="form-control" id="suffix_new" name="suffix_new" value="{{ form.suffix_new.data or '' }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Reason for name change -->
+      <div class="mb-3">
+        <label for="name_change_reason" class="form-label">Reason for Name Change:</label>
+        <select id="name_change_reason" name="name_change_reason" class="form-select" multiple>
+          <option value="marriage" {% if 'marriage' in form.name_change_reason.data %}selected{% endif %}>Marriage/Divorce</option>
+          <option value="court" {% if 'court' in form.name_change_reason.data %}selected{% endif %}>Court Order</option>
+          <option value="error" {% if 'error' in form.name_change_reason.data %}selected{% endif %}>Correction of Error</option>
+        </select>
+        <div class="form-text">Please select all that apply.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4" id="ssn-section">
+    <div class="card-header">
+      <h3>Section B: SSN Change</h3>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="ssn_old" class="form-label">Last 4 Digits of Old SSN:</label>
+            <input type="text" class="form-control" id="ssn_old" name="ssn_old" pattern="[0-9]{4}" maxlength="4" value="{{ form.ssn_old.data or '' }}">
+            <div class="form-text">For security, only enter last 4 digits.</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="ssn_new" class="form-label">Last 4 Digits of New SSN:</label>
+            <input type="text" class="form-control" id="ssn_new" name="ssn_new" pattern="[0-9]{4}" maxlength="4" value="{{ form.ssn_new.data or '' }}">
+            <div class="form-text">For security, only enter last 4 digits.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reason for SSN change -->
+      <div class="mb-3">
+        <label for="ssn_change_reason" class="form-label">Reason for SSN Change:</label>
+        <select id="ssn_change_reason" name="ssn_change_reason" class="form-select" multiple>
+          <option value="error" {% if 'error' in form.ssn_change_reason.data %}selected{% endif %}>Correction of Error</option>
+          <option value="addition" {% if 'addition' in form.ssn_change_reason.data %}selected{% endif %}>Addition of SSN to University Records</option>
+        </select>
+        <div class="form-text">Please select all that apply.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Signature</h3>
+    </div>
+    <div class="card-body">
+      <!-- Signature upload -->
+      <div class="mb-3">
+        <label for="signature" class="form-label">Upload Signature:</label>
+        <input type="file" class="form-control" id="signature" name="signature" accept=".jpg,.jpeg,.png,.gif" required>
+        <div class="form-text">Please upload an image of your signature (.jpg, .png, or .gif).</div>
+      </div>
+
+      <!-- Date -->
+      <div class="mb-3">
+        <label for="date" class="form-label">Date:</label>
+        <input type="date" class="form-control" id="date" name="date" value="{{ form.date.data.strftime('%Y-%m-%d') if form.date.data else today_date }}" required>
+      </div>
+
+      <!-- Draft option -->
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="is_draft" name="is_draft" {% if form.is_draft.data %}checked{% endif %}>
+        <label class="form-check-label" for="is_draft">Save as Draft</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-warning mb-4">
+    <p><strong>Note:</strong> You will need to provide documentation to support your name or SSN change request. Please be prepared to submit supporting documents to the Registrar's Office.</p>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+    <a href="{{ url_for('settings') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Submit Change Request</button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide form sections based on selection
+    const choiceSelect = document.getElementById('choice');
+    const nameSection = document.getElementById('name-section');
+    const ssnSection = document.getElementById('ssn-section');
+
+    function updateSections() {
+      const selectedValues = Array.from(choiceSelect.selectedOptions).map(opt => opt.value);
+
+      if (selectedValues.includes('name')) {
+        nameSection.style.display = 'block';
+      } else {
+        nameSection.style.display = 'none';
+      }
+
+      if (selectedValues.includes('ssn')) {
+        ssnSection.style.display = 'block';
+      } else {
+        ssnSection.style.display = 'none';
+      }
+    }
+
+    // Initial setup
+    updateSections();
+
+    // Update when selection changes
+    choiceSelect.addEventListener('change', updateSections);
+
+    // Add a simple helper message about multiple selections
+    const multiSelects = document.querySelectorAll('select[multiple]');
+    multiSelects.forEach(select => {
+      if (!select.nextElementSibling || !select.nextElementSibling.classList.contains('form-text')) {
+        const helpText = document.createElement('div');
+        helpText.className = 'form-text';
+        helpText.textContent = 'Hold Ctrl (or Cmd on Mac) to select multiple options';
+        select.parentNode.insertBefore(helpText, select.nextSibling);
+      }
+    });
+  });
+</script>
+{% endblock %}

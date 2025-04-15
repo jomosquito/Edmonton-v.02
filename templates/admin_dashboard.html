@@ -592,50 +592,83 @@
     <!-- Main Content Container -->
     <div class="main-container">
       <!-- Dashboard Stats Cards -->
-      <div class="dashboard-cards">
-        <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="card-title">Total Users</div>
-          <div class="card-value">{{ profiles|length }}</div>
-          <div class="card-link">
-            <a href="/adminpage">View All <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </div>
+      <!-- Updated dashboard cards section with FERPA and Name/SSN form cards -->
+<div class="dashboard-cards">
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="card-title">Total Users</div>
+    <div class="card-value">{{ profiles|length }}</div>
+    <div class="card-link">
+      <a href="/adminpage">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </div>
 
-        <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-procedures"></i>
-          </div>
-          <div class="card-title">Pending Medical Requests</div>
-          <div class="card-value">
-            {% if pending_medical_requests is defined %} {{
-            pending_medical_requests|length }} {% else %} 0 {% endif %}
-          </div>
-          <div class="card-link">
-            <a href="/notifications"
-              >View Requests <i class="fas fa-arrow-right"></i
-            ></a>
-          </div>
-        </div>
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-procedures"></i>
+    </div>
+    <div class="card-title">Pending Medical Requests</div>
+    <div class="card-value">
+      {% if pending_medical_requests is defined %} {{
+      pending_medical_requests|length }} {% else %} 0 {% endif %}
+    </div>
+    <div class="card-link">
+      <a href="/notifications"
+        >View Requests <i class="fas fa-arrow-right"></i
+      ></a>
+    </div>
+  </div>
 
-        <div class="card">
-          <div class="card-icon">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <div class="card-title">Pending Course Drops</div>
-          <div class="card-value">
-            {% if pending_student_drops is defined %} {{
-            pending_student_drops|length }} {% else %} 0 {% endif %}
-          </div>
-          <div class="card-link">
-            <a href="/notifications"
-              >View Drops <i class="fas fa-arrow-right"></i
-            ></a>
-          </div>
-        </div>
-      </div>
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="card-title">Pending Course Drops</div>
+    <div class="card-value">
+      {% if pending_student_drops is defined %} {{
+      pending_student_drops|length }} {% else %} 0 {% endif %}
+    </div>
+    <div class="card-link">
+      <a href="/notifications"
+        >View Drops <i class="fas fa-arrow-right"></i
+      ></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-lock"></i>
+    </div>
+    <div class="card-title">Pending FERPA Requests</div>
+    <div class="card-value">
+      {% if pending_ferpa_requests is defined %} {{
+      pending_ferpa_requests|length }} {% else %} 0 {% endif %}
+    </div>
+    <div class="card-link">
+      <a href="/notifications"
+        >View FERPA <i class="fas fa-arrow-right"></i
+      ></a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-id-card"></i>
+    </div>
+    <div class="card-title">Pending Name/SSN Changes</div>
+    <div class="card-value">
+      {% if pending_infochange_requests is defined %} {{
+      pending_infochange_requests|length }} {% else %} 0 {% endif %}
+    </div>
+    <div class="card-link">
+      <a href="/notifications"
+        >View Changes <i class="fas fa-arrow-right"></i
+      ></a>
+    </div>
+  </div>
+</div>
 
       <!-- Quick Actions Section -->
       <section class="quick-actions">
