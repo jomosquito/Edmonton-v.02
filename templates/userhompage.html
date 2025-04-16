@@ -191,6 +191,9 @@
           <a class="btn" href="/profile">View Profile</a>
           <a class="btn" href="/settings">Settings</a>
           <a class="btn" href="/">Logout</a>
+          {% if user.privilages_ == "admin" %}
+          <a class="btn" href="/admin_dashboard">Go to Admin Portal</a>
+          {% endif %}
         </div>
         <div class="card">
           <h2>Latest Updates</h2>

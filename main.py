@@ -1183,7 +1183,7 @@ def index():
 def admin():
     # If already logged in as admin, redirect to dashboard
     if session.get('user_id') and session.get('admin'):
-        return redirect(url_for('ap'))
+        return redirect(url_for('/'))
 
     # Otherwise show login page
     return render_template('adminlogin.html')
@@ -1528,7 +1528,7 @@ def add_profile():
 def change_privileges(id):
     data = Profile.query.get(id)
     if data is None:
-        return redirect('/ap')
+        return redirect('/login')
     if data.privilages_ == "user":
         data.privilages_ = "admin"
     else:
