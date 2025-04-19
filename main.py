@@ -1467,6 +1467,11 @@ def auth_step_one():
         return redirect('/')
 
     return "Authentication failed", 400
+
+@app.route('/deactivated')
+def deactivated():
+    return render_template('deactivated.html')
+
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
@@ -1484,7 +1489,7 @@ def auth_step_two_callback():
     if result:
         # Check if the user already exists in the database
         user = Profile.query.filter_by(email_=email).first()
-
+        
         if not user:
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
@@ -1526,7 +1531,10 @@ def auth_step_two_callback():
         if user.privilages_ == "admin":
             return redirect(url_for('adminpage'))  # Admin page
         else:
-            return redirect(url_for('userhompage'))  # User homepage
+            if user.active == False:
+                return redirect(url_for('deactivated'))
+            else:
+                return redirect(url_for('userhompage'))  # User homepage
         
 
     return "Authentication failed", 400

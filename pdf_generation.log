@@ -1412,3 +1412,233 @@ pdfs\medical_withdrawal_6_pending_20250319024537.log.
 2025-04-17 11:52:41,827 - INFO - 127.0.0.1 - - [17/Apr/2025 11:52:41] "GET / HTTP/1.1" 200 -
 2025-04-17 11:52:56,035 - INFO - 127.0.0.1 - - [17/Apr/2025 11:52:56] "GET / HTTP/1.1" 200 -
 2025-04-17 11:52:59,176 - INFO - 127.0.0.1 - - [17/Apr/2025 11:52:59] "GET / HTTP/1.1" 200 -
+DEBUG:pdf_debug:Debug for generate_ferpa: Path=C:\Users\johnp\Desktop\Edmonton-v.02\static\forms\ferpa_form_6c7a0d2a-931f-41fc-98b4-27525599f92c.pdf, Error=pdflatex error: 
+DEBUG:pdf_debug:Debug for generate_ferpa: Path=C:\Users\johnp\Desktop\Edmonton-v.02\static\forms\ferpa_form_6c7a0d2a-931f-41fc-98b4-27525599f92c.pdf, Error=PDF file not found after compilation
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:05] "POST /ferpa-form HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:08] "GET /settings HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:09] "GET /status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:16] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:16] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:23] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:24:23] "GET /medical-withdrawal-form HTTP/1.1" 200 -
+INFO:pdf_utils:PDF directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Template directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+INFO:pdf_utils:Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+INFO:pdf_utils:Successfully read template (3588 bytes)
+INFO:pdf_utils:Using existing signature file: C:/Users/johnp/Desktop/Edmonton-v.02/static/uploads/signatures/sig_2_20250419222514.png
+INFO:pdf_utils:Replaced ##FORMID## with 1
+INFO:pdf_utils:Replaced ##STATUS## with PENDING
+INFO:pdf_utils:Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+INFO:pdf_utils:Replaced ##MYUHID## with 3333333333
+INFO:pdf_utils:Replaced ##COLLEGE## with 333
+INFO:pdf_utils:Replaced ##DEGREE## with 333
+INFO:pdf_utils:Replaced ##PHONE## with None
+INFO:pdf_utils:Replaced ##ADDRESS## with None
+INFO:pdf_utils:Replaced ##CITY## with 3
+INFO:pdf_utils:Replaced ##STATE## with 3
+INFO:pdf_utils:Replaced ##ZIP## with 3
+INFO:pdf_utils:Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+INFO:pdf_utils:Replaced ##TERM_YEAR## with Fall 2024
+INFO:pdf_utils:Replaced ##LAST_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##REASON_TYPE## with Medical
+INFO:pdf_utils:Replaced ##DETAILS## with ewfasf
+INFO:pdf_utils:Replaced ##FINANCIAL_ASSISTANCE## with Yes
+INFO:pdf_utils:Replaced ##HEALTH_INSURANCE## with Yes
+INFO:pdf_utils:Replaced ##CAMPUS_HOUSING## with No
+INFO:pdf_utils:Replaced ##VISA_STATUS## with No
+INFO:pdf_utils:Replaced ##GI_BILL## with Yes
+INFO:pdf_utils:Replaced ##INITIAL## with 4
+INFO:pdf_utils:Replaced ##SIGNATURE_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##CREATED_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##COURSES## with ed & 444 & 444 \\
+
+INFO:pdf_utils:Replaced ##ADMIN_SIGNATURE_SECTION## with 
+INFO:pdf_utils:Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_1_pending_20250419222515.tex
+INFO:pdf_utils:Saved debug template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\debug_template_20250419222515.tex
+INFO:pdf_utils:Searching for pdflatex executable...
+INFO:pdf_utils:Trying pdflatex at: pdflatex
+INFO:pdf_utils:Found pdflatex at: pdflatex
+INFO:pdf_utils:Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_1_pending_20250419222515.tex
+INFO:pdf_utils:Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs medical_withdrawal_1_pending_20250419222515.tex
+INFO:pdf_utils:PDF directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Template directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+INFO:pdf_utils:Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+INFO:pdf_utils:Successfully read template (3588 bytes)
+INFO:pdf_utils:Using existing signature file: c:/Users/johnp/Desktop/Edmonton-v.02/static/temp/static/uploads/signatures/sig_2_20250419222529.png
+INFO:pdf_utils:Replaced ##FORMID## with 2
+INFO:pdf_utils:Replaced ##STATUS## with PENDING
+INFO:pdf_utils:Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+INFO:pdf_utils:Replaced ##MYUHID## with 3333333333
+INFO:pdf_utils:Replaced ##COLLEGE## with 333
+INFO:pdf_utils:Replaced ##DEGREE## with 333
+INFO:pdf_utils:Replaced ##PHONE## with None
+INFO:pdf_utils:Replaced ##ADDRESS## with None
+INFO:pdf_utils:Replaced ##CITY## with 3
+INFO:pdf_utils:Replaced ##STATE## with 3
+INFO:pdf_utils:Replaced ##ZIP## with 3
+INFO:pdf_utils:Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+INFO:pdf_utils:Replaced ##TERM_YEAR## with Fall 2024
+INFO:pdf_utils:Replaced ##LAST_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##REASON_TYPE## with Medical
+INFO:pdf_utils:Replaced ##DETAILS## with ewfasf
+INFO:pdf_utils:Replaced ##FINANCIAL_ASSISTANCE## with Yes
+INFO:pdf_utils:Replaced ##HEALTH_INSURANCE## with Yes
+INFO:pdf_utils:Replaced ##CAMPUS_HOUSING## with No
+INFO:pdf_utils:Replaced ##VISA_STATUS## with No
+INFO:pdf_utils:Replaced ##GI_BILL## with Yes
+INFO:pdf_utils:Replaced ##INITIAL## with 4
+INFO:pdf_utils:Replaced ##SIGNATURE_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##CREATED_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##COURSES## with ed & 444 & 444 \\
+
+INFO:pdf_utils:Replaced ##ADMIN_SIGNATURE_SECTION## with 
+INFO:pdf_utils:Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_2_pending_20250419222529.tex
+INFO:pdf_utils:Saved debug template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\debug_template_20250419222529.tex
+INFO:pdf_utils:Searching for pdflatex executable...
+INFO:pdf_utils:Trying pdflatex at: pdflatex
+INFO:pdf_utils:Found pdflatex at: pdflatex
+INFO:pdf_utils:Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_2_pending_20250419222529.tex
+INFO:pdf_utils:Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs medical_withdrawal_2_pending_20250419222529.tex
+INFO:pdf_utils:PDF directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Template directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+INFO:pdf_utils:Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+INFO:pdf_utils:Successfully read template (3588 bytes)
+INFO:pdf_utils:Using existing signature file: c:/Users/johnp/Desktop/Edmonton-v.02/static/temp/static/uploads/signatures/sig_2_20250419222531.png
+INFO:pdf_utils:Replaced ##FORMID## with 3
+INFO:pdf_utils:Replaced ##STATUS## with PENDING
+INFO:pdf_utils:Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+INFO:pdf_utils:Replaced ##MYUHID## with 3333333333
+INFO:pdf_utils:Replaced ##COLLEGE## with 333
+INFO:pdf_utils:Replaced ##DEGREE## with 333
+INFO:pdf_utils:Replaced ##PHONE## with None
+INFO:pdf_utils:Replaced ##ADDRESS## with None
+INFO:pdf_utils:Replaced ##CITY## with 3
+INFO:pdf_utils:Replaced ##STATE## with 3
+INFO:pdf_utils:Replaced ##ZIP## with 3
+INFO:pdf_utils:Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+INFO:pdf_utils:Replaced ##TERM_YEAR## with Fall 2024
+INFO:pdf_utils:Replaced ##LAST_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##REASON_TYPE## with Medical
+INFO:pdf_utils:Replaced ##DETAILS## with ewfasf
+INFO:pdf_utils:Replaced ##FINANCIAL_ASSISTANCE## with Yes
+INFO:pdf_utils:Replaced ##HEALTH_INSURANCE## with Yes
+INFO:pdf_utils:Replaced ##CAMPUS_HOUSING## with No
+INFO:pdf_utils:Replaced ##VISA_STATUS## with No
+INFO:pdf_utils:Replaced ##GI_BILL## with Yes
+INFO:pdf_utils:Replaced ##INITIAL## with 4
+INFO:pdf_utils:Replaced ##SIGNATURE_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##CREATED_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##COURSES## with ed & 444 & 444 \\
+
+INFO:pdf_utils:Replaced ##ADMIN_SIGNATURE_SECTION## with 
+INFO:pdf_utils:Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_3_pending_20250419222531.tex
+INFO:pdf_utils:Saved debug template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\debug_template_20250419222531.tex
+INFO:pdf_utils:Searching for pdflatex executable...
+INFO:pdf_utils:Trying pdflatex at: pdflatex
+INFO:pdf_utils:Found pdflatex at: pdflatex
+INFO:pdf_utils:Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_3_pending_20250419222531.tex
+INFO:pdf_utils:Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs medical_withdrawal_3_pending_20250419222531.tex
+INFO:pdf_utils:pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(medical_withdrawal_2_pending_20250419222529.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\A...
+ERROR:pdf_utils:Error compiling LaTeX file (exit code 1)
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:36] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+INFO:pdf_utils:pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(medical_withdrawal_1_pending_20250419222515.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\A...
+ERROR:pdf_utils:Error compiling LaTeX file (exit code 1)
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:38] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+INFO:pdf_utils:PDF directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Template directory (absolute): c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+INFO:pdf_utils:Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+INFO:pdf_utils:Successfully read template (3588 bytes)
+INFO:pdf_utils:Using existing signature file: C:/Users/johnp/Desktop/Edmonton-v.02/static/uploads/signatures/sig_2_20250419222539.png
+INFO:pdf_utils:Replaced ##FORMID## with 4
+INFO:pdf_utils:Replaced ##STATUS## with PENDING
+INFO:pdf_utils:Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+INFO:pdf_utils:Replaced ##MYUHID## with 3333333333
+INFO:pdf_utils:Replaced ##COLLEGE## with 333
+INFO:pdf_utils:Replaced ##DEGREE## with 333
+INFO:pdf_utils:Replaced ##PHONE## with None
+INFO:pdf_utils:Replaced ##ADDRESS## with None
+INFO:pdf_utils:Replaced ##CITY## with 3
+INFO:pdf_utils:Replaced ##STATE## with 3
+INFO:pdf_utils:Replaced ##ZIP## with 3
+INFO:pdf_utils:Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+INFO:pdf_utils:Replaced ##TERM_YEAR## with Fall 2024
+INFO:pdf_utils:Replaced ##LAST_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##REASON_TYPE## with Medical
+INFO:pdf_utils:Replaced ##DETAILS## with ewfasf
+INFO:pdf_utils:Replaced ##FINANCIAL_ASSISTANCE## with Yes
+INFO:pdf_utils:Replaced ##HEALTH_INSURANCE## with Yes
+INFO:pdf_utils:Replaced ##CAMPUS_HOUSING## with No
+INFO:pdf_utils:Replaced ##VISA_STATUS## with No
+INFO:pdf_utils:Replaced ##GI_BILL## with Yes
+INFO:pdf_utils:Replaced ##INITIAL## with 4
+INFO:pdf_utils:Replaced ##SIGNATURE_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##CREATED_DATE## with April 19, 2025
+INFO:pdf_utils:Replaced ##COURSES## with ed & 444 & 444 \\
+
+INFO:pdf_utils:Replaced ##ADMIN_SIGNATURE_SECTION## with 
+INFO:pdf_utils:Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_4_pending_20250419222539.tex
+INFO:pdf_utils:Saved debug template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\debug_template_20250419222539.tex
+INFO:pdf_utils:Searching for pdflatex executable...
+INFO:pdf_utils:Trying pdflatex at: pdflatex
+INFO:pdf_utils:Found pdflatex at: pdflatex
+INFO:pdf_utils:Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+INFO:pdf_utils:Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\medical_withdrawal_4_pending_20250419222539.tex
+INFO:pdf_utils:Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs medical_withdrawal_4_pending_20250419222539.tex
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:42] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:43] "[35m[1mGET /drafts HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:43] "GET /drafts?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:43] "GET /drafts?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:43] "GET /drafts?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:43] "[36mGET /drafts?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:46] "GET /userhompage HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:48] "GET /status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:25:59] "GET /ap HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:04] "GET /notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:13] "GET /notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:18] "GET /notifications HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:22] "GET /ap HTTP/1.1" 200 -
+INFO:pdf_utils:pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(medical_withdrawal_4_pending_20250419222539.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\A...
+ERROR:pdf_utils:Error compiling LaTeX file (exit code 1)
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:40] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+INFO:pdf_utils:pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(medical_withdrawal_3_pending_20250419222531.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\A...
+ERROR:pdf_utils:Error compiling LaTeX file (exit code 1)
+INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:42] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -

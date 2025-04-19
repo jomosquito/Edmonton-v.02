@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Deactivated</title>
+    <style>
+        :root {
+            --primary-color: #3a506b;
+            --accent-color: #e63946;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 64px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        
+        .message {
+            color: var(--text-color);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
+        .contact-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .contact-btn:hover {
+            background-color: #2c3e50;
+        }
+        
+        .additional-info {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⚠️</div>
+        <h1>Account Deactivated</h1>
+        <p class="message">Your account has been <span class="highlight">temporarily deactivated</span>. Please contact the administrator for assistance.</p>
+        <a href="/" class="contact-btn">Return Home</a>
+        <div class="additional-info">
+            <p>If you believe this is an error, please include your account details when contacting the administrator.</p>
+        </div>
+    </div>
+</body>
+</html>
