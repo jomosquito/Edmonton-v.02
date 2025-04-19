@@ -10,6 +10,7 @@ from O365 import Account
 from datetime import datetime, timedelta, date
 from config import client_id, client_secret, SECRET_KEY
 from form_utils import allowed_file, return_choice, generate_ferpa, generate_ssn_name
+from sqlalchemy.orm import joinedload
 import json
 import os
 import re
@@ -64,6 +65,7 @@ class Profile(db.Model):
     active = db.Column(db.Boolean, default=True, nullable=True)
     pass_word = db.Column(db.String(200), nullable=False)  # Hashed passwords
     privilages_ = db.Column(db.String(20), default='user')
+    user_roles = db.relationship('UserRole', back_populates='user')
     email_ = db.Column(db.String(100), nullable=True)
     usertokenid = db.Column(db.String(100), nullable=True)
     bio = db.Column(db.Text, nullable=True)
@@ -402,6 +404,31 @@ class InfoChangeForm(FlaskForm):
     submit = SubmitField('Submit Name/SSN Change')
 
 ##### V3 Form Classes #####
+
+# Add after your existing models but before routes
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)  # student, department_chair, president
+    level = db.Column(db.Integer)  # 1=student, 2=chair, 3=president
+    user_roles = db.relationship('UserRole', back_populates='role')
+
+class Department(db.Model):
+    __tablename__ = 'departments'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(20), unique=True, nullable=False)
+    chairs = db.relationship('UserRole', back_populates='department')
+
+class UserRole(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'))
+    role = db.relationship('Role', back_populates='user_roles')
+    department = db.relationship('Department')
+    user = db.relationship('Profile', back_populates='user_roles')
 
 
 
@@ -1208,7 +1235,12 @@ def adminpage():
         return redirect(url_for('login'))
 
     # Get all profiles for user management
-    profiles = Profile.query.all()
+    profiles = Profile.query.options(
+        db.joinedload(Profile.user_roles)
+        .joinedload(UserRole.role),
+        db.joinedload(Profile.user_roles)
+        .joinedload(UserRole.department)
+    ).all()
 
     return render_template('adminpage.html', profiles=profiles)
 
@@ -1467,6 +1499,25 @@ def auth_step_two_callback():
             db.session.add(user)
             db.session.commit()
 
+             # Role assignment logic
+            if is_first_account:
+                # Assign president role to first account
+                president_role = Role.query.filter_by(name='president').first()
+                if president_role:
+                    db.session.add(UserRole(
+                        user_id=user.id,
+                        role_id=president_role.id
+                    ))
+            else:
+                # Assign student role to subsequent accounts
+                student_role = Role.query.filter_by(name='student').first()
+                if student_role:
+                    db.session.add(UserRole(
+                        user_id=user.id,
+                        role_id=student_role.id
+                    ))
+            db.session.commit()
+
         # Set session variables
         session['user_id'] = user.id
         session['admin'] = user.privilages_ == "admin"
@@ -1476,6 +1527,7 @@ def auth_step_two_callback():
             return redirect(url_for('adminpage'))  # Admin page
         else:
             return redirect(url_for('userhompage'))  # User homepage
+        
 
     return "Authentication failed", 400
 # -------------------------------
@@ -1550,25 +1602,39 @@ def update_user(id):
     user = Profile.query.get(id)
     if not user:
         return "User not found", 404
+
     if request.method == 'POST':
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
-        email = request.form.get("email")
-        phone_number = request.form.get("phoneN_")
-        privileges = request.form.get("privileges")
-        active = True if request.form.get("active") == "on" else False
-        new_password = request.form.get("pass_word")
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email_ = email
-        user.phoneN_ = phone_number
-        user.privilages_ = privileges
-        user.active = active
-        if new_password:
-            user.set_password(new_password)
+        # Update basic info
+        user.first_name = request.form.get("first_name")
+        user.last_name = request.form.get("last_name")
+        user.email_ = request.form.get("email")
+        user.phoneN_ = request.form.get("phoneN_")
+        user.privilages_ = request.form.get("privileges")
+        user.active = 'active' in request.form
+        
+        if request.form.get("pass_word"):
+            user.set_password(request.form.get("pass_word"))
+
+        # SIMPLIFIED ROLE UPDATE
+        new_role = request.form.get("user_role")  # 'student', 'department_chair', or 'president'
+        
+        # Clear existing roles
+        UserRole.query.filter_by(user_id=id).delete()
+        
+        # Add new role if selected
+        if new_role:
+            role = Role.query.filter_by(name=new_role).first()
+            if role:
+                db.session.add(UserRole(user_id=user.id, role_id=role.id))
+        
         db.session.commit()
         return redirect(url_for('adminpage'))
-    return render_template('update.html', profile=user)
+
+    # For GET request - show current role
+    current_role = user.user_roles[0].role.name if user.user_roles else 'student'
+    return render_template('update.html', 
+                         profile=user,
+                         current_role=current_role)
 
 @app.route("/create", methods=["GET", "POST"])
 def create_profile():
@@ -2467,8 +2533,33 @@ def drafts():
     draft_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id, status='draft').all()
     return render_template('drafts.html', draft_requests=draft_requests)
 
+def initialize_roles_and_departments():
+    """Safe initialization that won't duplicate existing data"""
+    with app.app_context():
+        # Create default roles if they don't exist
+        default_roles = [
+            {'name': 'student', 'level': 1},
+            {'name': 'department_chair', 'level': 2},
+            {'name': 'president', 'level': 3}
+        ]
+        
+        for role_data in default_roles:
+            if not Role.query.filter_by(name=role_data['name']).first():
+                db.session.add(Role(**role_data))
+        
+        # Create sample departments
+        sample_departments = ['Computer Science', 'Mathematics', 'Biology']
+        for dept_name in sample_departments:
+            if not Department.query.filter_by(name=dept_name).first():
+                db.session.add(Department(
+                    name=dept_name,
+                    code=dept_name[:3].upper()
+                ))
+        
+        db.session.commit()
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        initialize_roles_and_departments()  # Add this line
     app.run(debug=True)

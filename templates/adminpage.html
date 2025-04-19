@@ -382,6 +382,7 @@
             <th>Lastname</th>
             <th>Phone Number</th>
             <th>Privileges</th>
+            <th>Role</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -397,6 +398,17 @@
             <td>
               {% if data.privilages_ == "admin" %} Admin {% else %} User {%
               endif %}
+            </td>
+            <td>
+              {% if data.user_roles %}
+                {% for user_role in data.user_roles %}
+                  <span class="role-badge role-{{ user_role.role.name }}">
+                    {{ user_role.role.name|replace('_', ' ')|title }}
+                  </span>
+                {% endfor %}
+              {% else %}
+                <span class="role-badge role-student">Student</span>
+              {% endif %}
             </td>
             <td>{% if data.active %} Active {% else %} Inactive {% endif %}</td>
             <td>
@@ -458,3 +470,4 @@
     </script>
   </body>
 </html>
+

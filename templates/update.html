@@ -338,6 +338,27 @@
                 </select>
             </div>
 
+            
+            <div class="form-group">
+                <label for="user_roles">User Role:</label>
+                <select id="user_roles" name="user_roles" class="form-control">
+                    <option value="student" 
+                            {% if current_role == 'student' %}selected{% endif %}>
+                        Student
+                    </option>
+                    <option value="department_chair" 
+                            {% if current_role == 'department_chair' %}selected{% endif %}>
+                        Department Chair
+                    </option>
+                    <option value="president" 
+                            {% if current_role == 'president' %}selected{% endif %}>
+                        President
+                    </option>
+                </select>
+            </div>
+
+            
+
             <div class="form-group checkbox-group">
                 <input type="checkbox" id="active" name="active" {% if profile.active %}checked{% endif %}>
                 <label for="active">Active Account</label>
