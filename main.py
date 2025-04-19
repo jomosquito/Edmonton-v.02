@@ -518,6 +518,14 @@ class UserRole(db.Model):
     user = db.relationship('Profile', back_populates='user_roles')
 
 
+@app.before_request
+def check_user_active():
+    user_id = session.get('user_id')
+    if user_id:
+        user = Profile.query.get(user_id)
+        if user and not user.active and user.privilages_ != 'admin':
+            session.clear()  # Clear session to prevent further access
+            return redirect(url_for('deactivated'))  # Redirect to a deactivated page
 
 
 # -------------------------------
@@ -1775,7 +1783,7 @@ def update_user(id):
                 db.session.add(UserRole(user_id=user.id, role_id=role.id))
         
         db.session.commit()
-        return redirect(url_for('adminpage'))
+        return redirect(url_for('/'))  # Redirect to '/' instead of 'adminpage'
 
     # For GET request - show current role
     current_role = user.user_roles[0].role.name if user.user_roles else 'student'
