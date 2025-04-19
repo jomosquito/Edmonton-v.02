@@ -76,4 +76,34 @@ with app.app_context():
                 conn.execute(sa.text('ALTER TABLE student_initiated_drop ADD COLUMN admin_viewed TEXT'))
 
     db.session.commit()
+
+# Add admin_approvals columns if they don't exist
+with app.app_context():
+    with db.engine.connect() as conn:
+        inspector = sa.inspect(db.engine)
+        
+        # Check for admin_approvals in all request tables
+        tables = inspector.get_table_names()
+        
+        if 'medical_withdrawal_request' in tables:
+            columns = inspector.get_columns('medical_withdrawal_request')
+            if 'admin_approvals' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE medical_withdrawal_request ADD COLUMN admin_approvals TEXT'))
+        
+        if 'student_initiated_drop' in tables:
+            columns = inspector.get_columns('student_initiated_drop')
+            if 'admin_approvals' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE student_initiated_drop ADD COLUMN admin_approvals TEXT'))
+        
+        if 'ferpa_request' in tables:
+            columns = inspector.get_columns('ferpa_request')
+            if 'admin_approvals' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE ferpa_request ADD COLUMN admin_approvals TEXT'))
+        
+        if 'info_change_request' in tables:
+            columns = inspector.get_columns('info_change_request')
+            if 'admin_approvals' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE info_change_request ADD COLUMN admin_approvals TEXT'))
+
+    db.session.commit()
     print("Migrations completed successfully!")

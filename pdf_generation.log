@@ -1642,3 +1642,861 @@ Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
 (C:\Users\johnp\A...
 ERROR:pdf_utils:Error compiling LaTeX file (exit code 1)
 INFO:werkzeug:127.0.0.1 - - [19/Apr/2025 17:26:42] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-04-19 18:27:37,201 - DEBUG - PDF directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:27:37,202 - DEBUG - Template directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 18:27:37,202 - DEBUG - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/student_drop_template.tex
+2025-04-19 18:27:37,202 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-19 18:27:37,202 - INFO - Template found at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 18:27:37,204 - DEBUG - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/student_drop_1_pending_20250419232737.tex
+2025-04-19 18:27:37,208 - INFO - Replaced ##FORMID## with 1
+2025-04-19 18:27:37,208 - INFO - Replaced ##STATUS## with PENDING
+2025-04-19 18:27:37,209 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU None
+2025-04-19 18:27:37,209 - INFO - Replaced ##MYUHID## with 2
+2025-04-19 18:27:37,209 - DEBUG - Searching for pdflatex executable...
+2025-04-19 18:27:37,209 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-19 18:27:37,226 - INFO - Found pdflatex at: pdflatex
+2025-04-19 18:27:37,226 - DEBUG - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:27:37,226 - DEBUG - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/student_drop_1_pending_20250419232737.tex
+2025-04-19 18:27:37,226 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs student_drop_1_pending_20250419232737.tex
+2025-04-19 18:27:37,700 - ERROR - Error compiling LaTeX file:
+2025-04-19 18:27:37,700 - ERROR - 
+2025-04-19 18:27:37,700 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./student_drop_1_pending_20250419232737.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tools/array.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/local/texlive/2025/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/local/texlive/2025/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
+ty (/usr/local/texlive/2025/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/url/url.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/local/texlive/2025/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/atbegshi-ltx.sty))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/atveryend-ltx.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/usr/local/texlive/2025/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+))) (/usr/local/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/color.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/local/texlive/2025/texmf-dist/tex/latex/enumitem/enumitem.sty)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/lastpage/lastpage.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/lastpage/lastpage2e.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/lastpage/lastpagemodern.sty) 
+)) (/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+)
+No file student_drop_1_pending_20250419232737.aux.
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+(/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/local/texlive/2025/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Form ID: ##
+                      ##FORMID####
+l.31   \textbf{Form ID: ##FORMID##}
+                                   \\[0.2cm]
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Form ID: ####
+                        FORMID####
+l.31   \textbf{Form ID: ##FORMID##}
+                                   \\[0.2cm]
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Form ID: ####FORMID##
+                                ##
+l.31   \textbf{Form ID: ##FORMID##}
+                                   \\[0.2cm]
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Form ID: ####FORMID####
+                                  
+l.31   \textbf{Form ID: ##FORMID##}
+                                   \\[0.2cm]
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Status: ##
+                     ##STATUS####
+l.32   \textbf{Status: ##STATUS##}
+                                  
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Status: ####
+                       STATUS####
+l.32   \textbf{Status: ##STATUS##}
+                                  
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Status: ####STATUS##
+                               ##
+l.32   \textbf{Status: ##STATUS##}
+                                  
+! You can't use `macro parameter character #' in horizontal mode.
+<argument> Status: ####STATUS####
+                                 
+l.32   \textbf{Status: ##STATUS##}
+                                  
+! Illegal parameter number in definition of \reserved@b.
+<to be read again> 
+                   }
+l.40 Name: & \textbf{##FULLNAME##}
+                                   \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<recently read> ##
+                  
+l.40 Name: & \textbf{##FULLNAME##}
+                                   \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####
+               FULLNAME####
+l.40 Name: & \textbf{##FULLNAME##}
+                                   \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####FULLNAME##
+                         ##
+l.40 Name: & \textbf{##FULLNAME##}
+                                   \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####FULLNAME####
+                           
+l.40 Name: & \textbf{##FULLNAME##}
+                                   \\
+! Illegal parameter number in definition of \reserved@b.
+<to be read again> 
+                   }
+l.41 myUH ID: & \textbf{##MYUHID##}
+                                    \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<recently read> ##
+                  
+l.41 myUH ID: & \textbf{##MYUHID##}
+                                    \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####
+               MYUHID####
+l.41 myUH ID: & \textbf{##MYUHID##}
+                                    \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####MYUHID##
+                       ##
+l.41 myUH ID: & \textbf{##MYUHID##}
+                                    \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####MYUHID####
+                         
+l.41 myUH ID: & \textbf{##MYUHID##}
+                                    \\
+! Illegal parameter number in definition of \reserved@b.
+<to be read again> 
+                   }
+l.42 College: & \textbf{##COLLEGE##}
+                                     \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<recently read> ##
+                  
+l.42 College: & \textbf{##COLLEGE##}
+                                     \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####
+               COLLEGE####
+l.42 College: & \textbf{##COLLEGE##}
+                                     \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####COLLEGE##
+                        ##
+l.42 College: & \textbf{##COLLEGE##}
+                                     \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####COLLEGE####
+                          
+l.42 College: & \textbf{##COLLEGE##}
+                                     \\
+! Illegal parameter number in definition of \reserved@b.
+<to be read again> 
+                   }
+l.43 Plan/Degree: & \textbf{##DEGREE##}
+                                        \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<recently read> ##
+                  
+l.43 Plan/Degree: & \textbf{##DEGREE##}
+                                        \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####
+               DEGREE####
+l.43 Plan/Degree: & \textbf{##DEGREE##}
+                                        \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####DEGREE##
+                       ##
+l.43 Plan/Degree: & \textbf{##DEGREE##}
+                                        \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####DEGREE####
+                         
+l.43 Plan/Degree: & \textbf{##DEGREE##}
+                                        \\
+
+! LaTeX Error: File `SIGNATURE_PATH' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.70 ...includegraphics[width=5cm]{SIGNATURE_PATH}
+                                                   \\
+! Illegal parameter number in definition of \reserved@b.
+<to be read again> 
+                   }
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<recently read> ##
+                  
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! You can't use `macro parameter character #' in restricted horizontal mode.
+<argument> ####
+               SIGNATURE_DATE####
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! Missing $ inserted.
+<inserted text> 
+                $
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! You can't use `macro parameter character #' in math mode.
+<argument> ####SIGNATURE_DATE##
+                               ##
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! You can't use `macro parameter character #' in math mode.
+<argument> ####SIGNATURE_DATE####
+                                 
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.71 Date: & \textbf{##SIGNATURE_DATE##}
+                                         \\
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+! Missing } inserted.
+<inserted text> 
+                }
+l.72 \end
+         {tabular}
+! Extra }, or forgotten $.
+<inserted text> }
+                 
+l.72 \end
+         {tabular}
+(That makes 100 errors; please try again.)
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs/s
+tudent_drop_1_pending_20250419232737.log.
+
+2025-04-19 18:27:37,702 - INFO - 127.0.0.1 - - [19/Apr/2025 18:27:37] "[33mGET /download_student_drop_pdf/1/pending HTTP/1.1[0m" 404 -
+2025-04-19 18:27:39,307 - INFO - 127.0.0.1 - - [19/Apr/2025 18:27:39] "POST /mark_student_drop_viewed/1 HTTP/1.1" 200 -
+2025-04-19 18:27:42,599 - INFO - 127.0.0.1 - - [19/Apr/2025 18:27:42] "[32mPOST /approve_student_drop/1 HTTP/1.1[0m" 302 -
+2025-04-19 18:27:42,605 - INFO - 127.0.0.1 - - [19/Apr/2025 18:27:42] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 18:28:08,775 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:28:08,779 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 18:28:08,779 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 18:28:08,780 - INFO - Successfully read template (3588 bytes)
+2025-04-19 18:28:08,782 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222539.png
+2025-04-19 18:28:08,782 - INFO - Replaced ##FORMID## with 4
+2025-04-19 18:28:08,782 - INFO - Replaced ##STATUS## with PENDING
+2025-04-19 18:28:08,782 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 18:28:08,782 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 18:28:08,782 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 18:28:08,782 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 18:28:08,782 - INFO - Replaced ##PHONE## with None
+2025-04-19 18:28:08,782 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 18:28:08,782 - INFO - Replaced ##CITY## with 3
+2025-04-19 18:28:08,782 - INFO - Replaced ##STATE## with 3
+2025-04-19 18:28:08,782 - INFO - Replaced ##ZIP## with 3
+2025-04-19 18:28:08,782 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 18:28:08,782 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 18:28:08,782 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 18:28:08,782 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 18:28:08,782 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 18:28:08,782 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 18:28:08,782 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 18:28:08,782 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 18:28:08,783 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 18:28:08,783 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 18:28:08,783 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 18:28:08,783 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 18:28:08,783 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 18:28:08,783 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 18:28:08,783 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with 
+2025-04-19 18:28:08,783 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_4_pending_20250419232808.tex
+2025-04-19 18:28:08,785 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250419232808.tex
+2025-04-19 18:28:08,785 - INFO - Searching for pdflatex executable...
+2025-04-19 18:28:08,785 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 18:28:08,796 - INFO - Found pdflatex at: pdflatex
+2025-04-19 18:28:08,796 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:28:08,796 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_4_pending_20250419232808.tex
+2025-04-19 18:28:08,797 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_4_pending_20250419232808.tex
+2025-04-19 18:28:09,455 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_4_pending_20250419232808.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/t...
+2025-04-19 18:28:09,455 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 18:28:09,456 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:09] "[33mGET /download_pdf/4/pending HTTP/1.1[0m" 404 -
+2025-04-19 18:28:11,303 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:11] "[33mPOST /mark_pdf_viewed/4 HTTP/1.1[0m" 404 -
+2025-04-19 18:28:16,222 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:28:16,222 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 18:28:16,224 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 18:28:16,224 - INFO - Successfully read template (3588 bytes)
+2025-04-19 18:28:16,225 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222539.png
+2025-04-19 18:28:16,225 - INFO - Replaced ##FORMID## with 4
+2025-04-19 18:28:16,225 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-19 18:28:16,225 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 18:28:16,226 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 18:28:16,226 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 18:28:16,226 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 18:28:16,226 - INFO - Replaced ##PHONE## with None
+2025-04-19 18:28:16,226 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 18:28:16,226 - INFO - Replaced ##CITY## with 3
+2025-04-19 18:28:16,226 - INFO - Replaced ##STATE## with 3
+2025-04-19 18:28:16,226 - INFO - Replaced ##ZIP## with 3
+2025-04-19 18:28:16,226 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 18:28:16,226 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 18:28:16,226 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 18:28:16,226 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 18:28:16,226 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 18:28:16,226 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 18:28:16,226 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 18:28:16,226 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 18:28:16,226 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 18:28:16,226 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 18:28:16,226 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 18:28:16,226 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 18:28:16,226 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 18:28:16,226 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 18:28:16,226 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with \section*{Administrative Decision}
+            \begin{tabular}{l l}
+            Status: & \textbf{REJECTED} \\
+            Date: & April 19, 2025 \\
+            \end{tabular}
+2025-04-19 18:28:16,227 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_4_rejected_20250419232816.tex
+2025-04-19 18:28:16,228 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250419232816.tex
+2025-04-19 18:28:16,228 - INFO - Searching for pdflatex executable...
+2025-04-19 18:28:16,228 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 18:28:16,238 - INFO - Found pdflatex at: pdflatex
+2025-04-19 18:28:16,239 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 18:28:16,239 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_4_rejected_20250419232816.tex
+2025-04-19 18:28:16,239 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_4_rejected_20250419232816.tex
+2025-04-19 18:28:16,885 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_4_rejected_20250419232816.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/...
+2025-04-19 18:28:16,885 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 18:28:16,892 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:16] "[35m[1mPOST /reject_medical_withdrawal/4 HTTP/1.1[0m" 500 -
+2025-04-19 18:28:16,924 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:16] "GET /reject_medical_withdrawal/4?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-04-19 18:28:16,925 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:16] "GET /reject_medical_withdrawal/4?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-04-19 18:28:16,939 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:16] "GET /reject_medical_withdrawal/4?__debugger__=yes&cmd=resource&f=console.png&s=zxuaZxIGcqcPCdeSeDdz HTTP/1.1" 200 -
+2025-04-19 18:28:16,969 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:16] "GET /reject_medical_withdrawal/4?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-04-19 18:28:24,170 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:24] "GET /download_infochange_pdf/1 HTTP/1.1" 200 -
+2025-04-19 18:28:25,571 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:25] "POST /mark_infochange_viewed/1 HTTP/1.1" 200 -
+2025-04-19 18:28:30,506 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:30] "[32mPOST /approve_infochange/1 HTTP/1.1[0m" 302 -
+2025-04-19 18:28:30,515 - INFO - 127.0.0.1 - - [19/Apr/2025 18:28:30] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 18:29:32,665 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:32] "GET /ap HTTP/1.1" 200 -
+2025-04-19 18:29:36,652 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:36] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 18:29:37,444 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:37] "GET /ap HTTP/1.1" 200 -
+2025-04-19 18:29:38,130 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:38] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 18:29:40,140 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:40] "GET /ap HTTP/1.1" 200 -
+2025-04-19 18:29:40,997 - INFO - 127.0.0.1 - - [19/Apr/2025 18:29:40] "GET /notifications HTTP/1.1" 200 -

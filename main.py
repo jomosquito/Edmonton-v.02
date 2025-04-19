@@ -96,11 +96,32 @@ class StudentInitiatedDrop(db.Model):
     # Admin viewed field similar to MedicalWithdrawalRequest
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
 
+    # Add a new column to store admin approvals
+    admin_approvals = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have approved
+
     def has_admin_viewed(self, admin_id):
         if not self.admin_viewed:
             return False
         viewed_by = json.loads(self.admin_viewed)
         return str(admin_id) in viewed_by
+
+    def has_admin_approved(self, admin_id):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return str(admin_id) in approved_by
+        except:
+            return False
+
+    def is_fully_approved(self):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return len(approved_by) >= 2
+        except:
+            return False
 
     def set_password(self, password):
         self.pass_word = generate_password_hash(password)
@@ -180,12 +201,35 @@ class MedicalWithdrawalRequest(db.Model):
 
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
 
+    # Add a new column to store admin approvals (JSON array of admin IDs)
+    admin_approvals = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have approved
+
     # Helper method to check if an admin has viewed the request
     def has_admin_viewed(self, admin_id):
         if not self.admin_viewed:
             return False
         viewed_by = json.loads(self.admin_viewed)
         return str(admin_id) in viewed_by
+
+    # Helper method to check if an admin has approved the request
+    def has_admin_approved(self, admin_id):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return str(admin_id) in approved_by
+        except:
+            return False
+
+    # Helper method to check if request is fully approved (by 2 admins)
+    def is_fully_approved(self):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return len(approved_by) >= 2
+        except:
+            return False
 
     # Helper property for display in the admin portal
     @property
@@ -233,6 +277,9 @@ class FERPARequest(db.Model):
 
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
 
+    # Add a new column to store admin approvals
+    admin_approvals = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have approved
+
     def has_admin_viewed(self, admin_id):
         """Check if an admin has viewed this request"""
         if not self.admin_viewed:
@@ -242,6 +289,25 @@ class FERPARequest(db.Model):
             return str(admin_id) in viewed_by
         except:
             return False
+
+    def has_admin_approved(self, admin_id):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return str(admin_id) in approved_by
+        except:
+            return False
+
+    def is_fully_approved(self):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return len(approved_by) >= 2
+        except:
+            return False
+
 class InfoChangeRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -288,6 +354,9 @@ class InfoChangeRequest(db.Model):
 
     admin_viewed = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have viewed
 
+    # Add a new column to store admin approvals
+    admin_approvals = db.Column(db.Text, nullable=True)  # JSON array of admin IDs who have approved
+
     def has_admin_viewed(self, admin_id):
         """Check if an admin has viewed this request"""
         if not self.admin_viewed:
@@ -295,6 +364,24 @@ class InfoChangeRequest(db.Model):
         try:
             viewed_by = json.loads(self.admin_viewed)
             return str(admin_id) in viewed_by
+        except:
+            return False
+
+    def has_admin_approved(self, admin_id):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return str(admin_id) in approved_by
+        except:
+            return False
+
+    def is_fully_approved(self):
+        if not self.admin_approvals:
+            return False
+        try:
+            approved_by = json.loads(self.admin_approvals)
+            return len(approved_by) >= 2
         except:
             return False
 
@@ -1017,9 +1104,37 @@ def approve_ferpa(request_id):
         return redirect(url_for('notifications'))
 
     ferpa_request = FERPARequest.query.get_or_404(request_id)
-    ferpa_request.status = 'approved'
-
-    # If the model has an admin_viewed field, handle the admin viewing
+    
+    # Check if admin has viewed the PDF
+    if not ferpa_request.has_admin_viewed(user_id):
+        flash('You must view the request PDF before approving.', 'danger')
+        return redirect(url_for('notifications'))
+    
+    # Check if this admin has already approved
+    if ferpa_request.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+    
+    # Add admin to approvals list
+    if not ferpa_request.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(ferpa_request.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    ferpa_request.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        ferpa_request.status = 'approved'
+        flash('FERPA request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        ferpa_request.status = 'pending_approval'
+        flash('FERPA request has been partially approved. Awaiting second approval.', 'success')
+    
+    # Update the admin_viewed field as well
     if hasattr(ferpa_request, 'admin_viewed'):
         if not ferpa_request.admin_viewed:
             admin_viewed = [str(user_id)]
@@ -1030,8 +1145,6 @@ def approve_ferpa(request_id):
         ferpa_request.admin_viewed = json.dumps(admin_viewed)
 
     db.session.commit()
-
-    flash('FERPA request approved.', 'success')
     return redirect(url_for('notifications'))
 
 @app.route('/reject_ferpa/<int:request_id>', methods=['POST'])
@@ -1077,9 +1190,37 @@ def approve_infochange(request_id):
         return redirect(url_for('notifications'))
 
     infochange_request = InfoChangeRequest.query.get_or_404(request_id)
-    infochange_request.status = 'approved'
-
-    # If the model has an admin_viewed field, handle the admin viewing
+    
+    # Check if admin has viewed the PDF
+    if not infochange_request.has_admin_viewed(user_id):
+        flash('You must view the request PDF before approving.', 'danger')
+        return redirect(url_for('notifications'))
+    
+    # Check if this admin has already approved
+    if infochange_request.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+    
+    # Add admin to approvals list
+    if not infochange_request.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(infochange_request.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    infochange_request.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        infochange_request.status = 'approved'
+        flash('Name/SSN change request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        infochange_request.status = 'pending_approval'
+        flash('Name/SSN change request has been partially approved. Awaiting second approval.', 'success')
+    
+    # Update the admin_viewed field as well
     if hasattr(infochange_request, 'admin_viewed'):
         if not infochange_request.admin_viewed:
             admin_viewed = [str(user_id)]
@@ -1090,8 +1231,6 @@ def approve_infochange(request_id):
         infochange_request.admin_viewed = json.dumps(admin_viewed)
 
     db.session.commit()
-
-    flash('Name/SSN change request approved.', 'success')
     return redirect(url_for('notifications'))
 
 @app.route('/reject_infochange/<int:request_id>', methods=['POST'])
@@ -1400,17 +1539,25 @@ def ap():
 
 @app.route('/notifications')
 def notifications():
-    # Query pending medical withdrawal requests
-    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending').all()
+    # Query pending and partially approved medical withdrawal requests
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
 
-    # Query pending student drop requests
-    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending').all()
+    # Query pending and partially approved student drop requests
+    pending_student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['pending', 'pending_approval'])
+    ).all()
 
-    # Query pending FERPA requests
-    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending').all()
+    # Query pending and partially approved FERPA requests
+    pending_ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['pending', 'pending_approval'])
+    ).all()
 
-    # Query pending Info Change requests
-    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending').all()
+    # Query pending and partially approved Info Change requests
+    pending_infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
 
     return render_template(
         'notifications.html',
@@ -1467,11 +1614,6 @@ def auth_step_one():
         return redirect('/')
 
     return "Authentication failed", 400
-
-@app.route('/deactivated')
-def deactivated():
-    return render_template('deactivated.html')
-
 @app.route('/steptwo')
 def auth_step_two_callback():
     account = Account(credentials)
@@ -1489,7 +1631,7 @@ def auth_step_two_callback():
     if result:
         # Check if the user already exists in the database
         user = Profile.query.filter_by(email_=email).first()
-        
+
         if not user:
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
@@ -1531,10 +1673,7 @@ def auth_step_two_callback():
         if user.privilages_ == "admin":
             return redirect(url_for('adminpage'))  # Admin page
         else:
-            if user.active == False:
-                return redirect(url_for('deactivated'))
-            else:
-                return redirect(url_for('userhompage'))  # User homepage
+            return redirect(url_for('userhompage'))  # User homepage
         
 
     return "Authentication failed", 400
@@ -1852,59 +1991,61 @@ def approve_medical_withdrawal(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
+        
+    # Check if this admin has already approved
+    if req_record.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
 
-    # Get comments from form
-    comments = request.form.get('comments', '')
+    # Add admin to approvals list
+    if not req_record.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(req_record.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    req_record.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        req_record.status = 'approved'
+        
+        # Get comments from form
+        comments = request.form.get('comments', '')
 
-    # Create history record
-    history_entry = WithdrawalHistory(
-        withdrawal_id=request_id,
-        admin_id=user_id,
-        action='approved',
-        comments=comments
-    )
-    db.session.add(history_entry)
+        # Create history record
+        history_entry = WithdrawalHistory(
+            withdrawal_id=request_id,
+            admin_id=user_id,
+            action='approved',
+            comments=comments
+        )
+        db.session.add(history_entry)
+        
+        # Generate PDF with LaTeX
+        from pdf_utils import generate_medical_withdrawal_pdf
+        pdf_path = generate_medical_withdrawal_pdf(req_record)
 
-    # Change status to approved
-    req_record.status = 'approved'
+        # Store the PDF path
+        if pdf_path:
+            # If this is the first generated PDF
+            if not req_record.generated_pdfs:
+                req_record.generated_pdfs = json.dumps([pdf_path])
+            else:
+                # Otherwise append to existing list
+                pdfs = json.loads(req_record.generated_pdfs)
+                pdfs.append(pdf_path)
+                req_record.generated_pdfs = json.dumps(pdfs)
+                
+        flash('Medical withdrawal request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        req_record.status = 'pending_approval'
+        flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
+    
     db.session.commit()
-
-    # Get admin signature if available
-    admin_signature = None  # You'd need to implement signature storage for admins
-
-    # Generate PDF with LaTeX
-    from pdf_utils import generate_medical_withdrawal_pdf
-    pdf_path = generate_medical_withdrawal_pdf(req_record)
-
-    # Store the PDF path
-    if pdf_path:
-        # If this is the first generated PDF
-        if not req_record.generated_pdfs:
-            req_record.generated_pdfs = json.dumps([pdf_path])
-        else:
-            # Otherwise append to existing list
-            pdfs = json.loads(req_record.generated_pdfs)
-            pdfs.append(pdf_path)
-            req_record.generated_pdfs = json.dumps(pdfs)
-
-        db.session.commit()
-
-    return redirect(url_for('notification'))
-
-    # Store the PDF path in the request record
-    if pdf_path:
-        # If this is the first generated PDF
-        if not req_record.generated_pdfs:
-            req_record.generated_pdfs = json.dumps([pdf_path])
-        else:
-            # Otherwise append to existing list
-            pdfs = json.loads(req_record.generated_pdfs)
-            pdfs.append(pdf_path)
-            req_record.generated_pdfs = json.dumps(pdfs)
-
-        db.session.commit()
-
-    return redirect(url_for('notification'))
+    return redirect(url_for('notifications'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
 def reject_medical_withdrawal(request_id):
@@ -2207,8 +2348,7 @@ def form_history():
             'timestamp': req.time,  # Using time field as timestamp
             'form_type': request_type,
             'status': req.status,
-            'reviewed_by': 'Admin',  # Could be enhanced if you track which admin made the approval/rejection
-            'original_request': req
+            'reviewed_by': 'Admin'  # Could be enhanced if you track which admin made the approval/rejection
         })
 
     # Sort all entries by timestamp (newest first)
@@ -2372,30 +2512,49 @@ def approve_student_drop(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
+    
+    # Check if this admin has already approved
+    if req_record.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+    
+    # Add admin to approvals list
+    if not req_record.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(req_record.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    req_record.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        req_record.status = 'approved'
+        
+        # Generate PDF with the updated function
+        from pdf_utils import generate_student_drop_pdf
+        pdf_path = generate_student_drop_pdf(req_record)
 
-    # Change status to approved
-    req_record.status = 'approved'
+        # Store the PDF path in the request record
+        if pdf_path:
+            # If this is the first generated PDF
+            if not req_record.generated_pdfs:
+                req_record.generated_pdfs = json.dumps([pdf_path])
+            else:
+                # Otherwise append to existing list
+                pdfs = json.loads(req_record.generated_pdfs)
+                pdfs.append(pdf_path)
+                req_record.generated_pdfs = json.dumps(pdfs)
+                
+        flash('Student drop request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        req_record.status = 'pending_approval'
+        flash('Student drop request has been partially approved. Awaiting second approval.', 'success')
+
     db.session.commit()
-
-    # Generate PDF with the updated function
-    from pdf_utils import generate_student_drop_pdf
-    pdf_path = generate_student_drop_pdf(req_record)
-
-    # Store the PDF path in the request record
-    if pdf_path:
-        # If this is the first generated PDF
-        if not req_record.generated_pdfs:
-            req_record.generated_pdfs = json.dumps([pdf_path])
-        else:
-            # Otherwise append to existing list
-            pdfs = json.loads(req_record.generated_pdfs)
-            pdfs.append(pdf_path)
-            req_record.generated_pdfs = json.dumps(pdfs)
-
-        db.session.commit()
-
-    return redirect(url_for('notification'))
-
+    return redirect(url_for('notifications'))
 
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
 def reject_student_drop(request_id):
@@ -2502,7 +2661,7 @@ def download_student_drop_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key=os.path.getctime)
+        latest_pdf = max(matching_files, key(os.path.getctime))
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database

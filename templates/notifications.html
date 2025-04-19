@@ -219,6 +219,28 @@
         background-color: #e8f5e9;
       }
 
+      /* Add styles for partially approved status */
+      .status-pending_approval {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+      }
+      
+      .approval-count {
+        display: inline-block;
+        background-color: #17a2b8;
+        color: white;
+        font-size: 0.8rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+      }
+      
+      .approved-by-you {
+        background-color: #d4edda;
+        border-left: 3px solid #28a745;
+      }
+
       /* Responsive design */
       @media (max-width: 768px) {
           .admin-navbar .nav-container {
@@ -312,12 +334,17 @@
         </thead>
         <tbody>
           {% for request in pending_medical_requests %}
-          <tr id="request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
+          <tr id="request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
             <td>{{ request.id }}</td>
             <td>{{ request.user_id }}</td>
             <td>{{ request.first_name }} {{ request.last_name }}</td>
             <td>{{ request.reason_type }}</td>
-            <td>{{ request.status }}</td>
+            <td>
+              {{ request.status }}
+              {% if request.status == 'pending_approval' %}
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+              {% endif %}
+            </td>
             <td>
               <div class="request-actions">
                 <!-- View PDF button -->
@@ -341,6 +368,8 @@
                     class="approve"
                     id="approve-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
                   >
                     <i class="fas fa-check"></i> Approve
                   </button>
@@ -370,6 +399,10 @@
               </div>
             </td>
           </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center;">No pending medical withdrawal requests</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -389,12 +422,17 @@
         </thead>
         <tbody>
           {% for request in pending_student_drops %}
-          <tr id="student-drop-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
+          <tr id="student-drop-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
             <td>{{ request.id }}</td>
             <td>{{ request.student_name }}</td>
             <td>{{ request.course_title }}</td>
             <td>{{ request.reason }}</td>
-            <td>{{ request.status }}</td>
+            <td>
+              {{ request.status }}
+              {% if request.status == 'pending_approval' %}
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+              {% endif %}
+            </td>
             <td>
               <div class="request-actions">
                 <!-- View PDF button -->
@@ -418,6 +456,8 @@
                     class="approve"
                     id="approve-drop-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
                   >
                     <i class="fas fa-check"></i> Approve
                   </button>
@@ -447,11 +487,15 @@
               </div>
             </td>
           </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center;">No pending student drop requests</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
 
-<!-- FERPA Requests Section - Updated with proper view/approve/reject functionality -->
+<!-- FERPA Requests Section -->
 <h3 style="margin-top: 30px;"><i class="fas fa-lock"></i> FERPA Requests</h3>
 <table>
   <thead>
@@ -465,10 +509,15 @@
   </thead>
   <tbody>
     {% for request in pending_ferpa_requests %}
-    <tr id="ferpa-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
+    <tr id="ferpa-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
       <td>{{ request.id }}</td>
       <td>{{ request.name }}</td>
-      <td>{{ request.status }}</td>
+      <td>
+        {{ request.status }}
+        {% if request.status == 'pending_approval' %}
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+        {% endif %}
+      </td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
@@ -487,7 +536,9 @@
             style="display: inline"
           >
             <button type="submit" class="approve" id="approve-ferpa-{{ request.id }}"
-                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
               <i class="fas fa-check"></i> Approve
             </button>
           </form>
@@ -534,10 +585,15 @@
   </thead>
   <tbody>
     {% for request in pending_infochange_requests %}
-    <tr id="infochange-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %}">
+    <tr id="infochange-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
       <td>{{ request.id }}</td>
       <td>{{ request.name }}</td>
-      <td>{{ request.status }}</td>
+      <td>
+        {{ request.status }}
+        {% if request.status == 'pending_approval' %}
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+        {% endif %}
+      </td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
       <td>
         <div class="request-actions">
@@ -556,7 +612,9 @@
             style="display: inline"
           >
             <button type="submit" class="approve" id="approve-infochange-{{ request.id }}"
-                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
               <i class="fas fa-check"></i> Approve
             </button>
           </form>
