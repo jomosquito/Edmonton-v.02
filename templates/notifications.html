@@ -290,24 +290,25 @@
   <body>
     <!-- Admin Navigation Bar -->
     <nav class="admin-navbar">
-        <div class="nav-container">
-            <div class="top-bar">
-                <a href="/ap" class="logo">
-                    <i class="fas fa-shield-alt"></i> Admin Portal
-                </a>
-                <button class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            <div class="nav-links">
-                <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
-                <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
-                <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-                <a href="/form_history"><i class="fas fa-history"></i> Form History</a>
-                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-              </div>
+      <div class="nav-container">
+        <div class="top-bar">
+          <a href="/ap" class="logo">
+            <i class="fas fa-shield-alt"></i> Admin Portal
+          </a>
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
         </div>
+        <div class="nav-links">
+          <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
+          <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
+          <a href="/form_history"><i class="fas fa-history"></i> Form History</a>
+          <a href="/profile" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
+          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
     </nav>
 
     <!-- Page Header with Breadcrumbs -->

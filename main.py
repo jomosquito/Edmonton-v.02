@@ -1771,7 +1771,7 @@ def update_user(id):
             user.set_password(request.form.get("pass_word"))
 
         # SIMPLIFIED ROLE UPDATE
-        new_role = request.form.get("user_role")  # 'student', 'department_chair', or 'president'
+        new_role = request.form.get("user_roles")  # Change from user_role to user_roles to match the form field
         
         # Clear existing roles
         UserRole.query.filter_by(user_id=id).delete()
@@ -1783,10 +1783,12 @@ def update_user(id):
                 db.session.add(UserRole(user_id=user.id, role_id=role.id))
         
         db.session.commit()
-        return redirect(url_for('/'))  # Redirect to '/' instead of 'adminpage'
+        return redirect(url_for('adminpage'))  # Fix: Change from '/' to 'adminpage'
 
     # For GET request - show current role
-    current_role = user.user_roles[0].role.name if user.user_roles else 'student'
+    current_role = None
+    if user.user_roles:  # Check if user has any roles
+        current_role = user.user_roles[0].role.name if user.user_roles else 'student'
     return render_template('update.html', 
                          profile=user,
                          current_role=current_role)

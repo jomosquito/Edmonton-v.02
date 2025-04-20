@@ -81,6 +81,15 @@
   background-color: #fff;
 }
 
+/* Add a slight highlight to the profile link */
+.admin-navbar .nav-links a.profile-link {
+  border-left: 3px solid rgba(106, 90, 205, 0.5);
+}
+
+.admin-navbar .nav-links a.profile-link:hover {
+  border-left-color: #fff;
+}
+
 .admin-navbar .menu-toggle {
   display: none;
   background: none;
