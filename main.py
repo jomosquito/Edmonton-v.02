@@ -2107,7 +2107,7 @@ def reject_medical_withdrawal(request_id):
 
         db.session.commit()
 
-    return redirect(url_for('notification'))
+    return redirect(url_for('notifications'))
 
 @app.route('/download_pdf/<int:request_id>/<string:status>')
 def download_pdf(request_id, status):
@@ -2151,7 +2151,7 @@ def download_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key=os.path.getctime)
+        latest_pdf = max(matching_files, key(os.path.getctime))
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database
@@ -2306,11 +2306,19 @@ def form_history():
             WithdrawalHistory.action_date.desc()
         ).first()
 
+        # Safely construct the reviewer name to handle None values
+        reviewer = 'System'
+        if history and history.admin:
+            first_name = history.admin.first_name or ''
+            last_name = history.admin.last_name or ''
+            if first_name or last_name:
+                reviewer = f"{first_name} {last_name}".strip()
+
         history_entries.append({
             'timestamp': req.updated_at or req.created_at,
             'form_type': 'Medical Withdrawal',
             'status': req.status,
-            'reviewed_by': history.admin.first_name + ' ' + history.admin.last_name if history else 'System',
+            'reviewed_by': reviewer,
             'original_request': req  # Keep reference if needed
         })
 
@@ -2604,7 +2612,7 @@ def reject_student_drop(request_id):
 
         db.session.commit()
 
-    return redirect(url_for('notification'))
+    return redirect(url_for('notifications'))
 
 @app.route('/view-student-drop/<int:request_id>')
 def view_student_drop(request_id):
