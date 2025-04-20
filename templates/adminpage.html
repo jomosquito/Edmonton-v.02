@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Admin Dashboard</title>
+    <title>User Management</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_navbar.css') }}"
     />
     <style>
       /* Page background styling */
@@ -354,10 +358,12 @@
           <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
           <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
           <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-          <a href="/form_history"><i class="fas fa-history"></i> Form History</a>
-          <a href="/userhompage"><i class="fas fa-user"></i> User Homepage</a> <!-- New Button -->
-          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
+          <a href="/form_history"
+            ><i class="fas fa-history"></i> Form History</a
+          >
+          <a href="{{ url_for('logout') }}"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
         </div>
       </div>
     </nav>
@@ -400,14 +406,12 @@
               endif %}
             </td>
             <td>
-              {% if data.user_roles %}
-                {% for user_role in data.user_roles %}
-                  <span class="role-badge role-{{ user_role.role.name }}">
-                    {{ user_role.role.name|replace('_', ' ')|title }}
-                  </span>
-                {% endfor %}
-              {% else %}
-                <span class="role-badge role-student">Student</span>
+              {% if data.user_roles %} {% for user_role in data.user_roles %}
+              <span class="role-badge role-{{ user_role.role.name }}">
+                {{ user_role.role.name|replace('_', ' ')|title }}
+              </span>
+              {% endfor %} {% else %}
+              <span class="role-badge role-student">Student</span>
               {% endif %}
             </td>
             <td>{% if data.active %} Active {% else %} Inactive {% endif %}</td>
@@ -468,6 +472,6 @@
         });
       });
     </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
   </body>
 </html>
-

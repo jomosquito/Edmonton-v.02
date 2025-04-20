@@ -2830,3 +2830,319 @@ drop_1_approved_20250419234536.log.
 2025-04-19 18:46:14,016 - INFO - 127.0.0.1 - - [19/Apr/2025 18:46:14] "[36mGET /form_history?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
 2025-04-19 18:46:14,046 - INFO - 127.0.0.1 - - [19/Apr/2025 18:46:14] "[36mGET /form_history?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
 2025-04-19 18:46:14,374 - INFO - 127.0.0.1 - - [19/Apr/2025 18:46:14] "[36mGET /form_history?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-04-19 19:24:20,775 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:20,776 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 19:24:20,776 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 19:24:20,776 - INFO - Successfully read template (3588 bytes)
+2025-04-19 19:24:20,778 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222529.png
+2025-04-19 19:24:20,778 - INFO - Replaced ##FORMID## with 2
+2025-04-19 19:24:20,778 - INFO - Replaced ##STATUS## with PENDING
+2025-04-19 19:24:20,778 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 19:24:20,778 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 19:24:20,778 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 19:24:20,779 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 19:24:20,779 - INFO - Replaced ##PHONE## with None
+2025-04-19 19:24:20,779 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 19:24:20,779 - INFO - Replaced ##CITY## with 3
+2025-04-19 19:24:20,779 - INFO - Replaced ##STATE## with 3
+2025-04-19 19:24:20,779 - INFO - Replaced ##ZIP## with 3
+2025-04-19 19:24:20,779 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 19:24:20,779 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 19:24:20,779 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 19:24:20,779 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 19:24:20,779 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 19:24:20,779 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 19:24:20,779 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 19:24:20,779 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 19:24:20,779 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 19:24:20,779 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 19:24:20,779 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 19:24:20,779 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 19:24:20,779 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 19:24:20,779 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 19:24:20,779 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with 
+2025-04-19 19:24:20,780 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_2_pending_20250420002420.tex
+2025-04-19 19:24:20,780 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250420002420.tex
+2025-04-19 19:24:20,780 - INFO - Searching for pdflatex executable...
+2025-04-19 19:24:20,780 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 19:24:20,794 - INFO - Found pdflatex at: pdflatex
+2025-04-19 19:24:20,794 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:20,794 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_2_pending_20250420002420.tex
+2025-04-19 19:24:20,794 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_2_pending_20250420002420.tex
+2025-04-19 19:24:21,499 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_2_pending_20250420002420.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/t...
+2025-04-19 19:24:21,499 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 19:24:21,500 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:21] "[33mGET /download_pdf/2/pending HTTP/1.1[0m" 404 -
+2025-04-19 19:24:22,906 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:22] "[33mPOST /mark_pdf_viewed/2 HTTP/1.1[0m" 404 -
+2025-04-19 19:24:24,172 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:24,172 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 19:24:24,173 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 19:24:24,173 - INFO - Successfully read template (3588 bytes)
+2025-04-19 19:24:24,174 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222514.png
+2025-04-19 19:24:24,174 - INFO - Replaced ##FORMID## with 1
+2025-04-19 19:24:24,174 - INFO - Replaced ##STATUS## with PENDING
+2025-04-19 19:24:24,174 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 19:24:24,174 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 19:24:24,174 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 19:24:24,174 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 19:24:24,174 - INFO - Replaced ##PHONE## with None
+2025-04-19 19:24:24,174 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 19:24:24,174 - INFO - Replaced ##CITY## with 3
+2025-04-19 19:24:24,174 - INFO - Replaced ##STATE## with 3
+2025-04-19 19:24:24,175 - INFO - Replaced ##ZIP## with 3
+2025-04-19 19:24:24,175 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 19:24:24,175 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 19:24:24,175 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 19:24:24,175 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 19:24:24,175 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 19:24:24,175 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 19:24:24,175 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 19:24:24,175 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 19:24:24,175 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 19:24:24,175 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 19:24:24,175 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 19:24:24,175 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 19:24:24,175 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 19:24:24,175 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 19:24:24,175 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with 
+2025-04-19 19:24:24,176 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_1_pending_20250420002424.tex
+2025-04-19 19:24:24,176 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250420002424.tex
+2025-04-19 19:24:24,176 - INFO - Searching for pdflatex executable...
+2025-04-19 19:24:24,176 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 19:24:24,188 - INFO - Found pdflatex at: pdflatex
+2025-04-19 19:24:24,188 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:24,188 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_1_pending_20250420002424.tex
+2025-04-19 19:24:24,188 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_1_pending_20250420002424.tex
+2025-04-19 19:24:24,886 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_1_pending_20250420002424.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/t...
+2025-04-19 19:24:24,886 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 19:24:24,887 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:24] "[33mGET /download_pdf/1/pending HTTP/1.1[0m" 404 -
+2025-04-19 19:24:26,134 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:26] "[33mPOST /mark_pdf_viewed/1 HTTP/1.1[0m" 404 -
+2025-04-19 19:24:27,212 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:27,212 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 19:24:27,213 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 19:24:27,213 - INFO - Successfully read template (3588 bytes)
+2025-04-19 19:24:27,214 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222514.png
+2025-04-19 19:24:27,217 - INFO - Replaced ##FORMID## with 1
+2025-04-19 19:24:27,217 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-19 19:24:27,217 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 19:24:27,217 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 19:24:27,217 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 19:24:27,217 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 19:24:27,217 - INFO - Replaced ##PHONE## with None
+2025-04-19 19:24:27,217 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 19:24:27,217 - INFO - Replaced ##CITY## with 3
+2025-04-19 19:24:27,217 - INFO - Replaced ##STATE## with 3
+2025-04-19 19:24:27,217 - INFO - Replaced ##ZIP## with 3
+2025-04-19 19:24:27,217 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 19:24:27,217 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 19:24:27,217 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 19:24:27,217 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 19:24:27,217 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 19:24:27,217 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 19:24:27,217 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 19:24:27,217 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 19:24:27,217 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 19:24:27,217 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 19:24:27,217 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 19:24:27,217 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 19:24:27,217 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 19:24:27,217 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 19:24:27,217 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with \section*{Administrative Decision}
+            \begin{tabular}{l l}
+            Status: & \textbf{REJECTED} \\
+            Date: & April 20, 2025 \\
+            \end{tabular}
+2025-04-19 19:24:27,218 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_1_rejected_20250420002427.tex
+2025-04-19 19:24:27,218 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250420002427.tex
+2025-04-19 19:24:27,218 - INFO - Searching for pdflatex executable...
+2025-04-19 19:24:27,218 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 19:24:27,229 - INFO - Found pdflatex at: pdflatex
+2025-04-19 19:24:27,229 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:27,229 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_1_rejected_20250420002427.tex
+2025-04-19 19:24:27,229 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_1_rejected_20250420002427.tex
+2025-04-19 19:24:27,871 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_1_rejected_20250420002427.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/...
+2025-04-19 19:24:27,871 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 19:24:27,872 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:27] "[32mPOST /reject_medical_withdrawal/1 HTTP/1.1[0m" 302 -
+2025-04-19 19:24:27,878 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:27] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:24:27,907 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:27] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:27,911 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:27] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:28,953 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:28,953 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 19:24:28,953 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 19:24:28,954 - INFO - Successfully read template (3588 bytes)
+2025-04-19 19:24:28,954 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222529.png
+2025-04-19 19:24:28,954 - INFO - Replaced ##FORMID## with 2
+2025-04-19 19:24:28,954 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-19 19:24:28,954 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 19:24:28,954 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 19:24:28,954 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 19:24:28,954 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 19:24:28,954 - INFO - Replaced ##PHONE## with None
+2025-04-19 19:24:28,954 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 19:24:28,954 - INFO - Replaced ##CITY## with 3
+2025-04-19 19:24:28,954 - INFO - Replaced ##STATE## with 3
+2025-04-19 19:24:28,954 - INFO - Replaced ##ZIP## with 3
+2025-04-19 19:24:28,954 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 19:24:28,954 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 19:24:28,954 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 19:24:28,954 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 19:24:28,954 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 19:24:28,954 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 19:24:28,954 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 19:24:28,954 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 19:24:28,954 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 19:24:28,954 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 19:24:28,954 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 19:24:28,954 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 19:24:28,954 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 19:24:28,954 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 19:24:28,954 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with \section*{Administrative Decision}
+            \begin{tabular}{l l}
+            Status: & \textbf{REJECTED} \\
+            Date: & April 20, 2025 \\
+            \end{tabular}
+2025-04-19 19:24:28,955 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_2_rejected_20250420002428.tex
+2025-04-19 19:24:28,955 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250420002428.tex
+2025-04-19 19:24:28,955 - INFO - Searching for pdflatex executable...
+2025-04-19 19:24:28,955 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 19:24:28,963 - INFO - Found pdflatex at: pdflatex
+2025-04-19 19:24:28,964 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:28,964 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_2_rejected_20250420002428.tex
+2025-04-19 19:24:28,964 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_2_rejected_20250420002428.tex
+2025-04-19 19:24:29,649 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_2_rejected_20250420002428.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/...
+2025-04-19 19:24:29,649 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 19:24:29,650 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:29] "[32mPOST /reject_medical_withdrawal/2 HTTP/1.1[0m" 302 -
+2025-04-19 19:24:29,656 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:29] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:24:29,682 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:29] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:29,682 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:29] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:30,346 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:30,346 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-19 19:24:30,347 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-19 19:24:30,347 - INFO - Successfully read template (3588 bytes)
+2025-04-19 19:24:30,348 - INFO - Using text for signature: static/uploads\signatures\sig_2_20250419222531.png
+2025-04-19 19:24:30,348 - INFO - Replaced ##FORMID## with 3
+2025-04-19 19:24:30,348 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-19 19:24:30,348 - INFO - Replaced ##FULLNAME## with jcarde24@CougarNet.UH.EDU e None
+2025-04-19 19:24:30,348 - INFO - Replaced ##MYUHID## with 3333333333
+2025-04-19 19:24:30,348 - INFO - Replaced ##COLLEGE## with 333
+2025-04-19 19:24:30,348 - INFO - Replaced ##DEGREE## with 333
+2025-04-19 19:24:30,348 - INFO - Replaced ##PHONE## with None
+2025-04-19 19:24:30,348 - INFO - Replaced ##ADDRESS## with None
+2025-04-19 19:24:30,348 - INFO - Replaced ##CITY## with 3
+2025-04-19 19:24:30,348 - INFO - Replaced ##STATE## with 3
+2025-04-19 19:24:30,348 - INFO - Replaced ##ZIP## with 3
+2025-04-19 19:24:30,348 - INFO - Replaced ##EMAIL## with jcarde24@CougarNet.UH.EDU
+2025-04-19 19:24:30,348 - INFO - Replaced ##TERM_YEAR## with Fall 2024
+2025-04-19 19:24:30,348 - INFO - Replaced ##LAST_DATE## with April 19, 2025
+2025-04-19 19:24:30,348 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-19 19:24:30,348 - INFO - Replaced ##DETAILS## with ewfasf
+2025-04-19 19:24:30,348 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-19 19:24:30,348 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-19 19:24:30,348 - INFO - Replaced ##CAMPUS_HOUSING## with No
+2025-04-19 19:24:30,348 - INFO - Replaced ##VISA_STATUS## with No
+2025-04-19 19:24:30,348 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-19 19:24:30,348 - INFO - Replaced ##INITIAL## with 4
+2025-04-19 19:24:30,348 - INFO - Replaced ##SIGNATURE_DATE## with April 19, 2025
+2025-04-19 19:24:30,348 - INFO - Replaced ##CREATED_DATE## with April 19, 2025
+2025-04-19 19:24:30,348 - INFO - Replaced ##COURSES## with ed & 444 & 444 \\
+
+2025-04-19 19:24:30,348 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with \section*{Administrative Decision}
+            \begin{tabular}{l l}
+            Status: & \textbf{REJECTED} \\
+            Date: & April 20, 2025 \\
+            \end{tabular}
+2025-04-19 19:24:30,348 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_3_rejected_20250420002430.tex
+2025-04-19 19:24:30,348 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250420002430.tex
+2025-04-19 19:24:30,348 - INFO - Searching for pdflatex executable...
+2025-04-19 19:24:30,349 - INFO - Trying pdflatex at: pdflatex
+2025-04-19 19:24:30,359 - INFO - Found pdflatex at: pdflatex
+2025-04-19 19:24:30,359 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-19 19:24:30,360 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_3_rejected_20250420002430.tex
+2025-04-19 19:24:30,360 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_3_rejected_20250420002430.tex
+2025-04-19 19:24:31,049 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_3_rejected_20250420002430.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/...
+2025-04-19 19:24:31,049 - ERROR - Error compiling LaTeX file (exit code 1)
+2025-04-19 19:24:31,050 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:31] "[32mPOST /reject_medical_withdrawal/3 HTTP/1.1[0m" 302 -
+2025-04-19 19:24:31,056 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:31] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:24:31,082 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:31] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:31,085 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:31] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:39,127 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:39] "GET /form_history HTTP/1.1" 200 -
+2025-04-19 19:24:39,150 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:39] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:39,155 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:39] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:42,423 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "GET /create HTTP/1.1" 200 -
+2025-04-19 19:24:42,444 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:42,445 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:42,923 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "GET /adminpage HTTP/1.1" 200 -
+2025-04-19 19:24:42,944 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:42,944 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:42] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:43,953 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:43] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:24:43,968 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:43] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:43,972 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:43] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:45,785 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:45] "GET /download_infochange_pdf/2 HTTP/1.1" 200 -
+2025-04-19 19:24:47,909 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:47] "POST /mark_infochange_viewed/2 HTTP/1.1" 200 -
+2025-04-19 19:24:53,128 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:53] "[32mPOST /reject_infochange/2 HTTP/1.1[0m" 302 -
+2025-04-19 19:24:53,138 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:53] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:24:53,162 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:53] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:53,162 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:53] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:54,269 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:54] "GET /form_history HTTP/1.1" 200 -
+2025-04-19 19:24:54,289 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:54] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:54,293 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:54] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:24:58,647 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:58] "GET /ap HTTP/1.1" 200 -
+2025-04-19 19:24:58,661 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:58] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:24:58,664 - INFO - 127.0.0.1 - - [19/Apr/2025 19:24:58] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:25:01,727 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:01] "GET /notifications HTTP/1.1" 200 -
+2025-04-19 19:25:01,750 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:01] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:25:01,756 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:01] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:25:06,834 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "GET /adminpage HTTP/1.1" 200 -
+2025-04-19 19:25:06,849 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:25:06,852 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-19 19:25:06,865 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "GET /create HTTP/1.1" 200 -
+2025-04-19 19:25:06,886 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-19 19:25:06,887 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -

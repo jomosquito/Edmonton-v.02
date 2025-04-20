@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Student Drop Requests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_navbar.css') }}"
+    />
+    <style>
+      /* Page background styling */
+      body {
+        background-color: #f4f4f4;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      table th,
+      table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      table th {
+        background-color: #f2f2f2;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+
+      .btn.approve {
+        background-color: #28a745;
+      }
+
+      .btn.approve:hover {
+        background-color: #218838;
+      }
+
+      .btn.reject {
+        background-color: #dc3545;
+      }
+
+      .btn.reject:hover {
+        background-color: #c82333;
+      }
+
+      .btn.view {
+        background-color: #17a2b8;
+      }
+
+      .btn.view:hover {
+        background-color: #138496;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Admin Navigation Bar -->
+    <nav class="admin-navbar">
+      <div class="nav-container">
+        <div class="top-bar">
+          <a href="/ap" class="logo">
+            <i class="fas fa-shield-alt"></i> Admin Portal
+          </a>
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <div class="nav-links">
+          <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
+          <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
+          <a href="/form_history"
+            ><i class="fas fa-history"></i> Form History</a
+          >
+          <a href="{{ url_for('logout') }}"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Rest of the content -->
+    <div class="container">
+      <h1>Student Drop Requests</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Course Title</th>
+            <th>Reason</th>
+            <th>Date</th>
+            <th>Signature</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in drop_requests %}
+          <tr>
+            <td>{{ request.student_name }}</td>
+            <td>{{ request.course_title }}</td>
+            <td>{{ request.reason }}</td>
+            <td>{{ request.date }}</td>
+            <td>
+              {% if request.signature %}
+              <img
+                src="{{ url_for('static', filename=request.signature) }}"
+                alt="Signature"
+                width="100"
+              />
+              {% else %} No Signature {% endif %}
+            </td>
+            <td>{{ request.status }}</td>
+            <td>
+              <a
+                href="{{ url_for('view_student_drop', request_id=request.id) }}"
+                class="btn view"
+                >View</a
+              >
+              <form
+                action="{{ url_for('approve_student_drop', request_id=request.id) }}"
+                method="post"
+                style="display: inline"
+              >
+                <button type="submit" class="btn approve">Approve</button>
+              </form>
+              <form
+                action="{{ url_for('reject_student_drop', request_id=request.id) }}"
+                method="post"
+                style="display: inline"
+              >
+                <button type="submit" class="btn reject">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  </body>
+</html>

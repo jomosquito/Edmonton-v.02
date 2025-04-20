@@ -8,6 +8,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_navbar.css') }}"
+    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -297,9 +301,10 @@
         <div class="nav-links">
           <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
           <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
           <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-          <a href="/admin/student_drops"
-            ><i class="fas fa-file-alt"></i> Student Drops</a
+          <a href="/form_history"
+            ><i class="fas fa-history"></i> Form History</a
           >
           <a href="{{ url_for('logout') }}"
             ><i class="fas fa-sign-out-alt"></i> Logout</a
@@ -506,5 +511,6 @@
         return isValid;
       }
     </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
   </body>
 </html>

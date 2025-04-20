@@ -7,6 +7,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_navbar.css') }}"
+    />
     <style>
       /* Page background styling */
       body {
@@ -392,8 +396,14 @@
         <div class="nav-links">
           <a href="/ap"><i class="fas fa-home"></i> Dashboard</a>
           <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
           <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
-          <a href="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <a href="/form_history"
+            ><i class="fas fa-history"></i> Form History</a
+          >
+          <a href="{{ url_for('logout') }}"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
         </div>
       </div>
     </nav>
@@ -486,32 +496,6 @@
       >
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Toggle mobile menu
-        const menuToggle = document.querySelector(".menu-toggle");
-        const navLinks = document.querySelector(".nav-links");
-
-        if (menuToggle && navLinks) {
-          menuToggle.addEventListener("click", function () {
-            navLinks.classList.toggle("active");
-          });
-        }
-
-        // Set active link based on current page
-        const currentPath = window.location.pathname;
-        const navItems = document.querySelectorAll(".nav-links a");
-
-        navItems.forEach((item) => {
-          const href = item.getAttribute("href");
-          if (
-            currentPath === href ||
-            (href !== "/" && currentPath.startsWith(href))
-          ) {
-            item.classList.add("active");
-          }
-        });
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
   </body>
 </html>
