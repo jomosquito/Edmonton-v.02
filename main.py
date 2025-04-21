@@ -1834,6 +1834,12 @@ def create_profile():
     roles = Role.query.all()
     return render_template("create.html", roles=roles)
 
+# Optional: Logout route
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 # -------------------------------
 # Medical Withdrawal Form Routes
 # -------------------------------
