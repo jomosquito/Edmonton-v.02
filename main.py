@@ -1799,6 +1799,8 @@ def create_profile():
         password = request.form.get("pass_word")
         if not password:
             return "Password is required", 400
+            
+        # Create the new profile
         new_profile = Profile(
             first_name=request.form.get("first_name"),
             last_name=request.form.get("last_name"),
@@ -1807,16 +1809,26 @@ def create_profile():
             active=request.form.get("active") == "on",
             pass_word=generate_password_hash(password)
         )
+        
+        # Add profile to the database to get an ID
         db.session.add(new_profile)
+        db.session.flush()  # This assigns an ID to new_profile without committing
+        
+        # Assign role if specified in the form
+        role_name = request.form.get("user_roles")
+        if role_name:
+            role = Role.query.filter_by(name=role_name).first()
+            if role:
+                user_role = UserRole(user_id=new_profile.id, role_id=role.id)
+                db.session.add(user_role)
+        
+        # Commit all changes
         db.session.commit()
         return redirect('/ap')
-    return render_template("create.html")
-
-# Optional: Logout route
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('home'))
+        
+    # For GET request - get all roles to display in the form
+    roles = Role.query.all()
+    return render_template("create.html", roles=roles)
 
 # -------------------------------
 # Medical Withdrawal Form Routes
