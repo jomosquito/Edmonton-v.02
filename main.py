@@ -79,6 +79,10 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
+    @property
+    def is_department_chair(self):
+        return any(role.role.name == "department_chair" for role in self.user_roles)
+
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
