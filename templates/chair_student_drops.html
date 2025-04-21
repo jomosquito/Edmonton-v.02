@@ -1,1 +1,805 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_navbar.css') }}">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
 
+      /* Admin Navigation Bar Styles */
+      .admin-navbar {
+          background-color: #333;
+          overflow: hidden;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+      }
+
+      .admin-navbar .nav-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 20px;
+      }
+
+      .admin-navbar .logo {
+          color: white;
+          font-weight: bold;
+          font-size: 1.5rem;
+          padding: 14px 0;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+      }
+
+      .admin-navbar .logo i {
+          margin-right: 10px;
+      }
+
+      .admin-navbar .nav-links {
+          display: flex;
+      }
+
+      .admin-navbar .nav-links a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 16px 20px;
+          text-decoration: none;
+          transition: all 0.3s ease;
+      }
+
+      .admin-navbar .nav-links a:hover {
+          background-color: #555;
+      }
+
+      .admin-navbar .nav-links a.active {
+          background-color: #6a5acd;
+          color: white;
+      }
+
+      .admin-navbar .menu-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+      }
+
+      /* Page title and breadcrumb styles */
+      .page-header {
+          background-color: #f8f9fa;
+          padding: 15px 20px;
+          border-bottom: 1px solid #dee2e6;
+          max-width: 1200px;
+          margin: 0 auto;
+      }
+
+      .page-header .breadcrumb {
+          display: flex;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .page-header .breadcrumb li {
+          display: inline;
+          font-size: 0.9rem;
+      }
+
+      .page-header .breadcrumb li:not(:last-child)::after {
+          content: ">";
+          margin: 0 10px;
+          color: #6c757d;
+      }
+
+      .page-header .breadcrumb a {
+          color: #6a5acd;
+          text-decoration: none;
+      }
+
+      .page-header .breadcrumb a:hover {
+          text-decoration: underline;
+      }
+
+      .page-header .breadcrumb .current {
+          color: #6c757d;
+          font-weight: 500;
+      }
+
+      .page-header h2 {
+          margin: 10px 0 0 0;
+          color: #333;
+      }
+
+      /* Main content container */
+      .main-container {
+          max-width: 1200px;
+          margin: 20px auto;
+          padding: 0 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        color: #000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background-color: #6a5acd;
+        color: #fff;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+      button {
+        padding: 5px 10px;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+      button[disabled] {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      button.approve {
+        background-color: #4caf50;
+      }
+      button.approve:hover:not([disabled]) {
+        background-color: #45a049;
+      }
+      button.reject {
+        background-color: #f44336;
+      }
+      button.reject:hover:not([disabled]) {
+        background-color: #d32f2f;
+      }
+      .view-pdf {
+        background-color: #2196F3;
+        color: white;
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      .view-pdf:hover {
+        background-color: #0b7dda;
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+      .request-row-viewed {
+        background-color: #e8f5e9;
+      }
+
+      /* Add styles for partially approved status */
+      .status-pending_approval {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+      }
+      
+      .approval-count {
+        display: inline-block;
+        background-color: #17a2b8;
+        color: white;
+        font-size: 0.8rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+      }
+      
+      .approved-by-you {
+        background-color: #d4edda;
+        border-left: 3px solid #28a745;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+          .admin-navbar .nav-container {
+              flex-direction: column;
+              align-items: stretch;
+          }
+
+          .admin-navbar .top-bar {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+          }
+
+          .admin-navbar .menu-toggle {
+              display: block;
+          }
+
+          .admin-navbar .nav-links {
+              display: none;
+              flex-direction: column;
+              width: 100%;
+          }
+
+          .admin-navbar .nav-links.active {
+              display: flex;
+          }
+
+          .admin-navbar .nav-links a {
+              text-align: left;
+              padding: 12px 20px;
+          }
+
+          table {
+              display: block;
+              overflow-x: auto;
+          }
+
+          button, .view-pdf {
+              padding: 4px 8px;
+              font-size: 0.8rem;
+          }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Admin Navigation Bar -->
+    <nav class="admin-navbar">
+      <div class="nav-container">
+        <div class="top-bar">
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <div class="nav-links">
+          <a href="/profile" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
+          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Header with Breadcrumbs -->
+    <div class="page-header">
+        <ul class="breadcrumb">
+            <li><a href="/ap">Admin</a></li>
+            <li class="current">Notifications</li>
+        </ul>
+        <h2>Pending Requests</h2>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      <!-- Pending Medical Withdrawal Requests -->
+      <h3><i class="fas fa-procedures"></i> Medical Withdrawal Requests</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_medical_requests %}
+          <tr id="request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
+            <td>{{ request.id }}</td>
+            <td>{{ request.user_id }}</td>
+            <td>{{ request.first_name }} {{ request.last_name }}</td>
+            <td>{{ request.reason_type }}</td>
+            <td>
+              {{ request.status }}
+              {% if request.status == 'pending_approval' %}
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="request-actions">
+                <!-- View PDF button -->
+                <a
+                  href="{{ url_for('download_pdf', request_id=request.id, status='pending') }}"
+                  class="view-pdf"
+                  target="_blank"
+                  onclick="markAsViewed('{{ request.id }}')"
+                >
+                  <i class="fas fa-file-pdf"></i> View PDF
+                </a>
+
+                <!-- Show approve/reject buttons - initially disabled -->
+                <form
+                  action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="approve"
+                    id="approve-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
+                  >
+                    <i class="fas fa-check"></i> Approve
+                  </button>
+                </form>
+
+                <form
+                  action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="reject"
+                    id="reject-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                  >
+                    <i class="fas fa-times"></i> Reject
+                  </button>
+                </form>
+
+                <!-- Status message -->
+                <span id="status-{{ request.id }}" class="tooltip">
+                  {% if not request.has_admin_viewed(session.get('user_id')) %}
+                  <span class="tooltiptext">View PDF first</span>
+                  {% endif %}
+                </span>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center;">No pending medical withdrawal requests</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Pending Student Drop Requests -->
+      <h3 style="margin-top: 30px;"><i class="fas fa-file-alt"></i> Student Drop Requests</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Student Name</th>
+            <th>Course Title</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_student_drops %}
+          <tr id="student-drop-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
+            <td>{{ request.id }}</td>
+            <td>{{ request.student_name }}</td>
+            <td>{{ request.course_title }}</td>
+            <td>{{ request.reason }}</td>
+            <td>
+              {{ request.status }}
+              {% if request.status == 'pending_approval' %}
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="request-actions">
+                <!-- View PDF button -->
+                <a
+                  href="{{ url_for('download_student_drop_pdf', request_id=request.id, status='pending') }}"
+                  class="view-pdf"
+                  target="_blank"
+                  onclick="markStudentDropViewed('{{ request.id }}')"
+                >
+                  <i class="fas fa-file-pdf"></i> View PDF
+                </a>
+
+                <!-- Show approve/reject buttons - initially disabled -->
+                <form
+                  action="{{ url_for('approve_student_drop', request_id=request.id) }}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="approve"
+                    id="approve-drop-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
+                  >
+                    <i class="fas fa-check"></i> Approve
+                  </button>
+                </form>
+
+                <form
+                  action="{{ url_for('reject_student_drop', request_id=request.id) }}"
+                  method="post"
+                  style="display: inline"
+                >
+                  <button
+                    type="submit"
+                    class="reject"
+                    id="reject-drop-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                  >
+                    <i class="fas fa-times"></i> Reject
+                  </button>
+                </form>
+
+                <!-- Status message -->
+                <span id="status-drop-{{ request.id }}" class="tooltip">
+                  {% if not request.has_admin_viewed(session.get('user_id')) %}
+                  <span class="tooltiptext">View PDF first</span>
+                  {% endif %}
+                </span>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center;">No pending student drop requests</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+<!-- FERPA Requests Section -->
+<h3 style="margin-top: 30px;"><i class="fas fa-lock"></i> FERPA Requests</h3>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Status</th>
+      <th>Submission Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for request in pending_ferpa_requests %}
+    <tr id="ferpa-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
+      <td>{{ request.id }}</td>
+      <td>{{ request.name }}</td>
+      <td>
+        {{ request.status }}
+        {% if request.status == 'pending_approval' %}
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+        {% endif %}
+      </td>
+      <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
+      <td>
+        <div class="request-actions">
+          <!-- View PDF button -->
+          <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}"
+             class="view-pdf"
+             target="_blank"
+             onclick="markFERPAViewed('{{ request.id }}')">
+            <i class="fas fa-file-pdf"></i> View PDF
+          </a>
+
+          <!-- Show approve/reject buttons -->
+          <form
+            action="{{ url_for('approve_ferpa', request_id=request.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            <button type="submit" class="approve" id="approve-ferpa-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
+              <i class="fas fa-check"></i> Approve
+            </button>
+          </form>
+
+          <form
+            action="{{ url_for('reject_ferpa', request_id=request.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            <button type="submit" class="reject" id="reject-ferpa-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+              <i class="fas fa-times"></i> Reject
+            </button>
+          </form>
+
+          <!-- Status message -->
+          <span id="status-ferpa-{{ request.id }}" class="tooltip">
+            {% if not request.has_admin_viewed(session.get('user_id')) %}
+            <span class="tooltiptext">View PDF first</span>
+            {% endif %}
+          </span>
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5" style="text-align: center;">No pending FERPA requests</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Name/SSN Change Requests Section -->
+<h3 style="margin-top: 30px;"><i class="fas fa-id-card"></i> Name/SSN Change Requests</h3>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Status</th>
+      <th>Submission Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for request in pending_infochange_requests %}
+    <tr id="infochange-request-{{ request.id }}" class="{% if request.has_admin_viewed(session.get('user_id')) %}request-row-viewed{% endif %} {% if request.has_admin_approved(session.get('user_id')) %}approved-by-you{% endif %}">
+      <td>{{ request.id }}</td>
+      <td>{{ request.name }}</td>
+      <td>
+        {{ request.status }}
+        {% if request.status == 'pending_approval' %}
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+        {% endif %}
+      </td>
+      <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
+      <td>
+        <div class="request-actions">
+          <!-- View PDF button -->
+          <a href="{{ url_for('download_infochange_pdf', request_id=request.id) }}"
+             class="view-pdf"
+             target="_blank"
+             onclick="markInfoChangeViewed('{{ request.id }}')">
+            <i class="fas fa-file-pdf"></i> View PDF
+          </a>
+
+          <!-- Show approve/reject buttons -->
+          <form
+            action="{{ url_for('approve_infochange', request_id=request.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            <button type="submit" class="approve" id="approve-infochange-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
+              <i class="fas fa-check"></i> Approve
+            </button>
+          </form>
+
+          <form
+            action="{{ url_for('reject_infochange', request_id=request.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            <button type="submit" class="reject" id="reject-infochange-{{ request.id }}"
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+              <i class="fas fa-times"></i> Reject
+            </button>
+          </form>
+
+          <!-- Status message -->
+          <span id="status-infochange-{{ request.id }}" class="tooltip">
+            {% if not request.has_admin_viewed(session.get('user_id')) %}
+            <span class="tooltiptext">View PDF first</span>
+            {% endif %}
+          </span>
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5" style="text-align: center;">No pending Name/SSN change requests</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          // Toggle mobile menu
+          const menuToggle = document.querySelector('.menu-toggle');
+          const navLinks = document.querySelector('.nav-links');
+
+          if (menuToggle && navLinks) {
+              menuToggle.addEventListener('click', function() {
+                  navLinks.classList.toggle('active');
+              });
+          }
+
+          // Set active link based on current page
+          const currentPath = window.location.pathname;
+          const navItems = document.querySelectorAll('.nav-links a');
+
+          navItems.forEach(item => {
+              const href = item.getAttribute('href');
+              if (currentPath === href ||
+                  (href !== '/' && currentPath.startsWith(href))) {
+                  item.classList.add('active');
+              }
+          });
+      });
+
+      // Function to handle AJAX update when FERPA PDF is viewed
+function markFERPAViewed(requestId) {
+  // After PDF is opened, wait a moment and then update UI
+  setTimeout(() => {
+    // Enable the buttons
+    document.getElementById(`approve-ferpa-${requestId}`).disabled = false;
+    document.getElementById(`reject-ferpa-${requestId}`).disabled = false;
+
+    // Add viewed class to row
+    document.getElementById(`ferpa-request-${requestId}`).classList.add('request-row-viewed');
+
+    // Remove tooltip
+    document.getElementById(`status-ferpa-${requestId}`).innerHTML = '';
+
+    // Add visual feedback
+    let statusElem = document.getElementById(`status-ferpa-${requestId}`);
+    statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+    // After showing confirmation for 3 seconds, remove it
+    setTimeout(() => {
+      statusElem.innerHTML = '';
+    }, 3000);
+
+    // Make AJAX call to update server-side state
+    fetch(`/mark_ferpa_viewed/${requestId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }, 2000); // Wait 2 seconds to simulate viewing the PDF
+}
+
+// Function to handle AJAX update when Name/SSN Change PDF is viewed
+function markInfoChangeViewed(requestId) {
+  // After PDF is opened, wait a moment and then update UI
+  setTimeout(() => {
+    // Enable the buttons
+    document.getElementById(`approve-infochange-${requestId}`).disabled = false;
+    document.getElementById(`reject-infochange-${requestId}`).disabled = false;
+
+    // Add viewed class to row
+    document.getElementById(`infochange-request-${requestId}`).classList.add('request-row-viewed');
+
+    // Remove tooltip
+    document.getElementById(`status-infochange-${requestId}`).innerHTML = '';
+
+    // Add visual feedback
+    let statusElem = document.getElementById(`status-infochange-${requestId}`);
+    statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+    // After showing confirmation for 3 seconds, remove it
+    setTimeout(() => {
+      statusElem.innerHTML = '';
+    }, 3000);
+
+    // Make AJAX call to update server-side state
+    fetch(`/mark_infochange_viewed/${requestId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+  }, 2000); // Wait 2 seconds to simulate viewing the PDF
+}
+
+      // Function to handle AJAX update when Medical Withdrawal PDF is viewed
+      function markAsViewed(requestId) {
+        // After PDF is opened, wait a moment and then update UI
+        setTimeout(() => {
+          // Enable the buttons
+          document.getElementById(`approve-${requestId}`).disabled = false;
+          document.getElementById(`reject-${requestId}`).disabled = false;
+
+          // Add viewed class to row
+          document.getElementById(`request-${requestId}`).classList.add('request-row-viewed');
+
+          // Remove tooltip
+          document.getElementById(`status-${requestId}`).innerHTML = '';
+
+          // Add visual feedback
+          let statusElem = document.getElementById(`status-${requestId}`);
+          statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+          // After showing confirmation for 3 seconds, remove it
+          setTimeout(() => {
+            statusElem.innerHTML = '';
+          }, 3000);
+
+          // Make AJAX call to update server-side state
+          fetch(`/mark_pdf_viewed/${requestId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+        }, 2000); // Wait 2 seconds to simulate viewing the PDF
+      }
+
+      // Function to handle AJAX update when Student Drop PDF is viewed
+      function markStudentDropViewed(requestId) {
+        // After PDF is opened, wait a moment and then update UI
+        setTimeout(() => {
+          // Enable the buttons
+          document.getElementById(`approve-drop-${requestId}`).disabled = false;
+          document.getElementById(`reject-drop-${requestId}`).disabled = false;
+
+          // Add viewed class to row
+          document.getElementById(`student-drop-${requestId}`).classList.add('request-row-viewed');
+
+          // Remove tooltip
+          document.getElementById(`status-drop-${requestId}`).innerHTML = '';
+
+          // Add visual feedback
+          let statusElem = document.getElementById(`status-drop-${requestId}`);
+          statusElem.innerHTML = '<span style="color: green;">✓ PDF viewed</span>';
+
+          // After showing confirmation for 3 seconds, remove it
+          setTimeout(() => {
+            statusElem.innerHTML = '';
+          }, 3000);
+
+          // Make AJAX call to update server-side state
+          fetch(`/mark_student_drop_viewed/${requestId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+        }, 2000); // Wait 2 seconds to simulate viewing the PDF
+      }
+    </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  </body>
+</html>
