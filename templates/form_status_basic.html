@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Form Status</h1>
+
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">Form Details</div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h5 class="card-title">Form Information</h5>
+          <p>
+            <strong>Form Type:</strong> {{ form_type|capitalize|replace('_', '
+            ') }}
+          </p>
+          <p>
+            <strong>Form Status:</strong>
+            {% if form.status == 'approved' %}
+            <span class="badge bg-success">Approved</span>
+            {% elif form.status == 'rejected' %}
+            <span class="badge bg-danger">Rejected</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="card-title">Submission Details</h5>
+          {% if form_type == 'medical_withdrawal' %}
+          <p><strong>Date Submitted:</strong> {{ form.Date_submitted }}</p>
+          <p><strong>Term:</strong> {{ form.term }}</p>
+          <p><strong>Course(s):</strong> {{ form.course_name }}</p>
+          {% elif form_type == 'student_drop' %}
+          <p><strong>Date Submitted:</strong> {{ form.date_submitted }}</p>
+          <p><strong>Course Info:</strong> {{ form.Course_name }}</p>
+          <p><strong>Course Number:</strong> {{ form.Course_number }}</p>
+          {% elif form_type == 'ferpa' %}
+          <p><strong>Date Submitted:</strong> {{ form.date_time }}</p>
+          <p><strong>Release To:</strong> {{ form.release_to }}</p>
+          <p><strong>Release Type:</strong> {{ form.release_type }}</p>
+          {% elif form_type == 'infochange' %}
+          <p><strong>Date Submitted:</strong> {{ form.date_submitted }}</p>
+          <p><strong>Change Type:</strong> {{ form.change_type }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="alert alert-info">
+        <i class="fa fa-info-circle"></i> This form is using the legacy approval
+        system. The form status will be updated once it's approved or rejected.
+      </div>
+
+      {% if is_admin %}
+      <div class="mt-3">
+        <h5>Administrator Notes</h5>
+        <p>
+          This form is not using the new multi-step approval workflow system. To
+          set up workflows for this form type, please go to the
+          <a href="{{ url_for('admin_workflows') }}">Workflow Management</a>
+          section.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <a href="{{ url_for('status') }}" class="btn btn-secondary"
+      >Back to Status Page</a
+    >
+
+    {% if form.status == 'rejected' %} {% if form_type == 'medical_withdrawal'
+    %}
+    <a href="{{ url_for('medical_withdrawal') }}" class="btn btn-primary"
+      >Submit New Request</a
+    >
+    {% elif form_type == 'student_drop' %}
+    <a href="{{ url_for('student_initiated_drop') }}" class="btn btn-primary"
+      >Submit New Request</a
+    >
+    {% elif form_type == 'ferpa' %}
+    <a href="{{ url_for('ferpa_form') }}" class="btn btn-primary"
+      >Submit New Request</a
+    >
+    {% elif form_type == 'infochange' %}
+    <a href="{{ url_for('name_ssn_change') }}" class="btn btn-primary"
+      >Submit New Request</a
+    >
+    {% endif %} {% endif %}
+  </div>
+</div>
+{% endblock %}

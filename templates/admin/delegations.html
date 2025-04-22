@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Approval Delegations</h1>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p>Manage temporary delegation of approval authorities</p>
+        <a href="{{ url_for('add_delegation') }}" class="btn btn-primary">Add New Delegation</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Active and Upcoming Delegations
+        </div>
+        <div class="card-body">
+            {% if delegations %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Delegated From</th>
+                            <th>Delegated To</th>
+                            <th>Role</th>
+                            <th>Department/Unit</th>
+                            <th>Period</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for delegation in delegations %}
+                            <tr>
+                                <td>{{ delegation.delegator.first_name }} {{ delegation.delegator.last_name }}</td>
+                                <td>{{ delegation.delegate.first_name }} {{ delegation.delegate.last_name }}</td>
+                                <td>{{ delegation.role.name if delegation.role else 'All Roles' }}</td>
+                                <td>
+                                    {% if delegation.department %}
+                                        {{ delegation.department.name }}
+                                    {% elif delegation.org_unit %}
+                                        {{ delegation.org_unit.name }}
+                                    {% else %}
+                                        All
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ delegation.start_date.strftime('%Y-%m-%d') }} to 
+                                    {{ delegation.end_date.strftime('%Y-%m-%d') }}
+                                </td>
+                                <td>
+                                    {% if delegation.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% elif delegation.active and delegation.start_date > now %}
+                                        <span class="badge bg-info">Upcoming</span>
+                                    {% elif delegation.active and delegation.end_date < now %}
+                                        <span class="badge bg-secondary">Expired</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('edit_delegation', delegation_id=delegation.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <form method="POST" action="{{ url_for('toggle_delegation', delegation_id=delegation.id) }}" class="d-inline">
+                                        {% if delegation.active %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Disable</button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Enable</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No delegations found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h3>About Approval Delegations</h3>
+        <p>
+            Approval delegations allow you to temporarily transfer your approval authorities to another user. 
+            This is useful for periods of absence, vacation, or when workload balancing is needed.
+        </p>
+        <p>
+            <strong>Key points:</strong>
+            <ul>
+                <li>Delegations are time-limited with specific start and end dates</li>
+                <li>You can delegate specific roles or all of your roles</li>
+                <li>You can delegate for specific departments/units or all of your departments</li>
+                <li>Delegations can be disabled at any time</li>
+            </ul>
+        </p>
+    </div>
+</div>
+{% endblock %}

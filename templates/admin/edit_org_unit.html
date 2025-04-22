@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Organizational Unit</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Edit Unit: {{ unit.name }}
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_org_unit', unit_id=unit.id) }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ unit.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="code" class="form-label">Code</label>
+                    <input type="text" class="form-control" id="code" name="code" value="{{ unit.code }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ unit.description }}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="parent_id" class="form-label">Parent Unit (Optional)</label>
+                    <select class="form-select" id="parent_id" name="parent_id">
+                        <option value="">-- No Parent (Top Level) --</option>
+                        {% for parent_unit in org_units %}
+                            <option value="{{ parent_unit.id }}" {% if unit.parent_id == parent_unit.id %}selected{% endif %}>
+                                {{ parent_unit.name }} ({{ parent_unit.code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="active" name="active" {% if unit.active %}checked{% endif %}>
+                    <label class="form-check-label" for="active">Active</label>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_org_units') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if unit.children %}
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            Sub-units ({{ unit.children|length }})
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for child in unit.children %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>{{ child.name }} ({{ child.code }})</h5>
+                        <a href="{{ url_for('edit_org_unit', unit_id=child.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    </div>
+                    <p class="mb-1">{{ child.description or 'No description' }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

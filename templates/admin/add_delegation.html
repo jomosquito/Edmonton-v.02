@@ -1,0 +1,160 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Add New Delegation</h1>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">Delegation Details</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('add_delegation') }}">
+        <div class="mb-3">
+          <label for="delegator_id" class="form-label"
+            >Delegate From (Authority Owner)</label
+          >
+          <select
+            class="form-select"
+            id="delegator_id"
+            name="delegator_id"
+            required
+            {%
+            if
+            not
+            is_admin
+            %}disabled{%
+            endif
+            %}
+          >
+            {% if default_delegator_id %} {% for profile in profiles %} {% if
+            profile.id == default_delegator_id %}
+            <option value="{{ profile.id }}" selected>
+              {{ profile.first_name }} {{ profile.last_name }}
+            </option>
+            <input type="hidden" name="delegator_id" value="{{ profile.id }}" />
+            {% endif %} {% endfor %} {% else %}
+            <option value="">-- Select User --</option>
+            {% for profile in profiles %}
+            <option value="{{ profile.id }}">
+              {{ profile.first_name }} {{ profile.last_name }}
+            </option>
+            {% endfor %} {% endif %}
+          </select>
+          <div class="form-text">
+            The person delegating their approval authority
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="delegate_id" class="form-label">Delegate To</label>
+          <select
+            class="form-select"
+            id="delegate_id"
+            name="delegate_id"
+            required
+          >
+            <option value="">-- Select User --</option>
+            {% for profile in profiles %} {% if profile.id !=
+            default_delegator_id %}
+            <option value="{{ profile.id }}">
+              {{ profile.first_name }} {{ profile.last_name }}
+            </option>
+            {% endif %} {% endfor %}
+          </select>
+          <div class="form-text">
+            The person who will receive temporarily approval authority
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="role_id" class="form-label">Role (Optional)</label>
+          <select class="form-select" id="role_id" name="role_id">
+            <option value="">-- All Roles --</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}">{{ role.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Specific role to delegate, or leave blank to delegate all roles
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="department_id" class="form-label"
+            >Department (Optional)</label
+          >
+          <select class="form-select" id="department_id" name="department_id">
+            <option value="">-- All Departments --</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Specific department to delegate, or leave blank for all departments
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="org_unit_id" class="form-label"
+            >Organizational Unit (Optional)</label
+          >
+          <select class="form-select" id="org_unit_id" name="org_unit_id">
+            <option value="">-- All Units --</option>
+            {% for unit in org_units %}
+            <option value="{{ unit.id }}">{{ unit.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Specific organizational unit to delegate, or leave blank for all
+            units
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="start_date" class="form-label">Start Date</label>
+          <input
+            type="date"
+            class="form-control"
+            id="start_date"
+            name="start_date"
+            min="{{ today }}"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="end_date" class="form-label">End Date</label>
+          <input
+            type="date"
+            class="form-control"
+            id="end_date"
+            name="end_date"
+            min="{{ today }}"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="reason" class="form-label">Reason for Delegation</label>
+          <textarea
+            class="form-control"
+            id="reason"
+            name="reason"
+            rows="3"
+          ></textarea>
+          <div class="form-text">
+            Optional justification for this delegation (e.g., "Vacation",
+            "Medical Leave")
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('admin_delegations') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">
+            Create Delegation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Add New Organizational Unit</h1>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      Organizational Unit Details
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('add_org_unit') }}">
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+          />
+          <div class="form-text">
+            The full name of the organizational unit (e.g., "College of Natural
+            Sciences and Mathematics")
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="code" class="form-label">Code</label>
+          <input
+            type="text"
+            class="form-control"
+            id="code"
+            name="code"
+            required
+          />
+          <div class="form-text">A short code for this unit (e.g., "NSM")</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="parent_id" class="form-label"
+            >Parent Unit (Optional)</label
+          >
+          <select class="form-select" id="parent_id" name="parent_id">
+            <option value="">-- No Parent (Top Level) --</option>
+            {% for unit in org_units %}
+            <option value="{{ unit.id }}">
+              {{ unit.name }} ({{ unit.code }})
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Select a parent unit if this is a sub-unit of another organizational
+            unit
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('admin_org_units') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">
+            Create Organizational Unit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
