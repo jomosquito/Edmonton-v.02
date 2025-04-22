@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stat-card {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    .chart-container {
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h1>Approval Analytics Dashboard</h1>
+    
+    <!-- Filter section -->
+    <div class="filter-section">
+        <form method="GET" action="{{ url_for('approval_analytics') }}" class="row g-3">
+            <div class="col-md-3">
+                <label for="range" class="form-label">Time Period</label>
+                <select id="range" name="range" class="form-select" onchange="this.form.submit()">
+                    <option value="30d" {% if date_range == '30d' %}selected{% endif %}>Last 30 days</option>
+                    <option value="90d" {% if date_range == '90d' %}selected{% endif %}>Last 90 days</option>
+                    <option value="180d" {% if date_range == '180d' %}selected{% endif %}>Last 180 days</option>
+                    <option value="1y" {% if date_range == '1y' %}selected{% endif %}>Last year</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="department_id" class="form-label">Department</label>
+                <select id="department_id" name="department_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if selected_department_id == dept.id|string %}selected{% endif %}>
+                        {{ dept.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="org_unit_id" class="form-label">Organizational Unit</label>
+                <select id="org_unit_id" name="org_unit_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Units</option>
+                    {% for unit in org_units %}
+                    <option value="{{ unit.id }}" {% if selected_org_unit_id == unit.id|string %}selected{% endif %}>
+                        {{ unit.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a href="{{ url_for('approval_analytics') }}" class="btn btn-outline-secondary">Reset Filters</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Key stats row -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_approvals }}</div>
+                <div class="stat-label">Total Approvals</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ approval_rate|round(1) }}%</div>
+                <div class="stat-label">Approval Rate</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ avg_approval_time }}</div>
+                <div class="stat-label">Avg Approval Time</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ delegation_percent|round(1) }}%</div>
+                <div class="stat-label">Delegated Approvals</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts row -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Approvals by Status
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="approvalStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Approvals by Form Type
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="formTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top approvers -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Top Approvers
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Approver</th>
+                                <th>Approvals</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for approver in top_approvers %}
+                            <tr>
+                                <td>{{ approver.name }}</td>
+                                <td>{{ approver.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Download section -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Export Data
+                </div>
+                <div class="card-body">
+                    <p>Download detailed approval data for further analysis:</p>
+                    <a href="#" class="btn btn-primary">Export to CSV</a>
+                    <a href="#" class="btn btn-secondary">Export to Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Approval status chart
+    const statusCtx = document.getElementById('approvalStatusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Approved', 'Rejected'],
+            datasets: [{
+                data: [{{ approved_count }}, {{ rejected_count }}],
+                backgroundColor: ['#28a745', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+    
+    // Form type chart
+    const formTypeCtx = document.getElementById('formTypeChart').getContext('2d');
+    new Chart(formTypeCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for form_type, count in form_type_counts.items() %}
+                    '{{ form_type }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Approvals',
+                data: [
+                    {% for form_type, count in form_type_counts.items() %}
+                        {{ count }},
+                    {% endfor %}
+                ],
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

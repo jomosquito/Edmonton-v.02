@@ -1,0 +1,214 @@
+{% extends "base.html" %} {% block head %} {{ super() }}
+<style>
+  .workflow-diagram {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px 0;
+  }
+  .workflow-step {
+    min-width: 180px;
+    padding: 15px;
+    margin: 0 10px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    position: relative;
+  }
+  .workflow-step.active {
+    background-color: #e8f5e9;
+    border-color: #28a745;
+  }
+  .workflow-step.inactive {
+    background-color: #f8f9fa;
+    border-color: #dc3545;
+    opacity: 0.7;
+  }
+  .workflow-step h5 {
+    margin-top: 0;
+    font-size: 1rem;
+  }
+  .workflow-step-details {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .workflow-arrow {
+    display: flex;
+    align-items: center;
+    color: #aaa;
+    font-size: 1.5rem;
+  }
+  .approver-badge {
+    display: inline-block;
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    margin: 2px;
+  }
+  .workflow-metadata {
+    background-color: #f1f8ff;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container mt-4">
+  <h1>Workflow Visualization</h1>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>{{ workflow.name }}</h3>
+    <a
+      href="{{ url_for('edit_workflow', workflow_id=workflow.id) }}"
+      class="btn btn-primary"
+      >Edit Workflow</a
+    >
+  </div>
+
+  <!-- Workflow metadata -->
+  <div class="workflow-metadata">
+    <div class="row">
+      <div class="col-md-4">
+        <strong>Form Type:</strong>
+        {% if workflow.form_type == 'medical_withdrawal' %} Medical Withdrawal
+        {% elif workflow.form_type == 'student_drop' %} Student Drop {% elif
+        workflow.form_type == 'ferpa' %} FERPA Release {% elif
+        workflow.form_type == 'infochange' %} Name/SSN Change {% else %} {{
+        workflow.form_type }} {% endif %}
+      </div>
+      <div class="col-md-4">
+        <strong>Scope:</strong>
+        {% if workflow.department %} Department: {{ workflow.department.name }}
+        {% elif workflow.org_unit %} Organizational Unit: {{
+        workflow.org_unit.name }} {% else %} Global (All units) {% endif %}
+      </div>
+      <div class="col-md-4">
+        <strong>Status:</strong>
+        {% if workflow.active %}
+        <span class="badge bg-success">Active</span>
+        {% else %}
+        <span class="badge bg-danger">Inactive</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-12">
+        <strong>Description:</strong> {{ workflow.description or 'No description
+        provided' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow diagram -->
+  <div class="card">
+    <div class="card-header bg-primary text-white">Approval Flow Diagram</div>
+    <div class="card-body p-0">
+      <div class="workflow-diagram">
+        <div class="workflow-step" style="background-color: #e3f2fd">
+          <h5><i class="fas fa-file-alt"></i> Form Submission</h5>
+          <div class="workflow-step-details">User submits a new form</div>
+        </div>
+
+        <div class="workflow-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+
+        {% for step in workflow.steps|sort(attribute='order') %}
+        <div
+          class="workflow-step {% if step.active %}active{% else %}inactive{% endif %}"
+        >
+          <h5>
+            <i class="fas fa-check-circle"></i>
+            Step {{ step.order }}: {{ step.name }}
+          </h5>
+          <div class="workflow-step-details">
+            {{ step.description or 'No description' }}
+
+            <div class="mt-2">
+              <strong>Approver Role:</strong>
+              {% if step.approver_role %} {{ step.approver_role.name }} {% else
+              %} Any role {% endif %}
+            </div>
+
+            <div><strong>Min Approvers:</strong> {{ step.min_approvers }}</div>
+
+            {% if step.department or step.org_unit %}
+            <div>
+              <strong>Restricted to:</strong>
+              {% if step.department %} {{ step.department.name }} {% elif
+              step.org_unit %} {{ step.org_unit.name }} {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if not loop.last %}
+        <div class="workflow-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+        {% endif %} {% endfor %}
+
+        <div class="workflow-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+
+        <div class="workflow-step" style="background-color: #e8f5e9">
+          <h5><i class="fas fa-check-double"></i> Final Approval</h5>
+          <div class="workflow-step-details">Form is fully approved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recently processed forms -->
+  <div class="card mt-4">
+    <div class="card-header bg-info text-white">
+      Recent Forms Using This Workflow
+    </div>
+    <div class="card-body">
+      {% if recent_approvals %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Form Type</th>
+            <th>Form ID</th>
+            <th>Step</th>
+            <th>Approver</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for approval in recent_approvals %}
+          <tr>
+            <td>{{ approval.form_type }}</td>
+            <td>{{ approval.form_id }}</td>
+            <td>{{ approval.step.name }}</td>
+            <td>
+              {{ approval.approver.first_name }} {{ approval.approver.last_name
+              }} {% if approval.delegated_by %}
+              <span class="text-muted"
+                >(delegated by {{ approval.delegated_by.first_name }} {{
+                approval.delegated_by.last_name }})</span
+              >
+              {% endif %}
+            </td>
+            <td>
+              <span
+                class="badge bg-{{ 'success' if approval.status == 'approved' else 'danger' }}"
+              >
+                {{ approval.status }}
+              </span>
+            </td>
+            <td>{{ approval.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No forms have been processed with this workflow yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

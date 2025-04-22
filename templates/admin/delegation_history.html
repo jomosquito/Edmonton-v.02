@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Delegation History</h1>
+
+  <div class="d-flex justify-content-between mb-3">
+    <p>Historical record of approval delegations</p>
+    <a href="{{ url_for('admin_delegations') }}" class="btn btn-primary"
+      >Back to Delegations</a
+    >
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">Delegation History</div>
+    <div class="card-body">
+      {% if delegations %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Role</th>
+            <th>Department/Unit</th>
+            <th>Period</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for delegation in delegations %}
+          <tr>
+            <td>
+              {{ delegation.delegator.first_name }} {{
+              delegation.delegator.last_name }}
+            </td>
+            <td>
+              {{ delegation.delegate.first_name }} {{
+              delegation.delegate.last_name }}
+            </td>
+            <td>
+              {{ delegation.role.name if delegation.role else 'All Roles' }}
+            </td>
+            <td>
+              {% if delegation.department %} {{ delegation.department.name }} {%
+              elif delegation.org_unit %} {{ delegation.org_unit.name }} {% else
+              %} All {% endif %}
+            </td>
+            <td>
+              {{ delegation.start_date.strftime('%Y-%m-%d') }} to {{
+              delegation.end_date.strftime('%Y-%m-%d') }}
+            </td>
+            <td>
+              {% if delegation.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% elif delegation.active and delegation.start_date > now %}
+              <span class="badge bg-info">Upcoming</span>
+              {% elif delegation.active and delegation.end_date < now %}
+              <span class="badge bg-secondary">Expired</span>
+              {% else %}
+              <span class="badge bg-danger">Disabled</span>
+              {% endif %}
+            </td>
+            <td>{{ delegation.created_at.strftime('%Y-%m-%d') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No delegation history found.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

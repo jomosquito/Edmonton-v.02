@@ -1,0 +1,180 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Delegation History</h1>
+
+  <ul class="nav nav-tabs mb-4" id="delegationTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="delegations-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#delegations"
+        type="button"
+        role="tab"
+        aria-controls="delegations"
+        aria-selected="true"
+      >
+        My Delegations
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="approvals-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#approvals"
+        type="button"
+        role="tab"
+        aria-controls="approvals"
+        aria-selected="false"
+      >
+        Delegated Approvals
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="delegationTabsContent">
+    <!-- Delegations tab -->
+    <div
+      class="tab-pane fade show active"
+      id="delegations"
+      role="tabpanel"
+      aria-labelledby="delegations-tab"
+    >
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          My Delegation Assignments
+        </div>
+        <div class="card-body">
+          {% if delegations %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>With</th>
+                <th>Role/Department</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for delegation in delegations %}
+              <tr>
+                <td>
+                  {% if delegation.delegator_id == session.get('user_id') %}
+                  <span class="badge bg-info">Delegated To</span>
+                  {% else %}
+                  <span class="badge bg-warning">Delegated From</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if delegation.delegator_id == session.get('user_id') %} {{
+                  delegation.delegate.first_name }} {{
+                  delegation.delegate.last_name }} {% else %} {{
+                  delegation.delegator.first_name }} {{
+                  delegation.delegator.last_name }} {% endif %}
+                </td>
+                <td>
+                  {% if delegation.role %} {{ delegation.role.name }} {% endif
+                  %} {% if delegation.department %}
+                  <br />{{ delegation.department.name }} {% endif %} {% if
+                  delegation.org_unit %} <br />{{ delegation.org_unit.name }} {%
+                  endif %} {% if not delegation.role and not
+                  delegation.department and not delegation.org_unit %} All roles
+                  and departments {% endif %}
+                </td>
+                <td>
+                  {{ delegation.start_date.strftime('%Y-%m-%d') }} to {{
+                  delegation.end_date.strftime('%Y-%m-%d') }}
+                </td>
+                <td>
+                  {% if delegation.active and delegation.start_date <= now and
+                  delegation.end_date >= now %}
+                  <span class="badge bg-success">Active</span>
+                  {% elif delegation.active and delegation.start_date > now %}
+                  <span class="badge bg-info">Upcoming</span>
+                  {% elif delegation.active and delegation.end_date < now %}
+                  <span class="badge bg-secondary">Expired</span>
+                  {% else %}
+                  <span class="badge bg-danger">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>{{ delegation.reason or 'No reason provided' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No delegations found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Delegated Approvals tab -->
+    <div
+      class="tab-pane fade"
+      id="approvals"
+      role="tabpanel"
+      aria-labelledby="approvals-tab"
+    >
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          Approvals Involving Delegation
+        </div>
+        <div class="card-body">
+          {% if delegated_approvals %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Form</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Delegation</th>
+                <th>Date</th>
+                <th>Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for approval in delegated_approvals %}
+              <tr>
+                <td>
+                  {% if approval.form_type == 'medical_withdrawal' %} Medical
+                  Withdrawal #{{ approval.form_id }} {% elif approval.form_type
+                  == 'student_drop' %} Student Drop #{{ approval.form_id }} {%
+                  elif approval.form_type == 'ferpa' %} FERPA Release #{{
+                  approval.form_id }} {% elif approval.form_type == 'infochange'
+                  %} Name/SSN Change #{{ approval.form_id }} {% else %} {{
+                  approval.form_type }} #{{ approval.form_id }} {% endif %}
+                </td>
+                <td>{{ approval.step.name }}</td>
+                <td>
+                  <span
+                    class="badge bg-{{ 'success' if approval.status == 'approved' else 'danger' }}"
+                  >
+                    {{ approval.status }}
+                  </span>
+                </td>
+                <td>
+                  {% if approval.approver_id == session.get('user_id') %} Acting
+                  for {{ approval.delegated_by.first_name }} {{
+                  approval.delegated_by.last_name }} {% else %} {{
+                  approval.approver.first_name }} {{ approval.approver.last_name
+                  }} acting for you {% endif %}
+                </td>
+                <td>{{ approval.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ approval.comments or 'No comments' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No delegated approvals found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

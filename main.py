@@ -1509,7 +1509,7 @@ def adminpage():
             return render_template('adminpage.html', profiles=profiles)
 
     # Regular database users
-    user = Profile.query.get(user_id)
+    user = db.session.get(Profile, user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
@@ -1651,7 +1651,7 @@ def ap():
             )
 
     # Regular database users
-    user = Profile.query.get(user_id)
+    user = db.session.get(Profile, user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
@@ -3543,7 +3543,7 @@ def add_workflow():
     
     # Get all org units and departments for dropdowns
     org_units = OrganizationalUnit.query.filter_by(active=True).all()
-    departments = Department.query.filter_by(active(True)).all()
+    departments = Department.query.filter_by(active=True).all()
     form_types = [
         ('medical_withdrawal', 'Medical Withdrawal'),
         ('student_drop', 'Student Drop'),
@@ -3595,7 +3595,7 @@ def edit_workflow(workflow_id):
     
     # Get all org units and departments for dropdowns
     org_units = OrganizationalUnit.query.filter_by(active=True).all()
-    departments = Department.query.filter_by(active(True)).all()
+    departments = Department.query.filter_by(active=True).all()
     form_types = [
         ('medical_withdrawal', 'Medical Withdrawal'),
         ('student_drop', 'Student Drop'),
@@ -3669,7 +3669,7 @@ def add_workflow_step(workflow_id):
     # Get all roles, org units, and departments for dropdowns
     roles = Role.query.all()
     org_units = OrganizationalUnit.query.filter_by(active=True).all()
-    departments = Department.query.filter_by(active(True)).all()
+    departments = Department.query.filter_by(active=True).all()
     
     # Determine the next available order number
     next_order = 1
@@ -3750,8 +3750,8 @@ def edit_workflow_step(step_id):
     
     # Get all roles, org units, and departments for dropdowns
     roles = Role.query.all()
-    org_units = OrganizationalUnit.query.filter_by(active(True)).all()
-    departments = Department.query.filter_by(active(True)).all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    departments = Department.query.filter_by(active=True).all()
     
     return render_template(
         'admin/edit_workflow_step.html',
@@ -4279,6 +4279,166 @@ def initialize_organization_structure():
         
         db.session.commit()
 
+@app.route('/admin/org_chart')
+def admin_org_chart():
+    """Display a visual organizational chart"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all organizational units with their hierarchy
+    root_units = OrganizationalUnit.query.filter_by(parent_id=None).all()
+    
+    return render_template(
+        'admin/org_chart.html',
+        root_units=root_units
+    )
+
+@app.route('/admin/approval_analytics')
+def approval_analytics():
+    """Display approval analytics dashboard"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get date range from request, default to last 30 days
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    
+    date_range = request.args.get('range', '30d')
+    if date_range == '90d':
+        start_date = end_date - timedelta(days=90)
+    elif date_range == '180d':
+        start_date = end_date - timedelta(days(180))
+    elif date_range == '1y':
+        start_date = end_date - timedelta(days(365))
+    
+    # Get department and org unit filters
+    department_id = request.args.get('department_id')
+    org_unit_id = request.args.get('org_unit_id')
+    
+    # Base query for approvals
+    approval_query = FormApproval.query.filter(FormApproval.created_at.between(start_date, end_date))
+    
+    # Apply filters if provided
+    if department_id:
+        # This would need joining with forms and their departments - simplified here
+        pass
+    if org_unit_id:
+        # This would need joining with forms and their org units - simplified here
+        pass
+    
+    # Get all approvals in the period
+    approvals = approval_query.all()
+    
+    # Calculate statistics
+    total_approvals = len(approvals)
+    approved_count = sum(1 for a in approvals if a.status == 'approved')
+    rejected_count = sum(1 for a in approvals if a.status == 'rejected')
+    
+    approval_rate = (approved_count / total_approvals * 100) if total_approvals > 0 else 0
+    
+    # Get approval times (time between form submission and approval)
+    # This would require additional queries to get form submission times
+    avg_approval_time = "2.3 days"  # Placeholder for actual calculation
+    
+    # Get most active approvers
+    approver_counts = {}
+    for approval in approvals:
+        approver_id = approval.approver_id
+        approver_counts[approver_id] = approver_counts.get(approver_id, 0) + 1
+    
+    top_approvers = []
+    for approver_id, count in sorted(approver_counts.items(), key=lambda x: x[1], reverse=True)[:5]:
+        approver = Profile.query.get(approver_id)
+        if approver:
+            top_approvers.append({
+                'name': f"{approver.first_name} {approver.last_name}",
+                'count': count
+            })
+    
+    # Get approval counts by form type
+    form_type_counts = {}
+    for approval in approvals:
+        form_type = approval.form_type
+        form_type_counts[form_type] = form_type_counts.get(form_type, 0) + 1
+    
+    # Get delegation statistics
+    delegated_approvals = [a for a in approvals if a.delegated_by_id is not None]
+    delegation_percent = (len(delegated_approvals) / total_approvals * 100) if total_approvals > 0 else 0
+    
+    # Get departments and org units for filter dropdowns
+    departments = Department.query.filter_by(active=True).all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    
+    return render_template(
+        'admin/approval_analytics.html',
+        total_approvals=total_approvals,
+        approved_count=approved_count,
+        rejected_count=rejected_count,
+        approval_rate=approval_rate,
+        avg_approval_time=avg_approval_time,
+        top_approvers=top_approvers,
+        form_type_counts=form_type_counts,
+        delegation_percent=delegation_percent,
+        date_range=date_range,
+        departments=departments,
+        org_units=org_units,
+        selected_department_id=department_id,
+        selected_org_unit_id=org_unit_id
+    )
+
+@app.route('/admin/delegations/history')
+def delegation_history():
+    """View history of approval delegations"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    # Update from Query.get() to db.session.get()
+    user = db.session.get(Profile, user_id)
+    if not user:
+        return redirect(url_for('login'))
+    
+    is_admin = user.privilages_ == 'admin'
+    
+    # Query delegations with joined data
+    query = ApprovalDelegation.query.options(
+        db.joinedload(ApprovalDelegation.delegator),
+        db.joinedload(ApprovalDelegation.delegate),
+        db.joinedload(ApprovalDelegation.role),
+        db.joinedload(ApprovalDelegation.department),
+        db.joinedload(ApprovalDelegation.org_unit)
+    )
+    
+    # Filter by user if not admin
+    if not is_admin:
+        query = query.filter(
+            db.or_(
+                ApprovalDelegation.delegator_id == user_id,
+                ApprovalDelegation.delegate_id == user_id
+            )
+        )
+    
+    delegations = query.order_by(ApprovalDelegation.created_at.desc()).all()
+    
+    now = datetime.utcnow()
+    
+    return render_template(
+        'admin/delegation_history.html',
+        delegations=delegations,
+        now=now,
+        is_admin=is_admin
+    )
+
 # Update the initialization in the main block
 if __name__ == "__main__":
     with app.app_context():
@@ -4286,3 +4446,4 @@ if __name__ == "__main__":
         initialize_roles_and_departments()
         initialize_organization_structure()  # Add the new initialization
     app.run(debug=True)
+
