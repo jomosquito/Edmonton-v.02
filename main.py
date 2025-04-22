@@ -79,6 +79,10 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
+    @property
+    def is_department_chair(self):
+        return any(role.role.name == "department_chair" for role in self.user_roles)
+
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -1830,6 +1834,12 @@ def create_profile():
     roles = Role.query.all()
     return render_template("create.html", roles=roles)
 
+# Optional: Logout route
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 # -------------------------------
 # Medical Withdrawal Form Routes
 # -------------------------------
@@ -2496,6 +2506,35 @@ def admin_student_drops():
     drop_requests = StudentInitiatedDrop.query.all()
     return render_template('admin_student_drops.html', drop_requests=drop_requests)
 
+@app.route('/chair_student_drops')
+def chair_student_drops():
+    # Query pending and partially approved medical withdrawal requests
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    # Query pending and partially approved student drop requests
+    pending_student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    # Query pending and partially approved FERPA requests
+    pending_ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    # Query pending and partially approved Info Change requests
+    pending_infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    return render_template(
+        'chair_student_drops.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests
+    )
 @app.route('/mark_student_drop_viewed/<int:request_id>', methods=['POST'])
 def mark_student_drop_viewed(request_id):
     """Mark a student drop request as viewed by the current admin"""

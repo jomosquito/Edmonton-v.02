@@ -194,6 +194,9 @@
           {% if user.privilages_ == "admin" %}
           <a class="btn" href="/adminpage">Go to Admin Portal</a>
           {% endif %}
+          {% if user.is_department_chair %}
+          <a class="btn" href="/chair_student_drops">Go to Department Chair Portal</a>
+          {% endif %}
         </div>
         <div class="card">
           <h2>Latest Updates</h2>
