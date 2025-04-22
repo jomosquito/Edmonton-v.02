@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Approval Workflow</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Edit Workflow: {{ workflow.name }}
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_workflow', workflow_id=workflow.id) }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Workflow Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ workflow.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ workflow.description }}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="form_type" class="form-label">Form Type</label>
+                    <select class="form-select" id="form_type" name="form_type" required>
+                        {% for type_code, type_name in form_types %}
+                            <option value="{{ type_code }}" {% if workflow.form_type == type_code %}selected{% endif %}>
+                                {{ type_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="org_unit_id" class="form-label">Organizational Unit (Optional)</label>
+                    <select class="form-select" id="org_unit_id" name="org_unit_id">
+                        <option value="">-- All Units --</option>
+                        {% for unit in org_units %}
+                            <option value="{{ unit.id }}" {% if workflow.org_unit_id == unit.id %}selected{% endif %}>
+                                {{ unit.name }} ({{ unit.code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="department_id" class="form-label">Department (Optional)</label>
+                    <select class="form-select" id="department_id" name="department_id">
+                        <option value="">-- All Departments --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" {% if workflow.department_id == dept.id %}selected{% endif %}>
+                                {{ dept.name }} ({{ dept.code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="active" name="active" {% if workflow.active %}checked{% endif %}>
+                    <label class="form-check-label" for="active">Active</label>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_workflows') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white d-flex justify-content-between">
+            <span>Approval Steps</span>
+            <a href="{{ url_for('add_workflow_step', workflow_id=workflow.id) }}" class="btn btn-sm btn-light">Add Step</a>
+        </div>
+        <div class="card-body">
+            {% if workflow.steps %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Name</th>
+                            <th>Approver Role</th>
+                            <th>Min Approvers</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for step in workflow.steps|sort(attribute='order') %}
+                            <tr>
+                                <td>{{ step.order }}</td>
+                                <td>{{ step.name }}</td>
+                                <td>{{ step.approver_role.name if step.approver_role else 'Any' }}</td>
+                                <td>{{ step.min_approvers }}</td>
+                                <td>
+                                    {% if step.active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('edit_workflow_step', step_id=step.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <form method="POST" action="{{ url_for('delete_workflow_step', step_id=step.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this step?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning">
+                    This workflow has no steps defined. Add steps to make it functional.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

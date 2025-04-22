@@ -504,12 +504,140 @@ class Role(db.Model):
     level = db.Column(db.Integer)  # 1=student, 2=chair, 3=president
     user_roles = db.relationship('UserRole', back_populates='role')
 
+class OrganizationalUnit(db.Model):
+    __tablename__ = 'organizational_units'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(20), unique=True, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
+    level = db.Column(db.Integer, default=1)  # Hierarchy level (1=top level, 2=second level, etc.)
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Self-referential relationship for hierarchy
+    children = db.relationship('OrganizationalUnit', 
+                               backref=db.backref('parent', remote_side=[id]),
+                               cascade="all, delete-orphan")
+    
+    # Other relationships
+    departments = db.relationship('Department', backref='organizational_unit', cascade="all, delete-orphan")
+    
+    def __repr__(self):
+        return f"<OrganizationalUnit {self.name}>"
+    
+    @property
+    def full_path(self):
+        """Get the full hierarchical path to this unit"""
+        if self.parent:
+            return f"{self.parent.full_path} > {self.name}"
+        return self.name
+
+# Update Department model to include organizational unit relationship
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(20), unique=True, nullable=False)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
     chairs = db.relationship('UserRole', back_populates='department')
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Add ApprovalWorkflow and Step models for dynamic approval workflows
+class ApprovalWorkflow(db.Model):
+    __tablename__ = 'approval_workflows'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    form_type = db.Column(db.String(50), nullable=False)  # Type of form this workflow applies to
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    steps = db.relationship('ApprovalStep', backref='workflow', cascade="all, delete-orphan", order_by="ApprovalStep.order")
+    org_unit = db.relationship('OrganizationalUnit')
+    department = db.relationship('Department')
+    
+    def __repr__(self):
+        return f"<ApprovalWorkflow {self.name}>"
+
+class ApprovalStep(db.Model):
+    __tablename__ = 'approval_steps'
+    id = db.Column(db.Integer, primary_key=True)
+    workflow_id = db.Column(db.Integer, db.ForeignKey('approval_workflows.id'), nullable=False)
+    order = db.Column(db.Integer, nullable=False)  # Order in the workflow
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    approver_role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=True)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    min_approvers = db.Column(db.Integer, default=1)  # Minimum approvers needed
+    active = db.Column(db.Boolean, default=True)
+    
+    # Relationships
+    approver_role = db.relationship('Role')
+    org_unit = db.relationship('OrganizationalUnit')
+    department = db.relationship('Department')
+    
+    def __repr__(self):
+        return f"<ApprovalStep {self.name} (Order: {self.order})>"
+
+# Add model for delegations
+class ApprovalDelegation(db.Model):
+    __tablename__ = 'approval_delegations'
+    id = db.Column(db.Integer, primary_key=True)
+    delegator_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    delegate_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=True)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+    org_unit_id = db.Column(db.Integer, db.ForeignKey('organizational_units.id'), nullable=True)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    reason = db.Column(db.Text, nullable=True)
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    delegator = db.relationship('Profile', foreign_keys=[delegator_id], backref='delegated_approvals')
+    delegate = db.relationship('Profile', foreign_keys=[delegate_id], backref='received_delegations')
+    role = db.relationship('Role')
+    department = db.relationship('Department')
+    org_unit = db.relationship('OrganizationalUnit')
+    
+    def __repr__(self):
+        return f"<Delegation from {self.delegator_id} to {self.delegate_id}>"
+    
+    @property
+    def is_active(self):
+        """Check if the delegation is currently active"""
+        now = datetime.utcnow()
+        return (self.active and 
+                self.start_date <= now and 
+                self.end_date >= now)
+
+# Enhanced tracking for form approvals
+class FormApproval(db.Model):
+    __tablename__ = 'form_approvals'
+    id = db.Column(db.Integer, primary_key=True)
+    form_type = db.Column(db.String(50), nullable=False)  # 'medical_withdrawal', 'ferpa', etc.
+    form_id = db.Column(db.Integer, nullable=False)  # ID of the form record
+    step_id = db.Column(db.Integer, db.ForeignKey('approval_steps.id'), nullable=False)
+    approver_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    delegated_by_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=True)  # If approval was delegated
+    status = db.Column(db.String(20), nullable=False)  # 'approved', 'rejected', 'pending'
+    comments = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    step = db.relationship('ApprovalStep')
+    approver = db.relationship('Profile', foreign_keys=[approver_id])
+    delegated_by = db.relationship('Profile', foreign_keys=[delegated_by_id])
+    
+    def __repr__(self):
+        return f"<FormApproval {self.form_type}:{self.form_id} by {self.approver_id}>"
 
 class UserRole(db.Model):
     __tablename__ = 'user_roles'
@@ -1381,7 +1509,7 @@ def adminpage():
             return render_template('adminpage.html', profiles=profiles)
 
     # Regular database users
-    user = Profile.query.get(user_id)
+    user = db.session.get(Profile, user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
@@ -1527,7 +1655,7 @@ def ap():
             )
 
     # Regular database users
-    user = Profile.query.get(user_id)
+    user = db.session.get(Profile, user_id)
     if not user or user.privilages_ != 'admin':
         return redirect(url_for('login'))
 
@@ -2777,6 +2905,347 @@ def drafts():
     draft_requests = MedicalWithdrawalRequest.query.filter_by(user_id=user_id, status='draft').all()
     return render_template('drafts.html', draft_requests=draft_requests)
 
+# Helper functions for multi-level approval workflows
+def get_workflow_for_form(form_type, org_unit_id=None, department_id=None):
+    """
+    Find the appropriate workflow for a form based on org unit and department
+    Prioritizes more specific workflows (department-level over org-level over global)
+    """
+    # Try to find a department-specific workflow first
+    if department_id:
+        workflow = ApprovalWorkflow.query.filter_by(
+            form_type=form_type,
+            department_id=department_id,
+            active=True
+        ).first()
+        if workflow:
+            return workflow
+    
+    # Then try org unit specific workflow
+    if org_unit_id:
+        workflow = ApprovalWorkflow.query.filter_by(
+            form_type=form_type,
+            org_unit_id=org_unit_id,
+            active=True
+        ).first()
+        if workflow:
+            return workflow
+    
+    # Finally, try a global workflow (no org_unit or department specified)
+    workflow = ApprovalWorkflow.query.filter_by(
+        form_type=form_type,
+        org_unit_id=None,
+        department_id=None,
+        active=True
+    ).first()
+    
+    return workflow
+
+def get_current_approval_step(form_type, form_id):
+    """Get the current approval step for a form"""
+    # Get all approvals for this form, ordered by step order
+    approvals = FormApproval.query.join(ApprovalStep).filter(
+        FormApproval.form_type == form_type,
+        FormApproval.form_id == form_id
+    ).order_by(ApprovalStep.order.desc()).all()
+    
+    if not approvals:
+        return None
+    
+    # Check if the last step was completed (all required approvals)
+    last_step = approvals[0].step
+    step_approvals = [a for a in approvals if a.step_id == last_step.id]
+    
+    if len(step_approvals) >= last_step.min_approvers:
+        # Last step was completed, get the next step in the workflow
+        next_step = ApprovalStep.query.filter(
+            ApprovalStep.workflow_id == last_step.workflow_id,
+            ApprovalStep.order > last_step.order,
+            ApprovalStep.active == True
+        ).order_by(ApprovalStep.order).first()
+        return next_step
+    else:
+        # Still waiting for approvals on the current step
+        return last_step
+
+def get_eligible_approvers(step):
+    """Get all users eligible to approve a step"""
+    if not step:
+        return []
+    
+    query = Profile.query.join(UserRole)
+    
+    # Filter by role if specified
+    if step.approver_role_id:
+        query = query.filter(UserRole.role_id == step.approver_role_id)
+    
+    # Filter by department if specified
+    if step.department_id:
+        query = query.filter(UserRole.department_id == step.department_id)
+    
+    # Filter by active users
+    query = query.filter(Profile.active == True)
+    
+    # Get all eligible approvers
+    eligible_approvers = query.all()
+    
+    # Also include users with active delegations from eligible approvers
+    now = datetime.utcnow()
+    for approver in list(eligible_approvers):
+        delegations = ApprovalDelegation.query.filter(
+            ApprovalDelegation.delegator_id == approver.id,
+            ApprovalDelegation.active == True,
+            ApprovalDelegation.start_date <= now,
+            ApprovalDelegation.end_date >= now
+        ).all()
+        
+        for delegation in delegations:
+            if delegation.delegate not in eligible_approvers:
+                eligible_approvers.append(delegation.delegate)
+    
+    return eligible_approvers
+
+def can_user_approve(user_id, step_id, form_type, form_id):
+    """Check if a user can approve a specific step"""
+    step = ApprovalStep.query.get(step_id)
+    if not step:
+        return False
+    
+    # Get eligible approvers for this step
+    eligible_approvers = get_eligible_approvers(step)
+    user = Profile.query.get(user_id)
+    
+    if user not in eligible_approvers:
+        return False
+    
+    # Check if this user has already approved this step
+    existing_approval = FormApproval.query.filter_by(
+        form_type=form_type,
+        form_id=form_id,
+        step_id=step_id,
+        approver_id=user_id
+    ).first()
+    
+    return existing_approval is None
+
+def get_delegated_by(delegate_id, step):
+    """Check if approval is being made as a delegate, return delegator if so"""
+    if not step:
+        return None
+    
+    # Find active delegations to this user
+    now = datetime.utcnow()
+    delegations = ApprovalDelegation.query.filter(
+        ApprovalDelegation.delegate_id == delegate_id,
+        ApprovalDelegation.active == True,
+        ApprovalDelegation.start_date <= now,
+        ApprovalDelegation.end_date >= now
+    ).all()
+    
+    for delegation in delegations:
+        # Check if the delegator is eligible to approve this step
+        delegator = Profile.query.get(delegation.delegator_id)
+        eligible_approvers = get_eligible_approvers(step)
+        
+        if delegator in eligible_approvers:
+            return delegator.id
+    
+    return None
+
+def get_form_status(form_type, form_id):
+    """Get detailed status information about a form's approval progress"""
+    # Get the workflow for this form
+    workflow = None
+    form = None
+    
+    # Determine which form table to query
+    if form_type == 'medical_withdrawal':
+        form = MedicalWithdrawalRequest.query.get(form_id)
+        if form:
+            dept = Department.query.filter_by(name=form.college).first()
+            dept_id = dept.id if dept else None
+            workflow = get_workflow_for_form(form_type, department_id=dept_id)
+    elif form_type == 'student_drop':
+        form = StudentInitiatedDrop.query.get(form_id)
+        workflow = get_workflow_for_form(form_type)
+    elif form_type == 'ferpa':
+        form = FERPARequest.query.get(form_id)
+        workflow = get_workflow_for_form(form_type)
+    elif form_type == 'infochange':
+        form = InfoChangeRequest.query.get(form_id)
+        workflow = get_workflow_for_form(form_type)
+    
+    if not form or not workflow:
+        return None
+    
+    # Get all approvals for this form
+    approvals = FormApproval.query.filter_by(
+        form_type=form_type,
+        form_id=form_id
+    ).all()
+    
+    # Get all steps in the workflow
+    steps = ApprovalStep.query.filter_by(
+        workflow_id=workflow.id
+    ).order_by(ApprovalStep.order).all()
+    
+    # Build status for each step
+    step_statuses = []
+    all_steps_approved = True
+    current_step = None
+    
+    for step in steps:
+        step_approvals = [a for a in approvals if a.step_id == step.id]
+        is_complete = len(step_approvals) >= step.min_approvers
+        
+        if not is_complete and all_steps_approved:
+            all_steps_approved = False
+            current_step = step
+        
+        approvers = []
+        for approval in step_approvals:
+            approver = Profile.query.get(approval.approver_id)
+            delegated_by = None
+            if approval.delegated_by_id:
+                delegated_by = Profile.query.get(approval.delegated_by_id)
+            
+            approvers.append({
+                'name': f"{approver.first_name} {approver.last_name}",
+                'id': approver.id,
+                'date': approval.created_at,
+                'delegated_by': delegated_by.first_name + ' ' + delegated_by.last_name if delegated_by else None
+            })
+        
+        step_statuses.append({
+            'id': step.id,
+            'name': step.name,
+            'order': step.order,
+            'min_approvers': step.min_approvers,
+            'current_approvers': len(step_approvals),
+            'is_complete': is_complete,
+            'approvers': approvers
+        })
+    
+    return {
+        'workflow': workflow,
+        'steps': step_statuses,
+        'current_step': current_step,
+        'is_fully_approved': all_steps_approved,
+        'form': form
+    }
+
+def start_approval_workflow(form_type, form_id):
+    """Initialize the approval workflow for a form"""
+    # Determine form details to get appropriate workflow
+    form = None
+    dept_id = None
+    
+    if form_type == 'medical_withdrawal':
+        form = MedicalWithdrawalRequest.query.get(form_id)
+        if form:
+            dept = Department.query.filter_by(name=form.college).first()
+            dept_id = dept.id if dept else None
+    elif form_type == 'student_drop':
+        form = StudentInitiatedDrop.query.get(form_id)
+    elif form_type == 'ferpa':
+        form = FERPARequest.query.get(form_id)
+    elif form_type == 'infochange':
+        form = InfoChangeRequest.query.get(form_id)
+    
+    if not form:
+        return False
+    
+    # Get the appropriate workflow
+    workflow = get_workflow_for_form(form_type, department_id=dept_id)
+    if not workflow:
+        # No workflow defined - use legacy behavior
+        return False
+    
+    # Get the first step in the workflow
+    first_step = ApprovalStep.query.filter_by(
+        workflow_id=workflow.id,
+        active=True
+    ).order_by(ApprovalStep.order).first()
+    
+    if not first_step:
+        return False
+    
+    # Mark the form as being in the workflow
+    if form_type == 'medical_withdrawal':
+        form.status = 'in_workflow'
+    elif form_type == 'student_drop':
+        form.status = 'in_workflow'
+    elif form_type == 'ferpa':
+        form.status = 'in_workflow'
+    elif form_type == 'infochange':
+        form.status = 'in_workflow'
+    
+    db.session.commit()
+    
+    return True
+
+def process_approval(user_id, form_type, form_id, step_id, action, comments=None):
+    """Process an approval or rejection action"""
+    step = ApprovalStep.query.get(step_id)
+    if not step:
+        return False, "Invalid step"
+    
+    # Check if user can approve this step
+    if not can_user_approve(user_id, step_id, form_type, form_id):
+        return False, "Not authorized to approve this step"
+    
+    # Check if this is a delegated approval
+    delegated_by_id = get_delegated_by(user_id, step)
+    
+    # Create the approval record
+    approval = FormApproval(
+        form_type=form_type,
+        form_id=form_id,
+        step_id=step_id,
+        approver_id=user_id,
+        delegated_by_id=delegated_by_id,
+        status=action,
+        comments=comments,
+        created_at=datetime.utcnow()
+    )
+    
+    db.session.add(approval)
+    
+    # Get the form status after this approval
+    form_status = get_form_status(form_type, form_id)
+    
+    # Update the form status if needed
+    if action == 'rejected':
+        if form_type == 'medical_withdrawal':
+            form = MedicalWithdrawalRequest.query.get(form_id)
+            form.status = 'rejected'
+        elif form_type == 'student_drop':
+            form = StudentInitiatedDrop.query.get(form_id)
+            form.status = 'rejected'
+        elif form_type == 'ferpa':
+            form = FERPARequest.query.get(form_id)
+            form.status = 'rejected'
+        elif form_type == 'infochange':
+            form = InfoChangeRequest.query.get(form_id)
+            form.status = 'rejected'
+    elif form_status and form_status['is_fully_approved']:
+        if form_type == 'medical_withdrawal':
+            form = MedicalWithdrawalRequest.query.get(form_id)
+            form.status = 'approved'
+        elif form_type == 'student_drop':
+            form = StudentInitiatedDrop.query.get(form_id)
+            form.status = 'approved'
+        elif form_type == 'ferpa':
+            form = FERPARequest.query.get(form_id)
+            form.status = 'approved'
+        elif form_type == 'infochange':
+            form = InfoChangeRequest.query.get(form_id)
+            form.status = 'approved'
+    
+    db.session.commit()
+    
+    return True, "Approval processed successfully"
+
 def initialize_roles_and_departments():
     """Safe initialization that won't duplicate existing data"""
     with app.app_context():
@@ -2802,8 +3271,1187 @@ def initialize_roles_and_departments():
         
         db.session.commit()
 
+# Organization and Workflow Management Routes
+
+@app.route('/admin/org_units')
+def admin_org_units():
+    """View and manage organizational units"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all organizational units with their hierarchy
+    org_units = OrganizationalUnit.query.filter_by(parent_id=None).all()
+    
+    return render_template(
+        'admin/org_units.html',
+        org_units=org_units
+    )
+
+@app.route('/admin/org_units/add', methods=['GET', 'POST'])
+def add_org_unit():
+    """Add a new organizational unit"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        code = request.form.get('code')
+        description = request.form.get('description')
+        parent_id = request.form.get('parent_id')
+        
+        if parent_id:
+            parent = OrganizationalUnit.query.get(parent_id)
+            level = parent.level + 1 if parent else 1
+        else:
+            level = 1
+        
+        new_unit = OrganizationalUnit(
+            name=name,
+            code=code,
+            description=description,
+            parent_id=parent_id if parent_id else None,
+            level=level
+        )
+        
+        db.session.add(new_unit)
+        db.session.commit()
+        
+        flash('Organizational unit added successfully.', 'success')
+        return redirect(url_for('admin_org_units'))
+    
+    # Get all existing org units for the parent dropdown
+    org_units = OrganizationalUnit.query.all()
+    return render_template(
+        'admin/add_org_unit.html',
+        org_units=org_units
+    )
+
+@app.route('/admin/org_units/edit/<int:unit_id>', methods=['GET', 'POST'])
+def edit_org_unit(unit_id):
+    """Edit an organizational unit"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    unit = OrganizationalUnit.query.get_or_404(unit_id)
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        code = request.form.get('code')
+        description = request.form.get('description')
+        parent_id = request.form.get('parent_id')
+        active = 'active' in request.form
+        
+        if parent_id and int(parent_id) != unit_id:  # Don't allow self as parent
+            parent = OrganizationalUnit.query.get(parent_id)
+            level = parent.level + 1 if parent else 1
+            
+            # Check if this would create a circular reference
+            current_parent = parent
+            while current_parent:
+                if current_parent.id == unit_id:
+                    flash('Cannot set a unit as parent that would create a circular reference.', 'danger')
+                    return redirect(url_for('edit_org_unit', unit_id=unit_id))
+                current_parent = current_parent.parent
+                
+            unit.parent_id = parent_id
+            unit.level = level
+        elif not parent_id:
+            unit.parent_id = None
+            unit.level = 1
+        
+        unit.name = name
+        unit.code = code
+        unit.description = description
+        unit.active = active
+        
+        db.session.commit()
+        
+        flash('Organizational unit updated successfully.', 'success')
+        return redirect(url_for('admin_org_units'))
+    
+    # Get all existing org units for the parent dropdown, excluding this unit and its children
+    org_units = OrganizationalUnit.query.filter(OrganizationalUnit.id != unit_id).all()
+    
+    # Filter out any children of this unit to prevent circular references
+    def get_child_ids(parent_unit):
+        child_ids = [child.id for child in parent_unit.children]
+        for child in parent_unit.children:
+            child_ids.extend(get_child_ids(child))
+        return child_ids
+    
+    child_ids = get_child_ids(unit)
+    valid_parents = [u for u in org_units if u.id not in child_ids]
+    
+    return render_template(
+        'admin/edit_org_unit.html',
+        unit=unit,
+        org_units=valid_parents
+    )
+
+@app.route('/admin/departments')
+def admin_departments():
+    """View and manage departments"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all departments with their organizational units
+    departments = Department.query.options(db.joinedload(Department.organizational_unit)).all()
+    
+    return render_template(
+        'admin/departments.html',
+        departments=departments
+    )
+
+@app.route('/admin/departments/add', methods=['GET', 'POST'])
+def add_department():
+    """Add a new department"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        code = request.form.get('code')
+        org_unit_id = request.form.get('org_unit_id')
+        
+        new_dept = Department(
+            name=name,
+            code=code,
+            org_unit_id=org_unit_id if org_unit_id else None
+        )
+        
+        db.session.add(new_dept)
+        db.session.commit()
+        
+        flash('Department added successfully.', 'success')
+        return redirect(url_for('admin_departments'))
+    
+    # Get all org units for dropdown
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    return render_template(
+        'admin/add_department.html',
+        org_units=org_units
+    )
+
+@app.route('/admin/departments/edit/<int:dept_id>', methods=['GET', 'POST'])
+def edit_department(dept_id):
+    """Edit a department"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    dept = Department.query.get_or_404(dept_id)
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        code = request.form.get('code')
+        org_unit_id = request.form.get('org_unit_id')
+        active = 'active' in request.form
+        
+        dept.name = name
+        dept.code = code
+        dept.org_unit_id = org_unit_id if org_unit_id else None
+        dept.active = active
+        
+        db.session.commit()
+        
+        flash('Department updated successfully.', 'success')
+        return redirect(url_for('admin_departments'))
+    
+    # Get all org units for dropdown
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    return render_template(
+        'admin/edit_department.html',
+        dept=dept,
+        org_units=org_units
+    )
+
+@app.route('/admin/workflows')
+def admin_workflows():
+    """View and manage approval workflows"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all workflows with their related entities
+    workflows = ApprovalWorkflow.query.options(
+        db.joinedload(ApprovalWorkflow.org_unit),
+        db.joinedload(ApprovalWorkflow.department),
+        db.joinedload(ApprovalWorkflow.steps).joinedload(ApprovalStep.approver_role)
+    ).all()
+    
+    return render_template(
+        'admin/workflows.html',
+        workflows=workflows
+    )
+
+@app.route('/admin/workflows/add', methods=['GET', 'POST'])
+def add_workflow():
+    """Add a new approval workflow"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        form_type = request.form.get('form_type')
+        org_unit_id = request.form.get('org_unit_id')
+        department_id = request.form.get('department_id')
+        
+        new_workflow = ApprovalWorkflow(
+            name=name,
+            description=description,
+            form_type=form_type,
+            org_unit_id=org_unit_id if org_unit_id else None,
+            department_id=department_id if department_id else None
+        )
+        
+        db.session.add(new_workflow)
+        db.session.commit()
+        
+        flash('Workflow added successfully. Now add steps to this workflow.', 'success')
+        return redirect(url_for('edit_workflow', workflow_id=new_workflow.id))
+    
+    # Get all org units and departments for dropdowns
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    departments = Department.query.filter_by(active=True).all()
+    form_types = [
+        ('medical_withdrawal', 'Medical Withdrawal'),
+        ('student_drop', 'Student Drop'),
+        ('ferpa', 'FERPA Release'),
+        ('infochange', 'Name/SSN Change')
+    ]
+    
+    return render_template(
+        'admin/add_workflow.html',
+        org_units=org_units,
+        departments=departments,
+        form_types=form_types
+    )
+
+@app.route('/admin/workflows/edit/<int:workflow_id>', methods=['GET', 'POST'])
+def edit_workflow(workflow_id):
+    """Edit an approval workflow and its steps"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    workflow = ApprovalWorkflow.query.options(
+        db.joinedload(ApprovalWorkflow.steps).joinedload(ApprovalStep.approver_role)
+    ).get_or_404(workflow_id)
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        form_type = request.form.get('form_type')
+        org_unit_id = request.form.get('org_unit_id')
+        department_id = request.form.get('department_id')
+        active = 'active' in request.form
+        
+        workflow.name = name
+        workflow.description = description
+        workflow.form_type = form_type
+        workflow.org_unit_id = org_unit_id if org_unit_id else None
+        workflow.department_id = department_id if department_id else None
+        workflow.active = active
+        
+        db.session.commit()
+        
+        flash('Workflow updated successfully.', 'success')
+        return redirect(url_for('admin_workflows'))
+    
+    # Get all org units and departments for dropdowns
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    departments = Department.query.filter_by(active=True).all()
+    form_types = [
+        ('medical_withdrawal', 'Medical Withdrawal'),
+        ('student_drop', 'Student Drop'),
+        ('ferpa', 'FERPA Release'),
+        ('infochange', 'Name/SSN Change')
+    ]
+    
+    return render_template(
+        'admin/edit_workflow.html',
+        workflow=workflow,
+        org_units=org_units,
+        departments=departments,
+        form_types=form_types
+    )
+
+@app.route('/admin/workflows/<int:workflow_id>/add_step', methods=['GET', 'POST'])
+def add_workflow_step(workflow_id):
+    """Add a step to an approval workflow"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    workflow = ApprovalWorkflow.query.get_or_404(workflow_id)
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        order = request.form.get('order', type=int)
+        approver_role_id = request.form.get('approver_role_id')
+        org_unit_id = request.form.get('org_unit_id')
+        department_id = request.form.get('department_id')
+        min_approvers = request.form.get('min_approvers', type=int, default=1)
+        
+        # Check if the order is already in use
+        existing_step = ApprovalStep.query.filter_by(
+            workflow_id=workflow_id,
+            order=order
+        ).first()
+        
+        if existing_step:
+            # Shift steps with the same or higher order
+            steps_to_shift = ApprovalStep.query.filter(
+                ApprovalStep.workflow_id == workflow_id,
+                ApprovalStep.order >= order
+            ).all()
+            
+            for step in steps_to_shift:
+                step.order += 1
+        
+        new_step = ApprovalStep(
+            workflow_id=workflow_id,
+            name=name,
+            description=description,
+            order=order,
+            approver_role_id=approver_role_id if approver_role_id else None,
+            org_unit_id=org_unit_id if org_unit_id else None,
+            department_id=department_id if department_id else None,
+            min_approvers=min_approvers
+        )
+        
+        db.session.add(new_step)
+        db.session.commit()
+        
+        flash('Workflow step added successfully.', 'success')
+        return redirect(url_for('edit_workflow', workflow_id=workflow_id))
+    
+    # Get all roles, org units, and departments for dropdowns
+    roles = Role.query.all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    departments = Department.query.filter_by(active=True).all()
+    
+    # Determine the next available order number
+    next_order = 1
+    highest_step = ApprovalStep.query.filter_by(workflow_id=workflow_id).order_by(ApprovalStep.order.desc()).first()
+    if highest_step:
+        next_order = highest_step.order + 1
+    
+    return render_template(
+        'admin/add_workflow_step.html',
+        workflow=workflow,
+        roles=roles,
+        org_units=org_units,
+        departments=departments,
+        next_order=next_order
+    )
+
+@app.route('/admin/workflows/steps/<int:step_id>/edit', methods=['GET', 'POST'])
+def edit_workflow_step(step_id):
+    """Edit a workflow step"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    step = ApprovalStep.query.get_or_404(step_id)
+    workflow = step.workflow
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        new_order = request.form.get('order', type=int)
+        approver_role_id = request.form.get('approver_role_id')
+        org_unit_id = request.form.get('org_unit_id')
+        department_id = request.form.get('department_id')
+        min_approvers = request.form.get('min_approvers', type=int, default=1)
+        active = 'active' in request.form
+        
+        # If order changed, handle reordering
+        if new_order != step.order:
+            if new_order < step.order:
+                # Moving up: bump steps in the way down
+                steps_to_shift = ApprovalStep.query.filter(
+                    ApprovalStep.workflow_id == workflow.id,
+                    ApprovalStep.order >= new_order,
+                    ApprovalStep.order < step.order
+                ).all()
+                
+                for s in steps_to_shift:
+                    s.order += 1
+            else:
+                # Moving down: bump steps in the way up
+                steps_to_shift = ApprovalStep.query.filter(
+                    ApprovalStep.workflow_id == workflow.id,
+                    ApprovalStep.order <= new_order,
+                    ApprovalStep.order > step.order
+                ).all()
+                
+                for s in steps_to_shift:
+                    s.order -= 1
+            
+            step.order = new_order
+        
+        step.name = name
+        step.description = description
+        step.approver_role_id = approver_role_id if approver_role_id else None
+        step.org_unit_id = org_unit_id if org_unit_id else None
+        step.department_id = department_id if department_id else None
+        step.min_approvers = min_approvers
+        step.active = active
+        
+        db.session.commit()
+        
+        flash('Workflow step updated successfully.', 'success')
+        return redirect(url_for('edit_workflow', workflow_id=workflow.id))
+    
+    # Get all roles, org units, and departments for dropdowns
+    roles = Role.query.all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    departments = Department.query.filter_by(active=True).all()
+    
+    return render_template(
+        'admin/edit_workflow_step.html',
+        step=step,
+        workflow=workflow,
+        roles=roles,
+        org_units=org_units,
+        departments=departments
+    )
+
+@app.route('/admin/workflows/steps/<int:step_id>/delete', methods=['POST'])
+def delete_workflow_step(step_id):
+    """Delete a workflow step"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    step = ApprovalStep.query.get_or_404(step_id)
+    workflow_id = step.workflow_id
+    
+    # Get steps that need to be re-ordered
+    steps_to_shift = ApprovalStep.query.filter(
+        ApprovalStep.workflow_id == workflow_id,
+        ApprovalStep.order > step.order
+    ).all()
+    
+    # Delete the step
+    db.session.delete(step)
+    
+    # Re-order the remaining steps
+    for s in steps_to_shift:
+        s.order -= 1
+    
+    db.session.commit()
+    
+    flash('Workflow step deleted successfully.', 'success')
+    return redirect(url_for('edit_workflow', workflow_id=workflow_id))
+
+# Delegation Routes
+
+@app.route('/admin/delegations')
+def admin_delegations():
+    """View all approval delegations"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+    
+    is_admin = user.privilages_ == 'admin'
+    
+    # If admin, show all delegations
+    if is_admin:
+        delegations = ApprovalDelegation.query.options(
+            db.joinedload(ApprovalDelegation.delegator),
+            db.joinedload(ApprovalDelegation.delegate),
+            db.joinedload(ApprovalDelegation.role),
+            db.joinedload(ApprovalDelegation.department),
+            db.joinedload(ApprovalDelegation.org_unit)
+        ).order_by(ApprovalDelegation.created_at.desc()).all()
+    else:
+        # Show only delegations where the user is the delegator or delegate
+        delegations = ApprovalDelegation.query.options(
+            db.joinedload(ApprovalDelegation.delegator),
+            db.joinedload(ApprovalDelegation.delegate),
+            db.joinedload(ApprovalDelegation.role),
+            db.joinedload(ApprovalDelegation.department),
+            db.joinedload(ApprovalDelegation.org_unit)
+        ).filter(
+            db.or_(
+                ApprovalDelegation.delegator_id == user_id,
+                ApprovalDelegation.delegate_id == user_id
+            )
+        ).order_by(ApprovalDelegation.created_at.desc()).all()
+    
+    now = datetime.utcnow()
+    
+    return render_template(
+        'admin/delegations.html',
+        delegations=delegations,
+        now=now,
+        is_admin=is_admin
+    )
+
+@app.route('/admin/delegations/add', methods=['GET', 'POST'])
+def add_delegation():
+    """Add a new approval delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    is_admin = user and user.privilages_ == 'admin'
+    
+    if request.method == 'POST':
+        delegator_id = request.form.get('delegator_id')
+        delegate_id = request.form.get('delegate_id')
+        role_id = request.form.get('role_id')
+        department_id = request.form.get('department_id')
+        org_unit_id = request.form.get('org_unit_id')
+        start_date_str = request.form.get('start_date')
+        end_date_str = request.form.get('end_date')
+        reason = request.form.get('reason')
+        
+        # Security check - only admins can delegate for others
+        if not is_admin and int(delegator_id) != user_id:
+            flash('You can only create delegations for yourself.', 'danger')
+            return redirect(url_for('admin_delegations'))
+        
+        # Parse dates
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            # Set time to end of day for end_date
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+            return redirect(url_for('add_delegation'))
+        
+        if start_date > end_date:
+            flash('Start date must be before end date.', 'danger')
+            return redirect(url_for('add_delegation'))
+        
+        # Ensure we're not delegating to the same person
+        if int(delegator_id) == int(delegate_id):
+            flash('You cannot delegate to yourself.', 'danger')
+            return redirect(url_for('add_delegation'))
+        
+        # Create the delegation
+        delegation = ApprovalDelegation(
+            delegator_id=delegator_id,
+            delegate_id=delegate_id,
+            role_id=role_id if role_id else None,
+            department_id=department_id if department_id else None,
+            org_unit_id=org_unit_id if org_unit_id else None,
+            start_date=start_date,
+            end_date=end_date,
+            reason=reason,
+            active=True,
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(delegation)
+        db.session.commit()
+        
+        flash('Delegation created successfully.', 'success')
+        return redirect(url_for('admin_delegations'))
+    
+    # Get data for dropdowns
+    profiles = Profile.query.filter_by(active=True).all()
+    roles = Role.query.all()
+    departments = Department.query.filter_by(active=True).all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    
+    # Default to current user as delegator if not admin
+    default_delegator_id = user_id if not is_admin else None
+    
+    return render_template(
+        'admin/add_delegation.html',
+        profiles=profiles,
+        roles=roles,
+        departments=departments,
+        org_units=org_units,
+        default_delegator_id=default_delegator_id,
+        is_admin=is_admin,
+        today=datetime.now().strftime('%Y-%m-%d')
+    )
+
+@app.route('/admin/delegations/edit/<int:delegation_id>', methods=['GET', 'POST'])
+def edit_delegation(delegation_id):
+    """Edit an approval delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    is_admin = user and user.privilages_ == 'admin'
+    
+    delegation = ApprovalDelegation.query.get_or_404(delegation_id)
+    
+    # Security check - only admin or the delegator can edit
+    if not is_admin and delegation.delegator_id != user_id:
+        flash('You can only edit your own delegations.', 'danger')
+        return redirect(url_for('admin_delegations'))
+    
+    if request.method == 'POST':
+        delegate_id = request.form.get('delegate_id')
+        role_id = request.form.get('role_id')
+        department_id = request.form.get('department_id')
+        org_unit_id = request.form.get('org_unit_id')
+        start_date_str = request.form.get('start_date')
+        end_date_str = request.form.get('end_date')
+        reason = request.form.get('reason')
+        active = 'active' in request.form
+        
+        # Parse dates
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            # Set time to end of day for end_date
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+            return redirect(url_for('edit_delegation', delegation_id=delegation_id))
+        
+        if start_date > end_date:
+            flash('Start date must be before end date.', 'danger')
+            return redirect(url_for('edit_delegation', delegation_id=delegation_id))
+        
+        # Ensure we're not delegating to the same person
+        if delegation.delegator_id == int(delegate_id):
+            flash('You cannot delegate to yourself.', 'danger')
+            return redirect(url_for('edit_delegation', delegation_id=delegation_id))
+        
+        # Update the delegation
+        delegation.delegate_id = delegate_id
+        delegation.role_id = role_id if role_id else None
+        delegation.department_id = department_id if department_id else None
+        delegation.org_unit_id = org_unit_id if org_unit_id else None
+        delegation.start_date = start_date
+        delegation.end_date = end_date
+        delegation.reason = reason
+        delegation.active = active
+        
+        db.session.commit()
+        
+        flash('Delegation updated successfully.', 'success')
+        return redirect(url_for('admin_delegations'))
+    
+    # Get data for dropdowns
+    profiles = Profile.query.filter_by(active=True).all()  # Fixed: active(True) → active=True
+    roles = Role.query.all()
+    departments = Department.query.filter_by(active=True).all()  # Fixed: active(True) → active=True
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()  # Fixed: active(True) → active=True
+    
+    # Format dates for the form
+    start_date = delegation.start_date.strftime('%Y-%m-%d')
+    end_date = delegation.end_date.strftime('%Y-%m-%d')
+    
+    return render_template(
+        'admin/edit_delegation.html',
+        delegation=delegation,
+        profiles=profiles,
+        roles=roles,
+        departments=departments,
+        org_units=org_units,
+        start_date=start_date,
+        end_date=end_date,
+        is_admin=is_admin
+    )
+
+@app.route('/admin/delegations/toggle/<int:delegation_id>', methods=['POST'])
+def toggle_delegation(delegation_id):
+    """Enable or disable a delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    is_admin = user and user.privilages_ == 'admin'
+    
+    delegation = ApprovalDelegation.query.get_or_404(delegation_id)
+    
+    # Security check - only admin or the delegator can toggle
+    if not is_admin and delegation.delegator_id != user_id:
+        flash('You can only modify your own delegations.', 'danger')
+        return redirect(url_for('admin_delegations'))
+    
+    delegation.active = not delegation.active
+    db.session.commit()
+    
+    status = 'enabled' if delegation.active else 'disabled'
+    flash(f'Delegation {status} successfully.', 'success')
+    
+    return redirect(url_for('admin_delegations'))
+
+# Enhanced workflow-based approval routes
+
+@app.route('/approve_form/<string:form_type>/<int:form_id>', methods=['GET', 'POST'])
+def approve_form(form_type, form_id):
+    """Universal route for approving forms in the new workflow system"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    
+    # Get form status information
+    form_status = get_form_status(form_type, form_id)
+    if not form_status:
+        flash('Unable to find workflow information for this form.', 'danger')
+        return redirect(url_for('notifications'))
+    
+    current_step = form_status['current_step']
+    if not current_step:
+        flash('This form has already completed all approval steps.', 'info')
+        return redirect(url_for('notifications'))
+    
+    # Check if user can approve this step
+    if not can_user_approve(user_id, current_step.id, form_type, form_id):
+        flash('You are not authorized to approve this form at the current step.', 'danger')
+        return redirect(url_for('notifications'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        comments = request.form.get('comments')
+        
+        if action not in ['approved', 'rejected']:
+            flash('Invalid action specified.', 'danger')
+            return redirect(url_for('approve_form', form_type=form_type, form_id=form_id))
+        
+        success, message = process_approval(user_id, form_type, form_id, current_step.id, action, comments)
+        
+        if success:
+            flash(f'Form {action} successfully.', 'success')
+        else:
+            flash(f'Error processing approval: {message}', 'danger')
+        
+        return redirect(url_for('notifications'))
+    
+    # Determine what form record to get based on type
+    form = None
+    if form_type == 'medical_withdrawal':
+        form = MedicalWithdrawalRequest.query.get(form_id)
+    elif form_type == 'student_drop':
+        form = StudentInitiatedDrop.query.get(form_id)
+    elif form_type == 'ferpa':
+        form = FERPARequest.query.get(form_id)
+    elif form_type == 'infochange':
+        form = InfoChangeRequest.query.get(form_id)
+    
+    if not form:
+        flash('Form not found.', 'danger')
+        return redirect(url_for('notifications'))
+    
+    # Check if this is a delegated approval
+    delegated_by_id = get_delegated_by(user_id, current_step)
+    delegated_by = None
+    if delegated_by_id:
+        delegated_by = Profile.query.get(delegated_by_id)
+    
+    # Get delegation history for this user and this form type
+    delegations = []
+    if delegated_by:
+        delegations.append({
+            'delegator': delegated_by,
+            'delegate': user,
+            'active': True
+        })
+    
+    return render_template(
+        'admin/approve_form.html',
+        form=form,
+        form_type=form_type,
+        form_id=form_id,
+        workflow=form_status['workflow'],
+        current_step=current_step,
+        steps=form_status['steps'],
+        delegated_by=delegated_by,
+        delegations=delegations,
+        user=user
+    )
+
+@app.route('/form_status/<string:form_type>/<int:form_id>')
+def view_form_status(form_type, form_id):
+    """View detailed approval status for a form"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    is_admin = user and user.privilages_ == 'admin'
+    
+    # Determine what form record to get based on type
+    form = None
+    can_view = False
+    
+    if form_type == 'medical_withdrawal':
+        form = MedicalWithdrawalRequest.query.get(form_id)
+        can_view = is_admin or (form and form.user_id == user_id)
+    elif form_type == 'student_drop':
+        form = StudentInitiatedDrop.query.get(form_id)
+        can_view = is_admin or (form and form.student_id == str(user_id))
+    elif form_type == 'ferpa':
+        form = FERPARequest.query.get(form_id)
+        can_view = is_admin or (form and form.user_id == user_id)
+    elif form_type == 'infochange':
+        form = InfoChangeRequest.query.get(form_id)
+        can_view = is_admin or (form and form.user_id == user_id)
+    
+    if not form:
+        flash('Form not found.', 'danger')
+        return redirect(url_for('status'))
+    
+    if not can_view:
+        flash('You do not have permission to view this form.', 'danger')
+        return redirect(url_for('status'))
+    
+    # Get workflow status information
+    form_status = get_form_status(form_type, form_id)
+    
+    # If no workflow is defined, show basic status
+    if not form_status:
+        return render_template(
+            'form_status_basic.html',
+            form=form,
+            form_type=form_type,
+            is_admin=is_admin
+        )
+    
+    return render_template(
+        'form_status.html',
+        form=form,
+        form_type=form_type,
+        form_id=form_id,
+        workflow=form_status['workflow'],
+        current_step=form_status['current_step'],
+        steps=form_status['steps'],
+        is_admin=is_admin
+    )
+
+# Initialize new tables
+def initialize_organization_structure():
+    """Create initial organizational structure if not exists"""
+    with app.app_context():
+        # Check if we already have organizational units
+        if OrganizationalUnit.query.count() > 0:
+            return
+        
+        # Create top-level university unit
+        university = OrganizationalUnit(
+            name="University of Houston",
+            code="UH",
+            description="Main university campus",
+            level=1
+        )
+        db.session.add(university)
+        db.session.flush()  # Get ID without committing
+        
+        # Create colleges as second-level units
+        colleges = [
+            {"name": "College of Natural Sciences and Mathematics", "code": "NSM"},
+            {"name": "College of Engineering", "code": "ENG"},
+            {"name": "College of Liberal Arts and Social Sciences", "code": "CLASS"},
+            {"name": "C. T. Bauer College of Business", "code": "BAUER"}
+        ]
+        
+        for college_data in colleges:
+            college = OrganizationalUnit(
+                name=college_data["name"],
+                code=college_data["code"],
+                description=f"{college_data['name']} at University of Houston",
+                parent_id=university.id,
+                level=2
+            )
+            db.session.add(college)
+        
+        db.session.commit()
+        
+        # Link existing departments to organizational units
+        # Example: Computer Science to NSM
+        nsm = OrganizationalUnit.query.filter_by(code="NSM").first()
+        if nsm:
+            cs_dept = Department.query.filter_by(name="Computer Science").first()
+            if cs_dept:
+                cs_dept.org_unit_id = nsm.id
+            
+            math_dept = Department.query.filter_by(name="Mathematics").first()
+            if math_dept:
+                math_dept.org_unit_id = nsm.id
+        
+        # Example: Biology to NSM
+        biology_dept = Department.query.filter_by(name="Biology").first()
+        if biology_dept and nsm:
+            biology_dept.org_unit_id = nsm.id
+        
+        db.session.commit()
+        
+        # Create default workflows
+        # 1. Global medical withdrawal workflow (applies to all departments)
+        med_withdrawal_workflow = ApprovalWorkflow(
+            name="Medical Withdrawal Approval",
+            description="Standard approval process for medical withdrawals",
+            form_type="medical_withdrawal",
+            active=True
+        )
+        db.session.add(med_withdrawal_workflow)
+        db.session.flush()
+        
+        # Add steps to medical withdrawal workflow
+        steps = [
+            {
+                "order": 1,
+                "name": "Department Chair Review",
+                "description": "Initial review by the department chair",
+                "approver_role_id": Role.query.filter_by(name="department_chair").first().id,
+                "min_approvers": 1
+            },
+            {
+                "order": 2,
+                "name": "President Review",
+                "description": "Final approval by university president",
+                "approver_role_id": Role.query.filter_by(name="president").first().id,
+                "min_approvers": 1
+            }
+        ]
+        
+        for step_data in steps:
+            step = ApprovalStep(
+                workflow_id=med_withdrawal_workflow.id,
+                order=step_data["order"],
+                name=step_data["name"],
+                description=step_data["description"],
+                approver_role_id=step_data["approver_role_id"],
+                min_approvers=step_data["min_approvers"],
+                active=True
+            )
+            db.session.add(step)
+        
+        db.session.commit()
+
+@app.route('/admin/org_chart')
+def admin_org_chart():
+    """Display a visual organizational chart"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get all organizational units with their hierarchy
+    root_units = OrganizationalUnit.query.filter_by(parent_id=None).all()
+    
+    return render_template(
+        'admin/org_chart.html',
+        root_units=root_units
+    )
+
+@app.route('/admin/approval_analytics')
+def approval_analytics():
+    """Display approval analytics dashboard"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    
+    # Get date range from request, default to last 30 days
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+    
+    date_range = request.args.get('range', '30d')
+    if date_range == '90d':
+        start_date = end_date - timedelta(days=90)
+    elif date_range == '180d':
+        start_date = end_date - timedelta(days(180))
+    elif date_range == '1y':
+        start_date = end_date - timedelta(days(365))
+    
+    # Get department and org unit filters
+    department_id = request.args.get('department_id')
+    org_unit_id = request.args.get('org_unit_id')
+    
+    # Base query for approvals
+    approval_query = FormApproval.query.filter(FormApproval.created_at.between(start_date, end_date))
+    
+    # Apply filters if provided
+    if department_id:
+        # This would need joining with forms and their departments - simplified here
+        pass
+    if org_unit_id:
+        # This would need joining with forms and their org units - simplified here
+        pass
+    
+    # Get all approvals in the period
+    approvals = approval_query.all()
+    
+    # Calculate statistics
+    total_approvals = len(approvals)
+    approved_count = sum(1 for a in approvals if a.status == 'approved')
+    rejected_count = sum(1 for a in approvals if a.status == 'rejected')
+    
+    approval_rate = (approved_count / total_approvals * 100) if total_approvals > 0 else 0
+    
+    # Get approval times (time between form submission and approval)
+    # This would require additional queries to get form submission times
+    avg_approval_time = "2.3 days"  # Placeholder for actual calculation
+    
+    # Get most active approvers
+    approver_counts = {}
+    for approval in approvals:
+        approver_id = approval.approver_id
+        approver_counts[approver_id] = approver_counts.get(approver_id, 0) + 1
+    
+    top_approvers = []
+    for approver_id, count in sorted(approver_counts.items(), key=lambda x: x[1], reverse=True)[:5]:
+        approver = Profile.query.get(approver_id)
+        if approver:
+            top_approvers.append({
+                'name': f"{approver.first_name} {approver.last_name}",
+                'count': count
+            })
+    
+    # Get approval counts by form type
+    form_type_counts = {}
+    for approval in approvals:
+        form_type = approval.form_type
+        form_type_counts[form_type] = form_type_counts.get(form_type, 0) + 1
+    
+    # Get delegation statistics
+    delegated_approvals = [a for a in approvals if a.delegated_by_id is not None]
+    delegation_percent = (len(delegated_approvals) / total_approvals * 100) if total_approvals > 0 else 0
+    
+    # Get departments and org units for filter dropdowns
+    departments = Department.query.filter_by(active=True).all()
+    org_units = OrganizationalUnit.query.filter_by(active=True).all()
+    
+    return render_template(
+        'admin/approval_analytics.html',
+        total_approvals=total_approvals,
+        approved_count=approved_count,
+        rejected_count=rejected_count,
+        approval_rate=approval_rate,
+        avg_approval_time=avg_approval_time,
+        top_approvers=top_approvers,
+        form_type_counts=form_type_counts,
+        delegation_percent=delegation_percent,
+        date_range=date_range,
+        departments=departments,
+        org_units=org_units,
+        selected_department_id=department_id,
+        selected_org_unit_id=org_unit_id
+    )
+
+@app.route('/admin/delegations/history')
+def delegation_history():
+    """View history of approval delegations"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    # Update from Query.get() to db.session.get()
+    user = db.session.get(Profile, user_id)
+    if not user:
+        return redirect(url_for('login'))
+    
+    is_admin = user.privilages_ == 'admin'
+    
+    # Query delegations with joined data
+    query = ApprovalDelegation.query.options(
+        db.joinedload(ApprovalDelegation.delegator),
+        db.joinedload(ApprovalDelegation.delegate),
+        db.joinedload(ApprovalDelegation.role),
+        db.joinedload(ApprovalDelegation.department),
+        db.joinedload(ApprovalDelegation.org_unit)
+    )
+    
+    # Filter by user if not admin
+    if not is_admin:
+        query = query.filter(
+            db.or_(
+                ApprovalDelegation.delegator_id == user_id,
+                ApprovalDelegation.delegate_id == user_id
+            )
+        )
+    
+    delegations = query.order_by(ApprovalDelegation.created_at.desc()).all()
+    
+    now = datetime.utcnow()
+    
+    return render_template(
+        'admin/delegation_history.html',
+        delegations=delegations,
+        now=now,
+        is_admin=is_admin
+    )
+
+# Update the initialization in the main block
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        initialize_roles_and_departments()  # Add this line
+        initialize_roles_and_departments()
+        initialize_organization_structure()  # Add the new initialization
     app.run(debug=True)
+

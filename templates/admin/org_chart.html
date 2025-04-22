@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block head %} {{ super() }}
+<style>
+  .org-tree {
+    margin: 20px 0;
+  }
+  .org-tree ul {
+    padding-left: 20px;
+  }
+  .org-tree li {
+    list-style-type: none;
+    margin: 10px 0;
+    position: relative;
+  }
+  .org-node {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    min-width: 200px;
+  }
+  .org-node.level-1 {
+    background-color: #e3f2fd;
+  }
+  .org-node.level-2 {
+    background-color: #e8f5e9;
+  }
+  .org-node.level-3 {
+    background-color: #fff8e1;
+  }
+  .org-node h5 {
+    margin: 0 0 5px 0;
+  }
+  .org-node-details {
+    font-size: 0.9em;
+    color: #666;
+  }
+  .connector {
+    position: absolute;
+    top: -10px;
+    left: -20px;
+    border-left: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    width: 20px;
+    height: 20px;
+  }
+  .org-tree > ul > li > .connector {
+    display: none;
+  }
+</style>
+{% endblock %} {% block content %} {% macro render_org_unit(unit, level) %}
+<li>
+  <div class="connector"></div>
+  <div class="org-node level-{{ level }}">
+    <h5>{{ unit.name }} ({{ unit.code }})</h5>
+    <div class="org-node-details">
+      <div>{{ unit.description or 'No description' }}</div>
+      {% if unit.departments %}
+      <div class="mt-1">
+        <strong>Departments:</strong>
+        {% for dept in unit.departments %}
+        <span class="badge bg-light text-dark">{{ dept.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="mt-1">
+        <a
+          href="{{ url_for('edit_org_unit', unit_id=unit.id) }}"
+          class="btn btn-sm btn-outline-primary"
+          >Edit</a
+        >
+      </div>
+    </div>
+  </div>
+  {% if unit.children %}
+  <ul>
+    {% for child in unit.children %} {{ render_org_unit(child, level+1) }} {%
+    endfor %}
+  </ul>
+  {% endif %}
+</li>
+{% endmacro %}
+
+<div class="container mt-4">
+  <h1>Organizational Chart</h1>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p>Visual representation of your organizational hierarchy</p>
+    <a href="{{ url_for('admin_org_units') }}" class="btn btn-primary"
+      >Manage Units</a
+    >
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      Organizational Structure
+    </div>
+    <div class="card-body">
+      <div class="org-tree">
+        <ul>
+          {% for unit in root_units %} {{ render_org_unit(unit, 1) }} {% endfor
+          %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

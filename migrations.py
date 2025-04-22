@@ -106,4 +106,41 @@ with app.app_context():
                 conn.execute(sa.text('ALTER TABLE info_change_request ADD COLUMN admin_approvals TEXT'))
 
     db.session.commit()
+
+# Add org_unit_id and active columns to departments table if they don't exist
+with app.app_context():
+    with db.engine.connect() as conn:
+        inspector = sa.inspect(db.engine)
+        
+        # Check for org_unit_id in departments table
+        tables = inspector.get_table_names()
+        
+        if 'departments' in tables:
+            columns = inspector.get_columns('departments')
+            if 'org_unit_id' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE departments ADD COLUMN org_unit_id INTEGER REFERENCES organizational_units(id)'))
+                print("Added org_unit_id column to departments table")
+            
+            # Check for active column in departments table
+            if 'active' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE departments ADD COLUMN active BOOLEAN DEFAULT TRUE'))
+                print("Added active column to departments table")
+
+    db.session.commit()
+
+# Add created_at column to departments table if it doesn't exist
+with app.app_context():
+    with db.engine.connect() as conn:
+        inspector = sa.inspect(db.engine)
+        
+        # Check for created_at in departments table
+        tables = inspector.get_table_names()
+        
+        if 'departments' in tables:
+            columns = inspector.get_columns('departments')
+            if 'created_at' not in [col['name'] for col in columns]:
+                conn.execute(sa.text('ALTER TABLE departments ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))
+                print("Added created_at column to departments table")
+
+    db.session.commit()
     print("Migrations completed successfully!")

@@ -1,0 +1,98 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Add New Approval Workflow</h1>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">Workflow Details</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('add_workflow') }}">
+        <div class="mb-3">
+          <label for="name" class="form-label">Workflow Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+          />
+          <div class="form-text">
+            A descriptive name for this workflow (e.g., "Medical Withdrawal -
+            Engineering")
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="3"
+          ></textarea>
+          <div class="form-text">
+            Optional description of this workflow's purpose
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="form_type" class="form-label">Form Type</label>
+          <select class="form-select" id="form_type" name="form_type" required>
+            <option value="">-- Select Form Type --</option>
+            {% for type_code, type_name in form_types %}
+            <option value="{{ type_code }}">{{ type_name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">The type of form this workflow applies to</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="org_unit_id" class="form-label"
+            >Organizational Unit (Optional)</label
+          >
+          <select class="form-select" id="org_unit_id" name="org_unit_id">
+            <option value="">-- All Units --</option>
+            {% for unit in org_units %}
+            <option value="{{ unit.id }}">
+              {{ unit.name }} ({{ unit.code }})
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            If specified, this workflow will only apply to forms from this unit
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="department_id" class="form-label"
+            >Department (Optional)</label
+          >
+          <select class="form-select" id="department_id" name="department_id">
+            <option value="">-- All Departments --</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}">
+              {{ dept.name }} ({{ dept.code }})
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            If specified, this workflow will only apply to forms from this
+            department
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <i class="fa fa-info-circle"></i> After creating the workflow, you'll
+          be able to add approval steps.
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('admin_workflows') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">Create Workflow</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

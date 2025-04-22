@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Delegation</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Edit Delegation
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_delegation', delegation_id=delegation.id) }}">
+                <div class="mb-3">
+                    <label class="form-label">Delegator (Authority Owner)</label>
+                    <input type="text" class="form-control" value="{{ delegation.delegator.first_name }} {{ delegation.delegator.last_name }}" readonly>
+                    <input type="hidden" name="delegator_id" value="{{ delegation.delegator_id }}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="delegate_id" class="form-label">Delegate To</label>
+                    <select class="form-select" id="delegate_id" name="delegate_id" required>
+                        <option value="">-- Select User --</option>
+                        {% for profile in profiles %}
+                            {% if profile.id != delegation.delegator_id %}
+                                <option value="{{ profile.id }}" {% if profile.id == delegation.delegate_id %}selected{% endif %}>
+                                    {{ profile.first_name }} {{ profile.last_name }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="role_id" class="form-label">Role (Optional)</label>
+                    <select class="form-select" id="role_id" name="role_id">
+                        <option value="">-- All Roles --</option>
+                        {% for role in roles %}
+                            <option value="{{ role.id }}" {% if delegation.role_id == role.id %}selected{% endif %}>
+                                {{ role.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="department_id" class="form-label">Department (Optional)</label>
+                    <select class="form-select" id="department_id" name="department_id">
+                        <option value="">-- All Departments --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" {% if delegation.department_id == dept.id %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="org_unit_id" class="form-label">Organizational Unit (Optional)</label>
+                    <select class="form-select" id="org_unit_id" name="org_unit_id">
+                        <option value="">-- All Units --</option>
+                        {% for unit in org_units %}
+                            <option value="{{ unit.id }}" {% if delegation.org_unit_id == unit.id %}selected{% endif %}>
+                                {{ unit.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="reason" class="form-label">Reason for Delegation</label>
+                    <textarea class="form-control" id="reason" name="reason" rows="3">{{ delegation.reason }}</textarea>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="active" name="active" {% if delegation.active %}checked{% endif %}>
+                    <label class="form-check-label" for="active">Active</label>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_delegations') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

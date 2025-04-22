@@ -1,0 +1,272 @@
+{% extends "base.html" %} {% block title %}Form Status{% endblock %} {% block
+content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2>Form Status Tracking</h2>
+    </div>
+    <div class="card-body">
+      <!-- Form Details -->
+      <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+          <h4>Form Details</h4>
+        </div>
+        <div class="card-body">
+          {% if form_type == 'medical_withdrawal' %}
+          <h4>Medical Withdrawal Request</h4>
+          <p><strong>Student:</strong> {{ form.student_name }}</p>
+          <p><strong>Student ID:</strong> {{ form.student_id }}</p>
+          <p><strong>Term:</strong> {{ form.term }}</p>
+          <p><strong>Reason:</strong> {{ form.reason }}</p>
+          {% if form.documentation_file %}
+          <p>
+            <strong>Documentation:</strong>
+            <a href="{{ url_for('view_documentation', form_id=form.id) }}"
+              >View Documentation</a
+            >
+          </p>
+          {% endif %} {% elif form_type == 'student_drop' %}
+          <h4>Student Initiated Drop</h4>
+          <p><strong>Student:</strong> {{ form.student_name }}</p>
+          <p><strong>Student ID:</strong> {{ form.student_id }}</p>
+          <p>
+            <strong>Course:</strong> {{ form.course_name }} ({{ form.course_id
+            }})
+          </p>
+          <p><strong>Reason:</strong> {{ form.reason }}</p>
+
+          {% elif form_type == 'ferpa' %}
+          <h4>FERPA Request</h4>
+          <p><strong>Student:</strong> {{ form.student_name }}</p>
+          <p><strong>Student ID:</strong> {{ form.student_id }}</p>
+          <p>
+            <strong>Authorizing Release To:</strong> {{ form.authorized_name }}
+          </p>
+          <p><strong>Relationship:</strong> {{ form.relationship }}</p>
+
+          {% elif form_type == 'infochange' %}
+          <h4>Information Change Request</h4>
+          <p><strong>Student:</strong> {{ form.student_name }}</p>
+          <p><strong>Student ID:</strong> {{ form.student_id }}</p>
+          {% if form.change_type == 'name' %}
+          <p><strong>Change Type:</strong> Name Change</p>
+          <p><strong>Current Name:</strong> {{ form.current_name }}</p>
+          <p><strong>New Name:</strong> {{ form.new_name }}</p>
+          {% elif form.change_type == 'ssn' %}
+          <p><strong>Change Type:</strong> SSN Correction</p>
+          <p>
+            <strong>Current SSN:</strong> XXX-XX-{{ form.current_ssn[-4:] if
+            form.current_ssn else '' }}
+          </p>
+          <p>
+            <strong>New SSN:</strong> XXX-XX-{{ form.new_ssn[-4:] if
+            form.new_ssn else '' }}
+          </p>
+          {% endif %} {% endif %}
+
+          <p>
+            <strong>Submitted:</strong> {{ form.created_at.strftime('%Y-%m-%d
+            %H:%M') }}
+          </p>
+          <p>
+            <strong>Status:</strong>
+            <span
+              class="badge bg-{{ 'success' if form.status == 'approved' else 'warning' if form.status == 'pending' else 'danger' }}"
+              >{{ form.status.upper() }}</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- Workflow Info -->
+      <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+          <h4>Approval Workflow: {{ workflow.name }}</h4>
+        </div>
+        <div class="card-body">
+          <p>{{ workflow.description }}</p>
+
+          <!-- Progress Bar -->
+          <h5>Overall Progress</h5>
+          <div class="progress mb-4" style="height: 30px">
+            {% set completed = 0 %} {% for step in steps %} {% if step.status ==
+            'approved' %} {% set completed = completed + 1 %} {% endif %} {%
+            endfor %} {% set progress_percent = (completed / steps|length) * 100
+            %}
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              style="width: {{ progress_percent }}%;"
+              aria-valuenow="{{ progress_percent }}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              {{ completed }} / {{ steps|length }} steps completed
+            </div>
+          </div>
+
+          <!-- Timeline View -->
+          <h5>Approval Timeline</h5>
+          <div class="workflow-timeline">
+            <div class="timeline">
+              {% for step in steps %}
+              <div class="timeline-item">
+                <div
+                  class="timeline-marker {% if step.status == 'approved' %} bg-success {% elif step.status == 'rejected' %} bg-danger {% elif current_step and step.id == current_step.id %} bg-primary {% else %} bg-secondary {% endif %}"
+                ></div>
+                <div class="timeline-content">
+                  <div
+                    class="card mb-3 {% if step.status == 'approved' %} border-success {% elif step.status == 'rejected' %} border-danger {% elif current_step and step.id == current_step.id %} border-primary {% else %} border-secondary {% endif %}"
+                  >
+                    <div
+                      class="card-header {% if step.status == 'approved' %} bg-success text-white {% elif step.status == 'rejected' %} bg-danger text-white {% elif current_step and step.id == current_step.id %} bg-primary text-white {% else %} bg-light {% endif %}"
+                    >
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <h5 class="mb-0">
+                          Step {{ step.order }}: {{ step.name }}
+                        </h5>
+                        <span
+                          class="badge bg-{{ 'success' if step.status == 'approved' else 'danger' if step.status == 'rejected' else 'warning' }}"
+                        >
+                          {{ step.status.upper() }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <p>{{ step.description }}</p>
+
+                      {% if step.approver_role %}
+                      <p>
+                        <small
+                          ><strong>Approver Role:</strong> {{
+                          step.approver_role.name }}</small
+                        >
+                      </p>
+                      {% endif %} {% if step.department %}
+                      <p>
+                        <small
+                          ><strong>Department:</strong> {{ step.department.name
+                          }}</small
+                        >
+                      </p>
+                      {% endif %} {% if step.status != 'pending' %}
+                      <p>
+                        <small
+                          ><strong>{{ step.status.capitalize() }} on:</strong>
+                          {{ step.approval_date.strftime('%Y-%m-%d') }}</small
+                        >
+                      </p>
+                      {% endif %} {% if step.approvals %}
+                      <div class="mt-3">
+                        <h6>Approval Actions:</h6>
+                        <ul class="list-group">
+                          {% for approval in step.approvals %} {% if
+                          approval.approver_id != 0 %}
+                          <!-- Skip placeholder approvals -->
+                          <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                              <div>
+                                <span
+                                  class="badge bg-{{ 'success' if approval.status == 'approved' else 'danger' }}"
+                                >
+                                  {{ approval.status.upper() }}
+                                </span>
+                                by {{ approval.approver.name }} {% if
+                                approval.delegated_by %}
+                                <small
+                                  >(on behalf of {{ approval.delegated_by.name
+                                  }})</small
+                                >
+                                {% endif %}
+                              </div>
+                              <small
+                                >{{ approval.created_at.strftime('%Y-%m-%d
+                                %H:%M') }}</small
+                              >
+                            </div>
+                            {% if approval.comments %}
+                            <div class="mt-2">
+                              <small class="text-muted"
+                                ><strong>Comments:</strong> {{ approval.comments
+                                }}</small
+                              >
+                            </div>
+                            {% endif %}
+                          </li>
+                          {% endif %} {% endfor %}
+                        </ul>
+                      </div>
+                      {% endif %} {% if current_step and step.id ==
+                      current_step.id and step.status == 'pending' %}
+                      <div class="alert alert-info mt-2">
+                        <i class="fas fa-info-circle"></i> This step is
+                        currently awaiting approval.
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('status') }}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Status
+        </a>
+
+        {% if form.status == 'pending' %} {% if is_admin %}
+        <a
+          href="{{ url_for('approve_form', form_type=form_type, form_id=form.id) }}"
+          class="btn btn-primary"
+        >
+          <i class="fas fa-check-circle"></i> Review and Approve
+        </a>
+        {% endif %} {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Timeline styles */
+  .timeline {
+    position: relative;
+    padding-left: 50px;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 19px;
+    height: 100%;
+    width: 2px;
+    background: #ddd;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -50px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-top: 12px;
+  }
+
+  .timeline-content {
+    padding-left: 10px;
+  }
+</style>
+{% endblock %}

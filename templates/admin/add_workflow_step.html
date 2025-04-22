@@ -1,0 +1,136 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Add Approval Step</h1>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      Add Step to Workflow: {{ workflow.name }}
+    </div>
+    <div class="card-body">
+      <form
+        method="POST"
+        action="{{ url_for('add_workflow_step', workflow_id=workflow.id) }}"
+      >
+        <div class="mb-3">
+          <label for="name" class="form-label">Step Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+          />
+          <div class="form-text">
+            A descriptive name for this step (e.g., "Department Chair Approval")
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="2"
+          ></textarea>
+          <div class="form-text">
+            Optional description of this step's purpose
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="order" class="form-label">Order</label>
+          <input
+            type="number"
+            class="form-control"
+            id="order"
+            name="order"
+            value="{{ next_order }}"
+            min="1"
+            required
+          />
+          <div class="form-text">
+            The order in which this step occurs in the workflow (1, 2, 3, etc.)
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="approver_role_id" class="form-label">Approver Role</label>
+          <select
+            class="form-select"
+            id="approver_role_id"
+            name="approver_role_id"
+          >
+            <option value="">-- Any Role --</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}">{{ role.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            The role required to approve this step (optional)
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="org_unit_id" class="form-label"
+            >Organizational Unit</label
+          >
+          <select class="form-select" id="org_unit_id" name="org_unit_id">
+            <option value="">-- Any Unit --</option>
+            {% for unit in org_units %}
+            <option value="{{ unit.id }}">
+              {{ unit.name }} ({{ unit.code }})
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Restrict approvers to this organizational unit (optional)
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="department_id" class="form-label">Department</label>
+          <select class="form-select" id="department_id" name="department_id">
+            <option value="">-- Any Department --</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}">
+              {{ dept.name }} ({{ dept.code }})
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Restrict approvers to this department (optional)
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="min_approvers" class="form-label"
+            >Minimum Approvers</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="min_approvers"
+            name="min_approvers"
+            value="1"
+            min="1"
+            required
+          />
+          <div class="form-text">
+            The minimum number of approvals needed to complete this step
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a
+            href="{{ url_for('edit_workflow', workflow_id=workflow.id) }}"
+            class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">Add Step</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

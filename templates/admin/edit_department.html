@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Department</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Edit Department: {{ dept.name }}
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_department', dept_id=dept.id) }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Department Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ dept.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="code" class="form-label">Department Code</label>
+                    <input type="text" class="form-control" id="code" name="code" value="{{ dept.code }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="org_unit_id" class="form-label">Organizational Unit</label>
+                    <select class="form-select" id="org_unit_id" name="org_unit_id">
+                        <option value="">-- None --</option>
+                        {% for unit in org_units %}
+                            <option value="{{ unit.id }}" {% if dept.org_unit_id == unit.id %}selected{% endif %}>
+                                {{ unit.name }} ({{ unit.code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="active" name="active" {% if dept.active %}checked{% endif %}>
+                    <label class="form-check-label" for="active">Active</label>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_departments') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if dept.chairs %}
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            Department Chairs ({{ dept.chairs|length }})
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for chair in dept.chairs %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>{{ chair.user.first_name }} {{ chair.user.last_name }}</h5>
+                        <a href="{{ url_for('update_user', id=chair.user.id) }}" class="btn btn-sm btn-outline-primary">View User</a>
+                    </div>
+                    <p class="mb-1">Role: {{ chair.role.name }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

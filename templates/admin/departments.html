@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Departments Management</h1>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p>Manage departments for approval routing</p>
+    <a href="{{ url_for('add_department') }}" class="btn btn-primary"
+      >Add New Department</a
+    >
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">Departments</div>
+    <div class="card-body">
+      {% if departments %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Organizational Unit</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dept in departments %}
+          <tr>
+            <td>{{ dept.name }}</td>
+            <td>{{ dept.code }}</td>
+            <td>
+              {{ dept.organizational_unit.name if dept.organizational_unit else
+              'None' }}
+            </td>
+            <td>
+              {% if dept.active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <a
+                href="{{ url_for('edit_department', dept_id=dept.id) }}"
+                class="btn btn-sm btn-outline-primary"
+                >Edit</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No departments found. Add one to get started.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h3>Departments and Organizational Structure</h3>
+    <p>
+      Departments represent academic or administrative units within your
+      organizational structure. Each department can belong to an organizational
+      unit and can have its own approval workflows.
+    </p>
+    <p>
+      Department chairs and other approvers can be assigned to specific
+      departments to manage approvals for forms from students in those
+      departments.
+    </p>
+  </div>
+</div>
+{% endblock %}

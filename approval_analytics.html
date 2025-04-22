@@ -1,0 +1,109 @@
+{% extends "base.html" %} {% block title %}Approval Analytics{% endblock %} {%
+block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Approval Analytics</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Approval Status</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="approvalStatusChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Form Type Distribution</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="formTypeChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Approval Metrics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <h3>{{ approval_rate|default(0)|round(1) }}%</h3>
+              <p class="text-muted">Approval Rate</p>
+            </div>
+            <div class="col-md-4">
+              <h3>{{ approved_count|default(0) }}</h3>
+              <p class="text-muted">Approved Forms</p>
+            </div>
+            <div class="col-md-4">
+              <h3>{{ rejected_count|default(0) }}</h3>
+              <p class="text-muted">Rejected Forms</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Approval status chart
+      const statusCtx = document.getElementById('approvalStatusChart').getContext('2d');
+      new Chart(statusCtx, {
+          type: 'pie',
+          data: {
+              labels: ['Approved', 'Rejected'],
+              datasets: [{
+                  data: [{{ approved_count|default(0) }}, {{ rejected_count|default(0) }}],
+                  backgroundColor: ['#28a745', '#dc3545']
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false
+          }
+      });
+
+      // Form type chart
+      const formTypeCtx = document.getElementById('formTypeChart').getContext('2d');
+      new Chart(formTypeCtx, {
+          type: 'bar',
+          data: {
+              labels: [
+                  {% for form_type, count in form_type_counts.items() %}
+                      '{{ form_type }}',
+                  {% endfor %}
+              ],
+              datasets: [{
+                  label: 'Approvals',
+                  data: [
+                      {% for form_type, count in form_type_counts.items() %}
+                          {{ count }},
+                      {% endfor %}
+                  ],
+                  backgroundColor: '#007bff'
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+  });
+</script>
+{% endblock %}

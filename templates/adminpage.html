@@ -361,6 +361,12 @@
           <a href="/form_history"
             ><i class="fas fa-history"></i> Form History</a
           >
+          <a href="{{ url_for('admin_delegations') }}"
+            ><i class="fas fa-exchange-alt"></i> Delegations</a
+          >
+          <a href="{{ url_for('delegation_history') }}"
+            ><i class="fas fa-history"></i> Delegation History</a
+          >
           <a href="/profile" class="profile-link"
             ><i class="fas fa-user-circle"></i> My Profile</a
           >
@@ -382,6 +388,53 @@
 
     <!-- Main Content Container -->
     <div class="main-container">
+      <div class="admin-dashboard">
+        <div class="dashboard-section">
+          <h3>Organization Management</h3>
+          <div class="dashboard-links">
+            <a href="{{ url_for('admin_org_units') }}" class="dashboard-link">
+              <i class="fas fa-sitemap"></i>
+              <span>Organizational Units</span>
+            </a>
+            <a href="{{ url_for('admin_departments') }}" class="dashboard-link">
+              <i class="fas fa-building"></i>
+              <span>Departments</span>
+            </a>
+            <a href="{{ url_for('admin_org_chart') }}" class="dashboard-link">
+              <i class="fas fa-project-diagram"></i>
+              <span>Org Chart</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Workflow Management</h3>
+          <div class="dashboard-links">
+            <a href="{{ url_for('admin_workflows') }}" class="dashboard-link">
+              <i class="fas fa-route"></i>
+              <span>Approval Workflows</span>
+            </a>
+            <a href="{{ url_for('admin_delegations') }}" class="dashboard-link">
+              <i class="fas fa-exchange-alt"></i>
+              <span>Delegations</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Analytics & Reporting</h3>
+          <div class="dashboard-links">
+            <a
+              href="{{ url_for('approval_analytics') }}"
+              class="dashboard-link"
+            >
+              <i class="fas fa-chart-bar"></i>
+              <span>Approval Analytics</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <table>
         <thead>
           <tr>
