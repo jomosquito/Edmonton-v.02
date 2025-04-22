@@ -1442,6 +1442,10 @@ def loginadmin():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        email = request.form.get('email')
+        if not email.endswith('@cougarnet.uh.edu'):
+            flash('Only @cougarnet.uh.edu emails are allowed.', 'danger')
+            return render_template('log.html')
         first_name = request.form.get("first_name")
         pass_word = request.form.get("pass_word")
         user = Profile.query.filter_by(first_name=first_name).first()
@@ -1645,6 +1649,10 @@ def auth_step_two_callback():
         user = Profile.query.filter_by(email_=email).first()
 
         if not user:
+            # Ensure the email is a CougarNet account
+            if not email.endswith('@cougarnet.uh.edu'):
+                return "Account cannot be created. You need a CougarNet account.", 400
+
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
 
