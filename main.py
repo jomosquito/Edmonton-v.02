@@ -2498,7 +2498,7 @@ def download_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key(os.path.getctime))
+        latest_pdf = max(matching_files, key=os.path.getctime)
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database
