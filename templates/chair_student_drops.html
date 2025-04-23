@@ -350,7 +350,7 @@
 
                 <!-- Show approve/reject buttons - initially disabled -->
                 <form
-                  action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}"
+                  action="{{ url_for('simple_approve_withdrawal', request_id=request.id) }}"
                   method="post"
                   style="display: inline"
                 >
@@ -367,7 +367,7 @@
                 </form>
 
                 <form
-                  action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}"
+                  action="{{ url_for('simple_reject_medical_withdrawal', request_id=request.id) }}"
                   method="post"
                   style="display: inline"
                 >
@@ -438,7 +438,7 @@
 
                 <!-- Show approve/reject buttons - initially disabled -->
                 <form
-                  action="{{ url_for('approve_student_drop', request_id=request.id) }}"
+                  action="{{ url_for('simple_approve_student_drop', request_id=request.id) }}"
                   method="post"
                   style="display: inline"
                 >
@@ -455,7 +455,7 @@
                 </form>
 
                 <form
-                  action="{{ url_for('reject_student_drop', request_id=request.id) }}"
+                  action="{{ url_for('simple_reject_student_drop', request_id=request.id) }}"
                   method="post"
                   style="display: inline"
                 >
@@ -522,7 +522,7 @@
 
           <!-- Show approve/reject buttons -->
           <form
-            action="{{ url_for('approve_ferpa', request_id=request.id) }}"
+            action="{{ url_for('simple_approve_ferpa', request_id=request.id) }}"
             method="post"
             style="display: inline"
           >
@@ -535,7 +535,7 @@
           </form>
 
           <form
-            action="{{ url_for('reject_ferpa', request_id=request.id) }}"
+            action="{{ url_for('simple_reject_ferpa', request_id=request.id) }}"
             method="post"
             style="display: inline"
           >
@@ -598,7 +598,7 @@
 
           <!-- Show approve/reject buttons -->
           <form
-            action="{{ url_for('approve_infochange', request_id=request.id) }}"
+            action="{{ url_for('simple_approve_infochange', request_id=request.id) }}"
             method="post"
             style="display: inline"
           >
@@ -611,7 +611,7 @@
           </form>
 
           <form
-            action="{{ url_for('reject_infochange', request_id=request.id) }}"
+            action="{{ url_for('simple_reject_infochange', request_id=request.id) }}"
             method="post"
             style="display: inline"
           >
