@@ -360,6 +360,9 @@
                     id="approve-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
                     {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.admin_approvals and request.admin_approvals|from_json|length == 1 %}
+                    onclick="event.preventDefault(); alert('Form has already been approved by a chair. Please allow a president to submit the final approval'); return false;"
+                    {% endif %}
                     title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
                   >
                     <i class="fas fa-check"></i> Approve
@@ -448,6 +451,9 @@
                     id="approve-drop-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
                     {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.admin_approvals and request.admin_approvals|from_json|length == 1 %}
+                    onclick="event.preventDefault(); alert('Form has already been approved by a chair. Please allow a president to submit the final approval'); return false;"
+                    {% endif %}
                     title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}"
                   >
                     <i class="fas fa-check"></i> Approve
@@ -529,6 +535,9 @@
             <button type="submit" class="approve" id="approve-ferpa-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
                     {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.admin_approvals and request.admin_approvals|from_json|length == 1 %}
+                    onclick="event.preventDefault(); alert('Form has already been approved by a chair. Please allow a president to submit the final approval'); return false;"
+                    {% endif %}
                     title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
               <i class="fas fa-check"></i> Approve
             </button>
@@ -605,7 +614,11 @@
             <button type="submit" class="approve" id="approve-infochange-{{ request.id }}"
                     {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
                     {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.admin_approvals and request.admin_approvals|from_json|length == 1 %}
+                    onclick="event.preventDefault(); alert('Form has already been approved by a chair. Please allow a president to submit the final approval'); return false;"
+                    {% endif %}
                     title="{% if request.has_admin_approved(session.get('user_id')) %}You have already approved this request{% endif %}">
+                    
               <i class="fas fa-check"></i> Approve
             </button>
           </form>
