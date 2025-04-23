@@ -2315,7 +2315,7 @@ def approve_medical_withdrawal(request_id):
         flash(f'{role} approval recorded. Awaiting second approval.', 'success')
     
     db.session.commit()
-    return redirect(url_for('chair_student_drops'))
+    return redirect(url_for('notifications'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
 def reject_medical_withdrawal(request_id):
