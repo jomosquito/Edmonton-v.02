@@ -78,10 +78,21 @@ class Profile(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
+    
+    def has_role(self, role_name):
+        return any(role.role.name == role_name for role in self.user_roles)
 
     @property
     def is_department_chair(self):
         return any(role.role.name == "department_chair" for role in self.user_roles)
+    
+    @property
+    def is_admin(self):
+        return self.has_role('admin') or self.privilages_ == 'admin'
+    
+    @property
+    def can_approve_forms(self):
+        return self.is_admin or self.is_department_chair
 
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -142,6 +153,7 @@ class WithdrawalHistory(db.Model):
     action = db.Column(db.String(20))  # 'approved', 'rejected'
     comments = db.Column(db.Text)
     action_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
 
     # Relationships
     withdrawal = db.relationship('MedicalWithdrawalRequest', backref='history_entries')
@@ -1287,6 +1299,36 @@ def approve_ferpa(request_id):
     db.session.commit()
     return redirect(url_for('notifications'))
 
+@app.route('/simple_approve_ferpa/<int:request_id>', methods=['POST'])
+def simple_approve_ferpa(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    ferpa_request = FERPARequest.query.get_or_404(request_id)
+    
+    # Add admin to approvals list
+    if not ferpa_request.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(ferpa_request.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    ferpa_request.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        ferpa_request.status = 'approved'
+        flash('FERPA request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        ferpa_request.status = 'pending_approval'
+        flash('FERPA request has been partially approved. Awaiting second approval.', 'success')
+    
+    db.session.commit()
+    return redirect(url_for('chair_student_drops'))
+
 @app.route('/reject_ferpa/<int:request_id>', methods=['POST'])
 def reject_ferpa(request_id):
     user_id = session.get('user_id')
@@ -1316,6 +1358,20 @@ def reject_ferpa(request_id):
 
     flash('FERPA request rejected.', 'success')
     return redirect(url_for('notifications'))
+
+@app.route('/simple_reject_ferpa/<int:request_id>', methods=['POST'])
+def simple_reject_ferpa(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    ferpa_request = FERPARequest.query.get_or_404(request_id)
+    ferpa_request.status = 'rejected'
+
+    db.session.commit()
+
+    flash('FERPA request rejected.', 'success')
+    return redirect(url_for('chair_student_drops'))
 
 @app.route('/approve_infochange/<int:request_id>', methods=['POST'])
 def approve_infochange(request_id):
@@ -1373,6 +1429,36 @@ def approve_infochange(request_id):
     db.session.commit()
     return redirect(url_for('notifications'))
 
+@app.route('/simple_approve_infochange/<int:request_id>', methods=['POST'])
+def simple_approve_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
+    
+    # Add user to approvals list
+    if not infochange_request.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(infochange_request.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    infochange_request.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        infochange_request.status = 'approved'
+        flash('Name/SSN change request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        infochange_request.status = 'pending_approval'
+        flash('Name/SSN change request has been partially approved. Awaiting second approval.', 'success')
+
+    db.session.commit()
+    return redirect(url_for('chair_student_drops'))
+
 @app.route('/reject_infochange/<int:request_id>', methods=['POST'])
 def reject_infochange(request_id):
     user_id = session.get('user_id')
@@ -1402,6 +1488,20 @@ def reject_infochange(request_id):
 
     flash('Name/SSN change request rejected.', 'success')
     return redirect(url_for('notifications'))
+
+@app.route('/simple_reject_infochange/<int:request_id>', methods=['POST'])
+def simple_reject_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
+    infochange_request.status = 'rejected'
+
+    db.session.commit()
+
+    flash('Name/SSN change request rejected.', 'success')
+    return redirect(url_for('chair_student_drops'))
 
 # Add routes for marking FERPA and Name/SSN forms as viewed by admin
 @app.route('/mark_ferpa_viewed/<int:request_id>', methods=['POST'])
@@ -2148,24 +2248,27 @@ def approve_medical_withdrawal(request_id):
     if not user_id:
         return redirect(url_for('login'))
 
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
+    # Get current user with roles loaded
+    user = Profile.query.options(joinedload(Profile.user_roles)).get(user_id)
+    
+    # Check if user is either admin or department chair
+    if not (user.is_admin or user.is_department_chair):  # Using the property we defined earlier
         return "Unauthorized", 403
 
     req_record = MedicalWithdrawalRequest.query.get(request_id)
     if not req_record:
         return "Request not found", 404
 
-    # Check if admin has viewed the PDF
-    if not req_record.has_admin_viewed(user_id):
-        return "You must view the request PDF before approving", 400
+    # Check if user has viewed the PDF
+    #if not req_record.has_admin_viewed(user_id):
+        #return "You must view the request PDF before approving", 400
         
-    # Check if this admin has already approved
+    # Check if this user has already approved
     if req_record.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
 
-    # Add admin to approvals list
+    # Add user to approvals list
     if not req_record.admin_approvals:
         admin_approvals = [str(user_id)]
     else:
@@ -2175,7 +2278,7 @@ def approve_medical_withdrawal(request_id):
     
     req_record.admin_approvals = json.dumps(admin_approvals)
     
-    # Check if we now have 2 approvals, if so mark as fully approved
+    # Check if we now have 2 approvals
     if len(admin_approvals) >= 2:
         req_record.status = 'approved'
         
@@ -2187,7 +2290,8 @@ def approve_medical_withdrawal(request_id):
             withdrawal_id=request_id,
             admin_id=user_id,
             action='approved',
-            comments=comments
+            comments=comments,
+            
         )
         db.session.add(history_entry)
         
@@ -2197,23 +2301,21 @@ def approve_medical_withdrawal(request_id):
 
         # Store the PDF path
         if pdf_path:
-            # If this is the first generated PDF
             if not req_record.generated_pdfs:
                 req_record.generated_pdfs = json.dumps([pdf_path])
             else:
-                # Otherwise append to existing list
                 pdfs = json.loads(req_record.generated_pdfs)
                 pdfs.append(pdf_path)
                 req_record.generated_pdfs = json.dumps(pdfs)
                 
         flash('Medical withdrawal request has been fully approved.', 'success')
     else:
-        # Mark as partially approved
         req_record.status = 'pending_approval'
-        flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
+        role = 'Department Chair' if user.is_department_chair else 'Admin'
+        flash(f'{role} approval recorded. Awaiting second approval.', 'success')
     
     db.session.commit()
-    return redirect(url_for('notifications'))
+    return redirect(url_for('chair_student_drops'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
 def reject_medical_withdrawal(request_id):
@@ -2268,6 +2370,91 @@ def reject_medical_withdrawal(request_id):
         db.session.commit()
 
     return redirect(url_for('notifications'))
+
+@app.route('/simple_approve_withdrawal/<int:request_id>', methods=['POST'])
+def simple_approve_withdrawal(request_id):
+    """Basic approval endpoint that just records the approval"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    req_record = MedicalWithdrawalRequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+    
+    # Check if this request already has an approval
+    if req_record.admin_approvals:
+        existing_approvals = json.loads(req_record.admin_approvals)
+        if existing_approvals:  # If there's at least one approval already
+            flash('This request already has an approval and needs to be reviewed by someone else.', 'warning')
+            return redirect(url_for('chair_student_drops'))
+
+    # Check if this user has already approved
+    if req_record.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('chair_student_drops'))
+
+    # Add user to approvals list
+    if not req_record.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(req_record.admin_approvals)
+        admin_approvals.append(str(user_id))
+    
+    req_record.admin_approvals = json.dumps(admin_approvals)
+    req_record.status = 'approved'  # Immediately approve with single approval
+
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        req_record.status = 'approved'
+        flash('Request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        req_record.status = 'pending_approval'
+        flash('Request has been partially approved. Awaiting second approval.', 'success')
+    
+    # Create simple history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='approved',
+        comments='Approved via simple approval',
+        
+    )
+    db.session.add(history_entry)
+    
+    db.session.commit()
+    flash('Request approved successfully.', 'success')
+    return redirect(url_for('chair_student_drops'))  # Or wherever you want to redirect
+
+@app.route('/simple_reject_medical_withdrawal/<int:request_id>', methods=['POST'])
+def simple_reject_medical_withdrawal(request_id):
+    """Reject a medical withdrawal request"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    req_record = MedicalWithdrawalRequest.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Get comments from form
+    comments = request.form.get('comments', '')
+
+    # Create history record
+    history_entry = WithdrawalHistory(
+        withdrawal_id=request_id,
+        admin_id=user_id,
+        action='rejected',
+        comments=comments
+    )
+    db.session.add(history_entry)
+
+    # Change status to rejected
+    req_record.status = 'rejected'
+    db.session.commit()
+
+    return redirect(url_for('chair_student_drops'))
 
 @app.route('/download_pdf/<int:request_id>/<string:status>')
 def download_pdf(request_id, status):
@@ -2761,6 +2948,37 @@ def approve_student_drop(request_id):
     db.session.commit()
     return redirect(url_for('notifications'))
 
+@app.route('/simple_approve_student_drop/<int:request_id>', methods=['POST'])
+def simple_approve_student_drop(request_id):
+    """Approve a student-initiated drop request"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    req_record = StudentInitiatedDrop.query.get_or_404(request_id)
+    
+    # Add user to approvals list
+    if not req_record.admin_approvals:
+        admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(req_record.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+    
+    req_record.admin_approvals = json.dumps(admin_approvals)
+    
+    # Check if we now have 2 approvals, if so mark as fully approved
+    if len(admin_approvals) >= 2:
+        req_record.status = 'approved'
+        flash('Student drop request has been fully approved.', 'success')
+    else:
+        # Mark as partially approved
+        req_record.status = 'pending_approval'
+        flash('Student drop request has been partially approved. Awaiting second approval.', 'success')
+
+    db.session.commit()
+    return redirect(url_for('chair_student_drops'))
+
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
 def reject_student_drop(request_id):
     """Reject a student-initiated drop request and generate a PDF"""
@@ -2802,6 +3020,21 @@ def reject_student_drop(request_id):
         db.session.commit()
 
     return redirect(url_for('notifications'))
+
+@app.route('/simple_reject_student_drop/<int:request_id>', methods=['POST'])
+def simple_reject_student_drop(request_id):
+    """Reject a student-initiated drop request"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    req_record = StudentInitiatedDrop.query.get_or_404(request_id)
+
+    # Change status to rejected
+    req_record.status = 'rejected'
+    db.session.commit()
+
+    return redirect(url_for('chair_student_drops'))
 
 @app.route('/view-student-drop/<int:request_id>')
 def view_student_drop(request_id):
@@ -4454,4 +4687,6 @@ if __name__ == "__main__":
         initialize_roles_and_departments()
         initialize_organization_structure()  # Add the new initialization
     app.run(debug=True)
+
+
 
