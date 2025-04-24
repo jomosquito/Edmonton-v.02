@@ -8043,3 +8043,97 @@ drop_2_pending_20250424071355.log.
 2025-04-24 02:46:45,748 - INFO - 127.0.0.1 - - [24/Apr/2025 02:46:45] "GET /notifications HTTP/1.1" 200 -
 2025-04-24 02:46:46,087 - INFO - 127.0.0.1 - - [24/Apr/2025 02:46:46] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
 2025-04-24 02:46:46,089 - INFO - 127.0.0.1 - - [24/Apr/2025 02:46:46] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:02:19,917 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-24 04:02:19,918 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-24 04:02:19,919 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-24 04:02:19,919 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-24 04:02:19,919 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-24 04:02:19,923 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_1_pending_20250424090219.tex
+2025-04-24 04:02:19,923 - INFO - Replaced ##FORMID## with 1
+2025-04-24 04:02:19,924 - INFO - Replaced ##STATUS## with PENDING
+2025-04-24 04:02:19,924 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-24 04:02:19,924 - INFO - Replaced ##MYUHID## with 1
+2025-04-24 04:02:19,924 - DEBUG - Searching for pdflatex executable...
+2025-04-24 04:02:19,924 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-24 04:02:20,799 - INFO - Found pdflatex at: pdflatex
+2025-04-24 04:02:20,799 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-24 04:02:20,799 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_1_pending_20250424090219.tex
+2025-04-24 04:02:20,800 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_1_pending_20250424090219.tex
+2025-04-24 04:02:21,675 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:21] "POST /mark_student_drop_viewed/1 HTTP/1.1" 200 -
+2025-04-24 04:02:22,354 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:22] "[32mPOST /approve_student_drop/1 HTTP/1.1[0m" 302 -
+2025-04-24 04:02:22,678 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:22] "GET /notifications HTTP/1.1" 200 -
+2025-04-24 04:02:23,009 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:23] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:02:23,010 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:23] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:02:47,524 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:47] "[32mGET /adminpage HTTP/1.1[0m" 302 -
+2025-04-24 04:02:47,788 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:47] "GET /login HTTP/1.1" 200 -
+2025-04-24 04:02:50,744 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:50] "[32mGET /adminpage HTTP/1.1[0m" 302 -
+2025-04-24 04:02:51,059 - INFO - 127.0.0.1 - - [24/Apr/2025 04:02:51] "GET /login HTTP/1.1" 200 -
+2025-04-24 04:03:00,041 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:00] "GET /ap HTTP/1.1" 200 -
+2025-04-24 04:03:00,249 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:00] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:03:00,375 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:00] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:03:01,857 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:01] "[32mGET /adminpage HTTP/1.1[0m" 302 -
+2025-04-24 04:03:02,171 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:02] "GET /login HTTP/1.1" 200 -
+2025-04-24 04:03:06,219 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:06] "GET /profile HTTP/1.1" 200 -
+2025-04-24 04:03:09,511 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:09] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:03:18,983 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:18] "GET /ap HTTP/1.1" 200 -
+2025-04-24 04:03:19,345 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:19] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:03:19,346 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:19] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:03:21,338 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:21] "GET /adminpage HTTP/1.1" 200 -
+2025-04-24 04:03:21,693 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:21] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:03:21,693 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:21] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:03:27,751 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:27] "[32mGET /priv/2 HTTP/1.1[0m" 302 -
+2025-04-24 04:03:28,084 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:28] "GET /adminpage HTTP/1.1" 200 -
+2025-04-24 04:03:28,424 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:28] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:03:28,424 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:28] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:03:35,454 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:35] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:03:36,748 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:36] "GET /chair_student_drops HTTP/1.1" 200 -
+2025-04-24 04:03:37,072 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:37] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:03:37,077 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:37] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:03:42,335 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:42] "GET /status HTTP/1.1" 200 -
+2025-04-24 04:03:44,706 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:44] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-24 04:03:44,944 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:44] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-24 04:03:58,981 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:58] "[32mPOST /submit_student_drop HTTP/1.1[0m" 302 -
+2025-04-24 04:03:59,310 - INFO - 127.0.0.1 - - [24/Apr/2025 04:03:59] "GET /status HTTP/1.1" 200 -
+2025-04-24 04:04:01,521 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:01] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:04:03,799 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:03] "GET /chair_student_drops HTTP/1.1" 200 -
+2025-04-24 04:04:04,053 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:04] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:04:04,131 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:04] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:04:05,200 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-24 04:04:05,200 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-24 04:04:05,200 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-24 04:04:05,200 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-24 04:04:05,200 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-24 04:04:05,202 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_pending_20250424090405.tex
+2025-04-24 04:04:05,203 - INFO - Replaced ##FORMID## with 2
+2025-04-24 04:04:05,203 - INFO - Replaced ##STATUS## with PENDING
+2025-04-24 04:04:05,203 - INFO - Replaced ##FULLNAME## with jamascar@CougarNet.UH.EDU None
+2025-04-24 04:04:05,203 - INFO - Replaced ##MYUHID## with 2
+2025-04-24 04:04:05,203 - DEBUG - Searching for pdflatex executable...
+2025-04-24 04:04:05,203 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-24 04:04:05,483 - INFO - Found pdflatex at: pdflatex
+2025-04-24 04:04:05,484 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-24 04:04:05,484 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_pending_20250424090405.tex
+2025-04-24 04:04:05,485 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_2_pending_20250424090405.tex
+2025-04-24 04:04:07,480 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:07] "POST /mark_student_drop_viewed/2 HTTP/1.1" 200 -
+2025-04-24 04:04:08,203 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:08] "[32mPOST /approve_student_drop/2 HTTP/1.1[0m" 302 -
+2025-04-24 04:04:08,519 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:08] "GET /notifications HTTP/1.1" 200 -
+2025-04-24 04:04:08,860 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:08] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:04:08,861 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:08] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:04:11,600 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:11] "GET /ap HTTP/1.1" 200 -
+2025-04-24 04:04:11,942 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:11] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:04:11,944 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:11] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:04:17,437 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:17] "GET /notifications HTTP/1.1" 200 -
+2025-04-24 04:04:17,776 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:17] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:04:17,776 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:17] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:04:21,092 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:21] "GET /profile HTTP/1.1" 200 -
+2025-04-24 04:04:22,617 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:22] "GET /profile HTTP/1.1" 200 -
+2025-04-24 04:04:23,833 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:23] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:04:26,215 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:26] "GET /chair_student_drops HTTP/1.1" 200 -
+2025-04-24 04:04:26,546 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:26] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-24 04:04:26,547 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:26] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-24 04:04:32,912 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:32] "GET /profile HTTP/1.1" 200 -
+2025-04-24 04:04:36,102 - INFO - 127.0.0.1 - - [24/Apr/2025 04:04:36] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:05:48,710 - INFO - 127.0.0.1 - - [24/Apr/2025 04:05:48] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:05:52,876 - INFO - 127.0.0.1 - - [24/Apr/2025 04:05:52] "GET /profile HTTP/1.1" 200 -
+2025-04-24 04:05:55,882 - INFO - 127.0.0.1 - - [24/Apr/2025 04:05:55] "GET /userhompage HTTP/1.1" 200 -
+2025-04-24 04:06:11,651 - INFO - 127.0.0.1 - - [24/Apr/2025 04:06:11] "GET /delegate_chair HTTP/1.1" 200 -

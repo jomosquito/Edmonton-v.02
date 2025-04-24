@@ -191,11 +191,12 @@
           <a class="btn" href="/profile">View Profile</a>
           <a class="btn" href="/settings">Settings</a>
           <a class="btn" href="/">Logout</a>
-          {% if user.privilages_ == "admin" %}
+          {% if user.privilages_ == "admin" and not user.is_department_chair %}
           <a class="btn" href="/adminpage">Go to Admin Portal</a>
           {% endif %}
           {% if user.is_department_chair %}
           <a class="btn" href="/chair_student_drops">Go to Department Chair Portal</a>
+          <a class="btn" href="/delegate_chair">Delegate Chair Authority</a>
           {% endif %}
         </div>
         <div class="card">

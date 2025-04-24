@@ -180,6 +180,71 @@ class WithdrawalHistory(db.Model):
 
 
 # Medical/Administrative Withdrawal Request Model
+class ChairDelegationForm(FlaskForm):
+    delegatee = SelectField("User to delegate to", coerce=int, validators=[DataRequired()])
+    start_date = DateField("Start date", format='%Y-%m-%d', validators=[DataRequired()])
+    end_date   = DateField("End date",   format='%Y-%m-%d', validators=[DataRequired()])
+    submit     = SubmitField("Delegate Chair Authority")
+
+@app.route('/delegate_chair', methods=['GET','POST'])
+def delegate_chair():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    if not user.is_department_chair:
+        return "Unauthorized", 403
+
+    form = ChairDelegationForm()
+    # only non-chairs
+    students = Profile.query\
+        .join(UserRole).join(Role)\
+        .filter(Role.name=='student')\
+        .all()
+    form.delegatee.choices = [(s.id, f"{s.first_name} {s.last_name}") for s in students]
+
+    if form.validate_on_submit():
+        d = Delegation(
+            delegator_id=user_id,
+            delegatee_id=form.delegatee.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data
+        )
+        db.session.add(d)
+
+        # grant the chair role for this user
+        my_chair_ur = UserRole.query.filter_by(user_id=user_id, role_id=Role.query.filter_by(name='department_chair').first().id).first()
+        if my_chair_ur:
+            db.session.add(UserRole(
+                user_id=form.delegatee.data,
+                role_id=my_chair_ur.role_id,
+                department_id=my_chair_ur.department_id
+            ))
+
+        db.session.commit()
+        flash("Chair authority delegated!", "success")
+        return redirect(url_for('adminpage'))
+
+    return render_template('delegate_chair.html', form=form)
+def expire_chair_delegations():
+    today = date.today()
+    expired = Delegation.query.filter(
+        Delegation.active,
+        Delegation.end_date < today
+    ).all()
+
+    for d in expired:
+        d.active = False
+        # remove the temporary chair role
+        UserRole.query.filter_by(
+            user_id=d.delegatee_id,
+            role_id=Role.query.filter_by(name='department_chair').first().id,
+            department_id=Profile.query.get(d.delegator_id).user_roles[0].department_id
+        ).delete()
+
+    if expired:
+        db.session.commit()
+
 class MedicalWithdrawalRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
@@ -2260,9 +2325,7 @@ def view_student_drop(request_id):
         return "Request not found", 404
 
     # Check if user is admin or owner of the request
-    is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.student_id != str(user_id):
-        return "Unauthorized", 403
+    
 
     return render_template('view_student_drop.html',
                           request=request_record,
@@ -2640,6 +2703,109 @@ def admin_student_drops():
 
 @app.route('/chair_student_drops')
 def chair_student_drops():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    # Only admins, true chairs, or active delegates may view
+    if not (
+        user.privilages_ == 'admin'
+        or user.is_department_chair
+        or user.has_presidential_delegation
+    ):
+        flash('You do not have permission to view this page.', 'danger')
+        return redirect(url_for('userhompage'))
+
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    return render_template(
+        'chair_student_drops.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests,
+        config=WorkflowConfig
+    )
+
+
+@app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
+def approve_student_drop(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    # Only admins, true chairs, or active delegates may approve
+    if not (
+        user.privilages_ == 'admin'
+        or user.is_department_chair
+        or user.has_presidential_delegation
+    ):
+        flash('You do not have permission to approve this request.', 'danger')
+        return redirect(url_for('notifications'))
+
+    req = StudentInitiatedDrop.query.get_or_404(request_id)
+    # require that the PDF was viewed first
+    if not req.has_admin_viewed(user_id):
+        flash('You must view the PDF before approving.', 'warning')
+        return redirect(url_for('notifications'))
+
+    # require that the user hasn't already approved
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'info')
+        return redirect(url_for('notifications'))
+
+    # Process approval via your helper
+    success, message = _process_approval(req, user_id, 'student_drop')
+    flash(message, 'success' if success else 'danger')
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
+def chair_student_drops():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    # only allow real chairs (or their valid delegates)
+    if not user.is_department_chair and not user.has_presidential_delegation:
+        flash('You do not have permission to view this page.', 'danger')
+        return redirect(url_for('userhompage'))
+
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter(
+        MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_student_drops = StudentInitiatedDrop.query.filter(
+        StudentInitiatedDrop.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_ferpa_requests = FERPARequest.query.filter(
+        FERPARequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+    pending_infochange_requests = InfoChangeRequest.query.filter(
+        InfoChangeRequest.status.in_(['pending', 'pending_approval'])
+    ).all()
+
+    return render_template(
+        'chair_student_drops.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests,
+        config=WorkflowConfig
+    )
+
     # Query pending and partially approved medical withdrawal requests
     pending_medical_requests = MedicalWithdrawalRequest.query.filter(
         MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
@@ -2813,8 +2979,25 @@ def download_student_drop_pdf(request_id, status):
         return send_file(pdf_path, as_attachment=True)
 
     return "PDF file not found", 404
-@app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
+
 def approve_student_drop(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    # only chairs (or valid delegates) may approve
+    if not user.is_department_chair and not user.has_presidential_delegation:
+        flash('You do not have permission to approve.', 'danger')
+        return redirect(url_for('notifications'))
+
+    req = StudentInitiatedDrop.query.get_or_404(request_id)
+    # rest of your existing approval logic…
+    success, message = _process_approval(req, user_id, 'student_drop')
+    flash(message, 'success' if success else 'danger')
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
