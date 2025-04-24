@@ -668,6 +668,34 @@ class Delegation(db.Model):
         ).first()
         return delegation is not None
 
+def check_authorization(user_id, required_roles=None):
+    """
+    Check if a user has authorization based on either direct admin privileges
+    or relevant delegated roles.
+
+    Args:
+        user_id: The user ID to check
+        required_roles: List of role names that are authorized (optional)
+
+    Returns:
+        (user, is_authorized) tuple with the user object and boolean authorization status
+    """
+    user = Profile.query.get(user_id)
+    if not user:
+        return None, False
+
+    # Direct admin check
+    if user.privilages_ == 'admin':
+        return user, True
+
+    # Check delegated roles if specific roles are provided
+    if required_roles:
+        user_effective_roles = get_user_effective_roles(user_id)
+        if any(role in required_roles for role in user_effective_roles):
+            return user, True
+
+    return user, False
+
 def user_has_role(user_id, role_name):
     """Check if a user has a specific role, either directly or via delegation"""
     # First check direct role assignments
@@ -3035,19 +3063,22 @@ def download_student_drop_pdf(request_id, status):
     if not user_id:
         return redirect(url_for('login'))
 
-    user = Profile.query.get(user_id)
-    request_record = StudentInitiatedDrop.query.get(request_id)
+    # Check if user is authorized (admin, department_chair, or president)
+    user, is_authorized = check_authorization(
+        user_id,
+        required_roles=['department_chair', 'president']
+    )
 
+    request_record = StudentInitiatedDrop.query.get(request_id)
     if not request_record:
         return "Request not found", 404
 
-    # Check if user is admin or owner of the request
-    is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.student_id != str(user_id):
+    # Check if user is authorized or owner of the request
+    if not is_authorized and request_record.student_id != str(user_id):
         return "Unauthorized", 403
 
-    # If admin is viewing, mark as viewed
-    if is_admin:
+    # If authorized user is viewing, mark as viewed
+    if is_authorized:
         if not request_record.admin_viewed:
             admin_viewed = [str(user_id)]
         else:
@@ -3092,17 +3123,19 @@ def approve_student_drop(request_id):
     if not user_id:
         return redirect(url_for('login'))
 
-    user = Profile.query.get(user_id)
-    if not user:
-        return "User not found", 404
-
-    # Get user's roles
-    user_roles = [role.role.name for role in user.user_roles]
+    # Get the user's direct and delegated roles
+    user_roles = get_user_effective_roles(user_id)
 
     # Get workflow configuration
     workflow = WorkflowConfig.query.filter_by(form_type='student_drop').first()
     if not workflow:
         flash('No workflow configuration found for student drops.', 'error')
+        return redirect(url_for('notifications'))
+
+    # Check if user has any of the required roles
+    required_roles = json.loads(workflow.required_roles)
+    if not any(role in required_roles for role in user_roles):
+        flash('You do not have the required role to approve student drop requests.', 'error')
         return redirect(url_for('notifications'))
 
     # Check if user has any of the required roles
