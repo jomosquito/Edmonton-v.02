@@ -2082,12 +2082,14 @@ def auth_step_two_callback():
     if result:
         # Check if the user already exists in the database
         user = Profile.query.filter_by(email_=email).first()
-
+        if not email.endswith('@CougarNet.UH.EDU'):
+                return "Invalid email domain. Please use a CougarNet account.", 400
         if not user:
             # Ensure the email is a CougarNet account
 
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
+
 
             # Create a new profile
             user = Profile(
