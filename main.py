@@ -779,6 +779,7 @@ def delegations_page():
                           delegatable_roles=delegatable_roles,
                           my_delegations=my_delegations)
 
+
 @app.route('/create_delegation', methods=['POST'])
 def create_delegation():
     """Create a new delegation"""
@@ -1839,6 +1840,8 @@ def settings():
             db.session.commit()
         return redirect(url_for('settings'))
     return render_template('settings.html', user=user)
+
+
 
 @app.route('/reports')
 def reports():

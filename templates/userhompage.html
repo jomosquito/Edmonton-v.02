@@ -1,4 +1,3 @@
-ompage.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -262,6 +261,28 @@ ompage.html
       font-weight: 500;
     }
 
+    /* Admin card */
+    .admin-card {
+      background-color: #343a40;
+      color: white;
+    }
+
+    .admin-card h3 {
+      color: white;
+    }
+
+    .admin-card p {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .admin-card .btn {
+      background-color: #dc3545;
+    }
+
+    .admin-card .btn:hover {
+      background-color: #c82333;
+    }
+
     /* Responsive */
     @media (max-width: 992px) {
       .sidebar {
@@ -297,16 +318,13 @@ ompage.html
       <a href="/settings"><i class="fas fa-file-alt"></i> Request</a>
       <a href="/status"><i class="fas fa-tasks"></i> Request Statuses</a>
       {% if user.is_department_chair or 'department_chair' in delegated_roles %}
-        <div class="action-card">
-          <h3>Department Chair Portal</h3>
-          <p>Review and manage student requests as department chair.</p>
-          <a href="{{ url_for('chair_student_drops') }}" class="btn">
-            <i class="fas fa-university"></i> Go to Department Chair Portal
-          </a>
-        </div>
-        {% endif %}
+      <a href="/chair_student_drops"><i class="fas fa-university"></i> Department Chair Portal</a>
+      {% endif %}
       {% if user.is_president or 'president' in delegated_roles %}
       <a href="/president_portal"><i class="fas fa-landmark"></i> President Portal</a>
+      {% endif %}
+      {% if user.privilages_ == 'admin' %}
+      <a href="/ap"><i class="fas fa-shield-alt"></i> Admin Portal</a>
       {% endif %}
       <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
@@ -368,6 +386,17 @@ ompage.html
       </div>
       {% endif %}
 
+      <!-- Admin Portal Card (if admin) -->
+      {% if user.privilages_ == 'admin' %}
+      <div class="card action-card admin-card">
+        <h3>Admin Portal</h3>
+        <p>Access administrative functions to manage users and system settings.</p>
+        <a href="/ap" class="btn">
+          <i class="fas fa-shield-alt"></i> Go to Admin Portal
+        </a>
+      </div>
+      {% endif %}
+
       <!-- Profile Management Card -->
       <div class="card action-card">
         <h3>Manage Profile</h3>
@@ -376,17 +405,6 @@ ompage.html
           <i class="fas fa-user-edit"></i> Edit Profile
         </a>
       </div>
-
-      <!-- Role Delegation Card (if department chair or president) -->
-      {% if 'department_chair' in user.effective_roles or 'president' in user.effective_roles %}
-      <div class="card action-card">
-        <h3>Delegate Authority</h3>
-        <p>Temporarily delegate your approval authority to another user.</p>
-        <a href="/delegations" class="btn">
-          <i class="fas fa-exchange-alt"></i> Manage Delegations
-        </a>
-      </div>
-      {% endif %}
 
       <!-- Status Card -->
       <div class="card status-card">
