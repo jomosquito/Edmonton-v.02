@@ -676,6 +676,19 @@
       <section class="quick-actions">
         <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
         <div class="action-buttons">
+          {% with roles = [] %}
+            {% if user.user_roles %}
+              {% for ur in user.user_roles %}
+                {% set _ = roles.append(ur.role.name) %}
+              {% endfor %}
+            {% endif %}
+            {% if 'president' in roles %}
+              <a href="{{ url_for('delegate') }}" class="action-button">
+                <i class="fas fa-user-shield"></i>
+                <span>Delegate Authority</span>
+              </a>
+            {% endif %}
+          {% endwith %}
           <a href="/create" class="action-button">
             <i class="fas fa-user-plus"></i>
             <span>Add New User</span>

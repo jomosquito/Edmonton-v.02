@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, SubmitField, SelectMultipleField, BooleanField, TextAreaField, DateField, FileField
+from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, BooleanField, TextAreaField, DateField, FileField
 from wtforms.validators import DataRequired, Length, Email, Optional
 from O365 import Account
 from datetime import datetime, timedelta, date
@@ -64,6 +64,22 @@ def deserialize(flow_str):
     return json.loads(flow_str)
 
 # Updated Profile Model with new fields for optional token claims
+class DelegationForm(FlaskForm):
+    delegatee = SelectField("Chair to delegate to", coerce=int, validators=[DataRequired()])
+    start_date = DateField("Start date", format='%Y-%m-%d', validators=[DataRequired()])
+    end_date   = DateField("End date",   format='%Y-%m-%d', validators=[DataRequired()])
+    submit     = SubmitField("Delegate Authority")
+class Delegation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    delegator_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    delegatee_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    start_date   = db.Column(db.Date, nullable=False)
+    end_date     = db.Column(db.Date, nullable=False)
+    active       = db.Column(db.Boolean, default=True)
+
+    delegator = db.relationship('Profile', foreign_keys=[delegator_id], backref='delegations_given')
+    delegatee = db.relationship('Profile', foreign_keys=[delegatee_id], backref='delegations_received')
+
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=True)
@@ -88,7 +104,16 @@ class Profile(db.Model):
     @property
     def is_department_chair(self):
         return any(role.role.name == "department_chair" for role in self.user_roles)
-
+    @property
+    def has_presidential_delegation(self):
+        today = date.today()
+        return any(d.active and d.start_date <= today <= d.end_date for d in self.delegations_received)
+    @property
+    def is_admin_effective(self):
+         # treat “president” → admin and any delegated chair → admin for the window
+         base = self.privilages_ == 'admin'
+         chair_del = self.has_presidential_delegation
+         return base or chair_del
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -1425,6 +1450,67 @@ def admin():
 
     # Otherwise show login page
     return render_template('adminlogin.html')
+def expire_old_delegations():
+    today = date.today()
+    president_role = Role.query.filter_by(name='president').first()
+    if not president_role:
+        return
+
+    expired = Delegation.query.filter(
+        Delegation.active == True,
+        Delegation.end_date < today
+    ).all()
+
+    for d in expired:
+        d.active = False
+        # remove the temporary UserRole
+        ur = UserRole.query.filter_by(
+            user_id=d.delegatee_id,
+            role_id=president_role.id
+        ).first()
+        if ur:
+            db.session.delete(ur)
+
+    if expired:
+        db.session.commit()
+@app.route('/delegate', methods=['GET', 'POST'])
+def delegate():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user.is_admin_effective:
+        return "Unauthorized", 403
+
+    form = DelegationForm()
+    chairs = (
+        Profile.query
+        .join(UserRole).join(Role)
+        .filter(Role.name == 'department_chair')
+        .all()
+    )
+    form.delegatee.choices = [(c.id, f"{c.first_name} {c.last_name}") for c in chairs]
+
+    if form.validate_on_submit():
+        d = Delegation(
+            delegator_id=user_id,
+            delegatee_id=form.delegatee.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data
+        )
+        db.session.add(d)
+
+        president_role = Role.query.filter_by(name='president').first()
+        delegatee = Profile.query.get(form.delegatee.data)
+        if president_role and not any(ur.role_id == president_role.id for ur in delegatee.user_roles):
+            db.session.add(UserRole(user_id=delegatee.id, role_id=president_role.id))
+
+        db.session.commit()
+        flash("Authority delegated successfully!", "success")
+        return redirect(url_for('adminpage'))
+
+    return render_template('delegate.html', form=form)
 
 @app.route('/adminpage')
 def adminpage():
@@ -1453,7 +1539,7 @@ def adminpage():
         .joinedload(UserRole.department)
     ).all()
 
-    return render_template('adminpage.html', profiles=profiles)
+    return render_template('adminpage.html', profiles=profiles, user=user )
 
 @app.route('/a')
 def ad():
@@ -1556,6 +1642,25 @@ def activate(id):
 
 @app.route('/ap')
 def ap():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+
+  
+
+    return render_template(
+      'admin_dashboard.html',
+      profiles=Profile.query.all(),  # Fetch all profiles from the database
+      pending_medical_requests=MedicalWithdrawalRequest.query.filter_by(status='pending').all(),
+      pending_student_drops=StudentInitiatedDrop.query.filter_by(status='pending').all(),
+      pending_ferpa_requests=FERPARequest.query.filter_by(status='pending').all(),
+      pending_infochange_requests=InfoChangeRequest.query.filter_by(status='pending').all(),
+      now=datetime.utcnow(),
+      user=user        # ← make sure to pass this
+    )
+
     # Authentication check
     user_id = session.get('user_id')
     if not user_id:
@@ -1579,7 +1684,8 @@ def ap():
                 pending_student_drops=pending_student_drops,
                 pending_ferpa_requests=pending_ferpa_requests,
                 pending_infochange_requests=pending_infochange_requests,
-                now=now
+                now=now,
+                user=user 
             )
 
     # Regular database users

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Delegate Presidential Authority</h2>
+    
+    <form method="POST">
+        {{ form.csrf_token }}
+        
+        <div class="form-group">
+            <label>{{ form.delegatee.label }}</label>
+            {{ form.delegatee(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.start_date.label }}</label>
+            {{ form.start_date(class="form-control", type="date") }}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.end_date.label }}</label>
+            {{ form.end_date(class="form-control", type="date") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
+        <a href="{{ url_for('adminpage') }}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+{% endblock %}
