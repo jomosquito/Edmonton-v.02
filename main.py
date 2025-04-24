@@ -514,12 +514,26 @@ class WorkflowConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     form_type = db.Column(db.String(50), unique=True, nullable=False)
     required_approvers = db.Column(db.Integer, default=2)
+    required_roles = db.Column(db.Text, default='[]')  # JSON array of role names in order
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    @staticmethod
+    @staticmethod 
     def get_required_approvers(form_type):
         config = WorkflowConfig.query.filter_by(form_type=form_type).first()
-        return config.required_approvers if config else 1  # Default to 2 if not configured
+        return config.required_approvers if config else 2
+
+    @staticmethod
+    def get_required_roles(form_type):
+        config = WorkflowConfig.query.filter_by(form_type=form_type).first()
+        if config and config.required_roles:
+            return json.loads(config.required_roles)
+        return []
+
+    def is_approval_valid(self, approver_roles):
+        """Check if a set of approver roles satisfies the requirements"""
+        required = set(json.loads(self.required_roles))
+        provided = set(approver_roles)
+        return len(required.intersection(provided)) == len(required)
 
 class Department(db.Model):
     __tablename__ = 'departments'
@@ -538,17 +552,17 @@ class UserRole(db.Model):
     department = db.relationship('Department')
     user = db.relationship('Profile', back_populates='user_roles')
 
+def _process_approval(request, user_id, form_type):
+    """Process an approval for any form type using workflow configuration"""
+    if not request.has_admin_viewed(user_id):
+        return False, 'You must view the request PDF before approving'
+    
+    if request.has_admin_approved(user_id):
+        return False, 'You have already approved this request'
 
-@app.before_request
-def check_user_active():
-    user_id = session.get('user_id')
-    if user_id:
-        user = Profile.query.get(user_id)
-        if user and not user.active and user.privilages_ != 'admin':
-            session.clear()  # Clear session to prevent further access
-            return redirect(url_for('deactivated'))  # Redirect to a deactivated page
-
-
+    # Add admin to approvals list
+    if not request.admin_approvals:
+        admin_approvals = [str(user_id)]
 # -------------------------------
 # V3 Routes
 # -------------------------------
@@ -1126,83 +1140,10 @@ def approve_ferpa(request_id):
         return redirect(url_for('notifications'))
 
     req = FERPARequest.query.get_or_404(request_id)
-    if not req.has_admin_viewed(user_id):
-        flash('You must view the request PDF before approving.', 'danger')
-        return redirect(url_for('notifications'))
-    if req.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
+    success, message = _process_approval(req, user_id, 'ferpa')
+    flash(message, 'success' if success else 'danger')
 
-    approvals = json.loads(req.admin_approvals or '[]')
-    approvals.append(str(user_id))
-    req.admin_approvals = json.dumps(approvals)
-
-    required = WorkflowConfig.get_required_approvers('ferpa')
-    if len(approvals) >= required:
-        req.status = 'approved'
-        flash(f'FERPA request fully approved ({len(approvals)}/{required}).', 'success')
-    else:
-        req.status = 'pending_approval'
-        flash(f'FERPA request partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
-
-    viewed = json.loads(req.admin_viewed or '[]')
-    if str(user_id) not in viewed:
-        viewed.append(str(user_id))
-    req.admin_viewed = json.dumps(viewed)
-
-    db.session.commit()
-    return redirect(url_for('notifications'))
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    # Check if user is admin
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        flash('You do not have permission to approve requests.', 'danger')
-        return redirect(url_for('notifications'))
-
-    ferpa_request = FERPARequest.query.get_or_404(request_id)
-    
-    # Check if admin has viewed the PDF
-    if not ferpa_request.has_admin_viewed(user_id):
-        flash('You must view the request PDF before approving.', 'danger')
-        return redirect(url_for('notifications'))
-    
-    # Check if this admin has already approved
-    if ferpa_request.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
-    
-    # Add admin to approvals list
-    if not ferpa_request.admin_approvals:
-        admin_approvals = [str(user_id)]
-    else:
-        admin_approvals = json.loads(ferpa_request.admin_approvals)
-        if str(user_id) not in admin_approvals:
-            admin_approvals.append(str(user_id))
-    
-    ferpa_request.admin_approvals = json.dumps(admin_approvals)
-    
-    # Check if we now have 2 approvals, if so mark as fully approved
-    if len(admin_approvals) >= 2:
-        ferpa_request.status = 'approved'
-        flash('FERPA request has been fully approved.', 'success')
-    else:
-        # Mark as partially approved
-        ferpa_request.status = 'pending_approval'
-        flash('FERPA request has been partially approved. Awaiting second approval.', 'success')
-    
-    # Update the admin_viewed field as well
-    if hasattr(ferpa_request, 'admin_viewed'):
-        if not ferpa_request.admin_viewed:
-            admin_viewed = [str(user_id)]
-        else:
-            admin_viewed = json.loads(ferpa_request.admin_viewed)
-            if str(user_id) not in admin_viewed:
-                admin_viewed.append(str(user_id))
-        ferpa_request.admin_viewed = json.dumps(admin_viewed)
-
+    # Commit changes
     db.session.commit()
     return redirect(url_for('notifications'))
 
@@ -1248,84 +1189,10 @@ def approve_infochange(request_id):
         return redirect(url_for('notifications'))
 
     req = InfoChangeRequest.query.get_or_404(request_id)
-    if not req.has_admin_viewed(user_id):
-        flash('You must view the request PDF before approving.', 'danger')
-        return redirect(url_for('notifications'))
-    if req.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
+    success, message = _process_approval(req, user_id, 'info_change')
+    flash(message, 'success' if success else 'danger')
 
-    approvals = json.loads(req.admin_approvals or '[]')
-    approvals.append(str(user_id))
-    req.admin_approvals = json.dumps(approvals)
-
-    required = WorkflowConfig.get_required_approvers('info_change')
-    if len(approvals) >= required:
-        req.status = 'approved'
-        flash(f'Name/SSN change fully approved ({len(approvals)}/{required}).', 'success')
-    else:
-        req.status = 'pending_approval'
-        flash(f'Name/SSN change partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
-
-    viewed = json.loads(req.admin_viewed or '[]')
-    if str(user_id) not in viewed:
-        viewed.append(str(user_id))
-    req.admin_viewed = json.dumps(viewed)
-
-    db.session.commit()
-    return redirect(url_for('notifications'))
-
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    # Check if user is admin
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        flash('You do not have permission to approve requests.', 'danger')
-        return redirect(url_for('notifications'))
-
-    infochange_request = InfoChangeRequest.query.get_or_404(request_id)
-    
-    # Check if admin has viewed the PDF
-    if not infochange_request.has_admin_viewed(user_id):
-        flash('You must view the request PDF before approving.', 'danger')
-        return redirect(url_for('notifications'))
-    
-    # Check if this admin has already approved
-    if infochange_request.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
-    
-    # Add admin to approvals list
-    if not infochange_request.admin_approvals:
-        admin_approvals = [str(user_id)]
-    else:
-        admin_approvals = json.loads(infochange_request.admin_approvals)
-        if str(user_id) not in admin_approvals:
-            admin_approvals.append(str(user_id))
-    
-    infochange_request.admin_approvals = json.dumps(admin_approvals)
-    
-    # Check if we now have 2 approvals, if so mark as fully approved
-    if len(admin_approvals) >= 2:
-        infochange_request.status = 'approved'
-        flash('Name/SSN change request has been fully approved.', 'success')
-    else:
-        # Mark as partially approved
-        infochange_request.status = 'pending_approval'
-        flash('Name/SSN change request has been partially approved. Awaiting second approval.', 'success')
-    
-    # Update the admin_viewed field as well
-    if hasattr(infochange_request, 'admin_viewed'):
-        if not infochange_request.admin_viewed:
-            admin_viewed = [str(user_id)]
-        else:
-            admin_viewed = json.loads(infochange_request.admin_viewed)
-            if str(user_id) not in admin_viewed:
-                admin_viewed.append(str(user_id))
-        infochange_request.admin_viewed = json.dumps(admin_viewed)
-
+    # Commit changes
     db.session.commit()
     return redirect(url_for('notifications'))
 
@@ -1418,7 +1285,7 @@ def mark_infochange_viewed(request_id):
 
 @app.route('/workflow_settings', methods=['GET', 'POST'])
 def workflow_settings():
-    """Admin page to configure workflow settings like number of required approvers"""
+    """Admin page to configure workflow settings like number of required approvers and their roles"""
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
@@ -1432,12 +1299,19 @@ def workflow_settings():
         # Update workflow configs
         form_types = ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change']
         for form_type in form_types:
-            required_approvers = int(request.form.get(form_type, 2))
+            required_approvers = int(request.form.get(f"{form_type}_approvers", 2))
+            required_roles = request.form.getlist(f"{form_type}_roles")
+            
             config = WorkflowConfig.query.filter_by(form_type=form_type).first()
             if config:
                 config.required_approvers = required_approvers
+                config.required_roles = json.dumps(required_roles)
             else:
-                config = WorkflowConfig(form_type=form_type, required_approvers=required_approvers)
+                config = WorkflowConfig(
+                    form_type=form_type, 
+                    required_approvers=required_approvers,
+                    required_roles=json.dumps(required_roles)
+                )
                 db.session.add(config)
         
         db.session.commit()
@@ -1447,9 +1321,15 @@ def workflow_settings():
     # Get current configs
     configs = {}
     for config in WorkflowConfig.query.all():
-        configs[config.form_type] = config.required_approvers
+        configs[config.form_type] = {
+            'approvers': config.required_approvers,
+            'roles': json.loads(config.required_roles) if config.required_roles else []
+        }
+    
+    # Get all available roles for the form
+    roles = Role.query.all()
 
-    return render_template('workflow_settings.html', configs=configs)
+    return render_template('workflow_settings.html', configs=configs, roles=roles)
 
 # Update model methods to use configurable approver count
 def _is_fully_approved(model, form_type):
@@ -1787,6 +1667,8 @@ def auth_step_two_callback():
         user = Profile.query.filter_by(email_=email).first()
 
         if not user:
+            # Ensure the email is a CougarNet account
+            
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
 
@@ -1941,7 +1823,7 @@ def update_user(id):
 
 @app.route("/create", methods=["GET", "POST"])
 def create_profile():
-    if request.method == "POST":
+    if request.method ==     "POST":
         password = request.form.get("pass_word")
         if not password:
             return "Password is required", 400
@@ -2094,7 +1976,7 @@ def submit_medical_withdrawal():
             gi_bill=(request.form.get('gi_bill') == 'yes'),
             courses=json.dumps(courses),
             initial=request.form.get('initial'),
-            signature=signature,  # This can now be None or a path or text
+            signature=signature,
             signature_date=datetime.strptime(request.form.get('signature_date'), '%Y-%m-%d'),
             documentation_files=json.dumps(documentation_files) if documentation_files else None,
             status='pending' if request.form.get('action') == 'submit' else 'draft'
@@ -2170,7 +2052,7 @@ def approve_medical_withdrawal(request_id):
     if req_record.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
-    
+
     # Add admin to approvals list
     if not req_record.admin_approvals:
         admin_approvals = [str(user_id)]
@@ -2181,11 +2063,9 @@ def approve_medical_withdrawal(request_id):
     
     req_record.admin_approvals = json.dumps(admin_approvals)
     
-    # Get required number of approvers from workflow config
-    required_approvers = WorkflowConfig.get_required_approvers('medical_withdrawal')
-    
-    # Check if we have enough approvals based on workflow config
-    if len(admin_approvals) >= required_approvers:
+    # Update status based on workflow config
+    required = WorkflowConfig.get_required_approvers('medical_withdrawal')
+    if len(admin_approvals) >= required:
         req_record.status = 'approved'
         
         # Get comments from form
@@ -2221,6 +2101,12 @@ def approve_medical_withdrawal(request_id):
         req_record.status = 'pending_approval'
         flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
 
+    # Mark as viewed if not already
+    viewed = json.loads(req_record.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    req_record.admin_viewed = json.dumps(viewed)
+
     db.session.commit()
     return redirect(url_for('notifications'))
 
@@ -2242,18 +2128,6 @@ def reject_medical_withdrawal(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before rejecting", 400
-
-    # Get comments from form
-    comments = request.form.get('comments', '')
-
-    # Create history record
-    history_entry = WithdrawalHistory(
-        withdrawal_id=request_id,
-        admin_id=user_id,
-        action='rejected',
-        comments=comments
-    )
-    db.session.add(history_entry)
 
     # Change status to rejected
     req_record.status = 'rejected'
@@ -2277,6 +2151,27 @@ def reject_medical_withdrawal(request_id):
         db.session.commit()
 
     return redirect(url_for('notifications'))
+
+@app.route('/view-student-drop/<int:request_id>')
+def view_student_drop(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    request_record = StudentInitiatedDrop.query.get(request_id)
+
+    if not request_record:
+        return "Request not found", 404
+
+    # Check if user is admin or owner of the request
+    is_admin = user.privilages_ == 'admin'
+    if not is_admin and request_record.student_id != str(user_id):
+        return "Unauthorized", 403
+
+    return render_template('view_student_drop.html',
+                          request=request_record,
+                          is_admin=is_admin)
 
 @app.route('/download_pdf/<int:request_id>/<string:status>')
 def download_pdf(request_id, status):
@@ -2488,7 +2383,7 @@ def form_history():
             'original_request': req  # Keep reference if needed
         })
 
-    # Process Student Drop Requests
+    # Process Student Drops
     student_drops = StudentInitiatedDrop.query.filter(
         StudentInitiatedDrop.status.in_(['approved', 'rejected'])
     ).all()
@@ -2706,166 +2601,65 @@ def mark_student_drop_viewed(request_id):
     db.session.commit()
 
     return {"success": True}
-
-@app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
-def approve_student_drop(request_id):
+@app.route('/student_initiated_drop')
+def student_initiated_drop():
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
-
-    req = StudentInitiatedDrop.query.get_or_404(request_id)
-    if not req.has_admin_viewed(user_id):
-        return "You must view the PDF before approving", 400
-    if req.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
-
-    approvals = json.loads(req.admin_approvals or '[]')
-    approvals.append(str(user_id))
-    req.admin_approvals = json.dumps(approvals)
-
-    required = WorkflowConfig.get_required_approvers('student_drop')
-    if len(approvals) >= required:
-        req.status = 'approved'
-        flash(f'Student drop fully approved ({len(approvals)}/{required}).', 'success')
-    else:
-        req.status = 'pending_approval'
-        flash(f'Student drop partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
-
-    db.session.commit()
-    return redirect(url_for('notifications'))
-
-    """Approve a student-initiated drop request and generate a PDF"""
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
-
-    req_record = StudentInitiatedDrop.query.get(request_id)
-    if not req_record:
-        return "Request not found", 404
-
-    # Check if admin has viewed the PDF
-    if not req_record.has_admin_viewed(user_id):
-        return "You must view the request PDF before approving", 400
+    # Add today's date for the form
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    return render_template('student_initiated_drop.html', user=user, today_date=today_date)
+def _process_approval(request, user_id, form_type):
+    """Process an approval for any form type using workflow configuration"""
+    if not request.has_admin_viewed(user_id):
+        return False, 'You must view the request PDF before approving'
     
-    # Check if this admin has already approved
-    if req_record.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
-    
+    if request.has_admin_approved(user_id):
+        return False, 'You have already approved this request'
+
     # Add admin to approvals list
-    if not req_record.admin_approvals:
+    if not request.admin_approvals:
         admin_approvals = [str(user_id)]
     else:
-        admin_approvals = json.loads(req_record.admin_approvals)
+        admin_approvals = json.loads(request.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
     
-    req_record.admin_approvals = json.dumps(admin_approvals)
+    request.admin_approvals = json.dumps(admin_approvals)
     
-    # Get required number of approvers from workflow config
-    required_approvers = WorkflowConfig.get_required_approvers('student_drop')
+    # Get workflow configuration
+    workflow = WorkflowConfig.query.filter_by(form_type=form_type).first()
+    if not workflow:
+        return False, f'No workflow configuration found for {form_type}'
     
-    # Check if we have enough approvals based on workflow config
-    if len(admin_approvals) >= required_approvers:
-        req_record.status = 'approved'
+    # Get user's roles
+    user = Profile.query.get(user_id)
+    if not user:
+        return False, 'User not found'
         
-        # Generate PDF with the updated function
-        from pdf_utils import generate_student_drop_pdf
-        pdf_path = generate_student_drop_pdf(req_record)
-
-        # Store the PDF path in the request record
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-                
-        flash('Student drop request has been fully approved.', 'success')
+    user_roles = [role.role.name for role in user.user_roles]
+    
+    # Check if user has required role from workflow
+    required_roles = json.loads(workflow.required_roles)
+    if not any(role in required_roles for role in user_roles):
+        return False, 'You do not have the required role to approve this request'
+    
+    # Update status based on workflow config
+    if len(admin_approvals) >= workflow.required_approvers:
+        request.status = 'approved'
+        message = f'{form_type.replace("_", " ").title()} request has been fully approved.'
     else:
-        # Mark as partially approved
-        req_record.status = 'pending_approval'
-        flash('Student drop request has been partially approved. Awaiting additional approval.', 'success')
+        request.status = 'pending_approval'
+        message = f'{form_type.replace("_", " ").title()} request has been partially approved. Awaiting additional approvals.'
 
-    db.session.commit()
-    return redirect(url_for('notifications'))
+    # Mark as viewed if not already
+    viewed = json.loads(request.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    request.admin_viewed = json.dumps(viewed)
 
-@app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
-def reject_student_drop(request_id):
-    """Reject a student-initiated drop request and generate a PDF"""
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
-
-    req_record = StudentInitiatedDrop.query.get(request_id)
-    if not req_record:
-        return "Request not found", 404
-
-    # Check if admin has viewed the PDF
-    if not req_record.has_admin_viewed(user_id):
-        return "You must view the request PDF before rejecting", 400
-
-    # Change status to rejected
-    req_record.status = 'rejected'
-    db.session.commit()
-
-    # Generate PDF with the updated function
-    from pdf_utils import generate_student_drop_pdf
-    pdf_path = generate_student_drop_pdf(req_record)
-
-    # Store the PDF path in the request record
-    if pdf_path:
-        # If this is the first generated PDF
-        if not req_record.generated_pdfs:
-            req_record.generated_pdfs = json.dumps([pdf_path])
-        else:
-            # Otherwise append to existing list
-            pdfs = json.loads(req_record.generated_pdfs)
-            pdfs.append(pdf_path)
-            req_record.generated_pdfs = json.dumps(pdfs)
-
-        db.session.commit()
-
-    return redirect(url_for('notifications'))
-
-@app.route('/view-student-drop/<int:request_id>')
-def view_student_drop(request_id):
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    user = Profile.query.get(user_id)
-    request_record = StudentInitiatedDrop.query.get(request_id)
-
-    if not request_record:
-        return "Request not found", 404
-
-    # Check if user is admin or owner of the request
-    is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.student_id != str(user_id):
-        return "Unauthorized", 403
-
-    return render_template('view_student_drop.html',
-                          request=request_record,
-                          is_admin=is_admin)
-
-
+    return True, message
 @app.route('/download_student_drop_pdf/<int:request_id>/<string:status>')
 def download_student_drop_pdf(request_id, status):
     """Download a generated PDF for a student drop request"""
@@ -2924,17 +2718,123 @@ def download_student_drop_pdf(request_id, status):
         return send_file(pdf_path, as_attachment=True)
 
     return "PDF file not found", 404
-
-@app.route('/student_initiated_drop')
-def student_initiated_drop():
+@app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
+def approve_student_drop(request_id):
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    user = Profile.query.get(user_id)
-    # Add today's date for the form
-    today_date = datetime.now().strftime('%Y-%m-%d')
-    return render_template('student_initiated_drop.html', user=user, today_date=today_date)
 
+    user = Profile.query.get(user_id)
+    if not user:
+        return "User not found", 404
+        
+    # Get user's roles
+    user_roles = [role.role.name for role in user.user_roles]
+    
+    # Get workflow configuration
+    workflow = WorkflowConfig.query.filter_by(form_type='student_drop').first()
+    if not workflow:
+        flash('No workflow configuration found for student drops.', 'error')
+        return redirect(url_for('notifications'))
+        
+    # Check if user has any of the required roles
+    required_roles = json.loads(workflow.required_roles)
+    if not any(role in required_roles for role in user_roles):
+        flash('You do not have the required role to approve student drop requests.', 'error')
+        return redirect(url_for('notifications'))
+
+    req = StudentInitiatedDrop.query.get_or_404(request_id)
+    
+    # Check if admin has viewed the PDF
+    if not req.has_admin_viewed(user_id):
+        return "You must view the PDF before approving", 400
+        
+    # Check if this admin has already approved
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+
+    success, message = _process_approval(req, user_id, 'student_drop')
+    flash(message, 'success' if success else 'danger')
+    
+    db.session.commit()
+    return redirect(url_for('notifications'))
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req = StudentInitiatedDrop.query.get_or_404(request_id)
+    if not req.has_admin_viewed(user_id):
+        return "You must view the PDF before approving", 400
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+
+    approvals = json.loads(req.admin_approvals or '[]')
+    approvals.append(str(user_id))
+    req.admin_approvals = json.dumps(approvals)
+
+    required = WorkflowConfig.get_required_approvers('student_drop')
+    if len(approvals) >= required:
+        req.status = 'approved'
+        flash(f'Student drop fully approved ({len(approvals)}/{required}).', 'success')
+    else:
+        req.status = 'pending_approval'
+        flash(f'Student drop partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
+
+    viewed = json.loads(req.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    req.admin_viewed = json.dumps(viewed)
+
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
+@app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
+def reject_student_drop(request_id):
+    """Reject a student-initiated drop request and generate a PDF"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req_record = StudentInitiatedDrop.query.get(request_id)
+    if not req_record:
+        return "Request not found", 404
+
+    # Check if admin has viewed the PDF
+    if not req_record.has_admin_viewed(user_id):
+        return "You must view the request PDF before rejecting", 400
+
+    # Change status to rejected
+    req_record.status = 'rejected'
+    db.session.commit()
+
+    # Generate PDF with the updated function
+    from pdf_utils import generate_student_drop_pdf
+    pdf_path = generate_student_drop_pdf(req_record)
+
+    # Store the PDF path in the request record
+    if pdf_path:
+        # If this is the first generated PDF
+        if not req_record.generated_pdfs:
+            req_record.generated_pdfs = json.dumps([pdf_path])
+        else:
+            # Otherwise append to existing list
+            pdfs = json.loads(req_record.generated_pdfs)
+            pdfs.append(pdf_path)
+            req_record.generated_pdfs = json.dumps(pdfs)
+
+        db.session.commit()
+
+    return redirect(url_for('notifications'))
 
 @app.route('/drafts')
 def drafts():

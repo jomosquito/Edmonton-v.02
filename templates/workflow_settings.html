@@ -3,41 +3,92 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Workflow Settings</h2>
-    <div class="card">
-        <div class="card-body">
-            <form method="POST">
-                <div class="mb-4">
-                    <h4>Required Approvers Configuration</h4>
-                    <p class="text-muted">Set the number of approvers required for each form type</p>
-                    
-                    <div class="mb-3">
-                        <label for="medical_withdrawal" class="form-label">Medical Withdrawal Forms</label>
-                        <input type="number" class="form-control" id="medical_withdrawal" name="medical_withdrawal" 
-                               min="1" max="10" value="{{ configs.get('medical_withdrawal', 2) }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="student_drop" class="form-label">Student Drop Forms</label>
-                        <input type="number" class="form-control" id="student_drop" name="student_drop" 
-                               min="1" max="10" value="{{ configs.get('student_drop', 2) }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="ferpa" class="form-label">FERPA Forms</label>
-                        <input type="number" class="form-control" id="ferpa" name="ferpa" 
-                               min="1" max="10" value="{{ configs.get('ferpa', 2) }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="info_change" class="form-label">Name/SSN Change Forms</label>
-                        <input type="number" class="form-control" id="info_change" name="info_change" 
-                               min="1" max="10" value="{{ configs.get('info_change', 2) }}" required>
-                    </div>
+    <form method="POST">
+        {% for form_type in ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change'] %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>{{ form_type|replace('_', ' ')|title }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ form_type }}_approvers">Number of Required Approvers:</label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="{{ form_type }}_approvers" 
+                           name="{{ form_type }}_approvers" 
+                           value="{{ configs[form_type]['approvers'] if form_type in configs else 2 }}"
+                           min="1" 
+                           max="5">
                 </div>
-
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
+                
+                <!-- Dynamic role selection based on number of approvers -->
+                <div id="{{ form_type }}_roles_container" class="mt-3">
+                    {% set num_approvers = configs[form_type]['approvers'] if form_type in configs else 2 %}
+                    {% for i in range(num_approvers) %}
+                    <div class="form-group mt-2">
+                        <label>Approver #{{ i + 1 }} Role:</label>
+                        <select class="form-control" name="{{ form_type }}_roles">
+                            {% for role in roles %}
+                            <option value="{{ role.name }}" 
+                                    {% if form_type in configs and configs[form_type]['roles'][i] == role.name %}selected{% endif %}>
+                                {{ role.name|replace('_', ' ')|title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-    </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to number inputs
+    ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change'].forEach(formType => {
+        const numInput = document.getElementById(`${formType}_approvers`);
+        numInput.addEventListener('change', function() {
+            updateRoleSelects(formType, this.value);
+        });
+    });
+});
+
+function updateRoleSelects(formType, count) {
+    const container = document.getElementById(`${formType}_roles_container`);
+    const roleOptions = Array.from(container.querySelector('select').options).map(opt => {
+        return {value: opt.value, text: opt.text};
+    });
+    
+    // Clear existing role selects
+    container.innerHTML = '';
+    
+    // Create new role selects based on count
+    for (let i = 0; i < count; i++) {
+        const div = document.createElement('div');
+        div.className = 'form-group mt-2';
+        
+        const label = document.createElement('label');
+        label.textContent = `Approver #${i + 1} Role:`;
+        
+        const select = document.createElement('select');
+        select.className = 'form-control';
+        select.name = `${formType}_roles`;
+        
+        roleOptions.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.text = opt.text;
+            select.appendChild(option);
+        });
+        
+        div.appendChild(label);
+        div.appendChild(select);
+        container.appendChild(div);
+    }
+}
+</script>
 {% endblock %}

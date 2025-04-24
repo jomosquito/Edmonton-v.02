@@ -1,0 +1,103 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{ifthen}
+\usepackage{amssymb}
+\usepackage{pifont}
+
+% Define CheckedBox command
+\newcommand{\CheckedBox}[1]{%
+  \ifthenelse{\equal{#1}{yes}}{$\boxtimes$}{$\square$}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+\textbf{Name and/or Social Security Number Change}\\
+University of Houston | Office of the University Registrar\\
+Houston, Texas 77204-2027 | (713) 743-1010, option 7
+\end{center}
+
+\vspace{1em}
+\noindent\begin{tabular}{@{}p{0.5\textwidth}p{0.5\textwidth}@{}}
+Student Name (as listed on university record) & myUH ID Number\\
+jamascar@Cou & 333333\\
+\end{tabular}
+
+\vspace{1em}
+\noindent\textbf{*What are you requesting to add or update?}\\
+\begin{itemize}[leftmargin=0.7cm]
+	\item \CheckedBox{no} Update Name (Complete Section A)
+	\item \CheckedBox{yes} Update/Add Social Security Number (Complete Section B)
+\end{itemize}
+
+\vspace{1em}
+\noindent\textbf{Section A: Student Name Change}\\
+The University of Houston record of your name was originally taken from your application for admission and may be changed if:
+\begin{enumerate}
+\item You have married, remarried, or divorced (a copy of marriage license or portion of divorce decree indicating new name must be provided)
+\item You have changed your name by court order (a copy of the court order must be provided)
+\item Your legal name is listed incorrectly and satisfactory evidence exists for its correction (driver license, state ID, birth certificate, valid passport, etc., must be provided)
+\end{enumerate}
+
+\noindent\textbf{NOTE:} A request to omit a first or middle name or to reverse the order of the first and middle names cannot be honored unless accompanied by appropriate documentation. All documents must also be submitted with a valid government-issued photo ID (such as a driver license, passport, or military ID).
+
+\vspace{1em}
+\noindent Please print and complete the following information:\\
+I request that my legal name be changed and reflected on University of Houston records as listed below:
+
+\vspace{0.5em}
+\noindent\begin{tabular}{@{}p{0.15\textwidth}p{0.35\textwidth}|p{0.15\textwidth}p{0.35\textwidth}@{}}
+FROM: & & TO: & \\
+First name & \makebox[4cm][l]{\textbf{jamascar@CougarNet.UH.EDU}} \underline{\hspace{4cm}} & First name & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} \\
+Middle name & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} & Middle name & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} \\
+Last name & \makebox[4cm][l]{\textbf{None}} \underline{\hspace{4cm}} & Last name & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} \\
+Suffix & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} & Suffix & \makebox[4cm][l]{\textbf{}} \underline{\hspace{4cm}} \\
+\end{tabular}
+
+\vspace{1em}
+Check reason for name change request:
+\begin{itemize}[leftmargin=0.7cm]
+	\item \CheckedBox{no} Marriage/Divorce
+	\item \CheckedBox{no} Court Order
+	\item \CheckedBox{no} Correction of Error
+\end{itemize}
+
+\vspace{1em}
+\noindent\textbf{Section B: Student Social Security Number Change}\\
+The University of Houston record of your Social Security Number was originally taken from your application for admission and may be changed only if the student has obtained a new social security number or an error was made. In either case, the student must provide a copy of the Social Security Card. The Social Security card must include the student's signature and must be submitted with a valid government-issued photo ID (such as a driver license, passport, or military ID).
+
+\vspace{1em}
+\noindent Please print and complete the following information: I request that my Social Security Number be changed and reflected on University of Houston records as listed below:
+
+\vspace{0.5em}
+\noindent FROM: 3333
+
+\vspace{0.5em}
+\noindent TO: 3333
+
+\vspace{0.5em}
+\begin{itemize}[leftmargin=0.7cm]
+	\item \CheckedBox{yes} Marriage/Divorce
+	\item \CheckedBox{no} Court Order
+\end{itemize}
+
+\vspace{1em}
+\noindent I authorize the University of Houston Main Campus to make the updates/changes to my student record as requested above.
+
+\vspace{1em}
+\noindent\textbf{*SIGNATURE (REQUIRED)} \includegraphics[width=5cm]{static/uploads/signatures/70d50f3d-f228-4922-a152-5431b1a5d776.jpg} Date 2025-04-24
+
+\vspace{1em}
+\footnotesize{*State law requires that you be informed of the following: (1) with few exceptions, you are entitled on request to be informed about the information the University collects about you by use of this form; (2) under sections 552.021 and 552.023 of the Government Code, you are entitled to receive and review the information; and (3) under section 559.004 of the Government Code, you are entitled to have the University correct information about you that is incorrect.}
+
+\end{document}
