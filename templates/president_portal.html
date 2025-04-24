@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>President Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_navbar.css') }}"
+    />
+    <style>
+      /* Page background styling */
+      body {
+        background-color: #f4f4f4;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2575fc;
+      }
+
+      .section-header {
+        background: linear-gradient(90deg, #2575fc, #6a11cb);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin: 20px 0 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      table th,
+      table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      table th {
+        background-color: #f2f2f2;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+
+      .btn.approve {
+        background-color: #28a745;
+      }
+
+      .btn.approve:hover {
+        background-color: #218838;
+      }
+
+      .btn.reject {
+        background-color: #dc3545;
+      }
+
+      .btn.reject:hover {
+        background-color: #c82333;
+      }
+
+      .btn.view {
+        background-color: #17a2b8;
+      }
+
+      .btn.view:hover {
+        background-color: #138496;
+      }
+
+      .no-requests {
+        text-align: center;
+        padding: 20px;
+        color: #888;
+      }
+
+      /* Status styling */
+      .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .pending {
+        background-color: #ffc107;
+        color: #212529;
+      }
+
+      .pending_approval {
+        background-color: #fd7e14;
+        color: white;
+      }
+
+      .approved {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .rejected {
+        background-color: #dc3545;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="admin-navbar">
+      <div class="nav-container">
+        <div class="top-bar">
+          <a href="/userhompage" class="logo">
+            <i class="fas fa-university"></i> President Portal
+          </a>
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <div class="nav-links">
+          <a href="/userhompage"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="/status"><i class="fas fa-list-check"></i> My Requests</a>
+          <a href="/president_portal" class="active"><i class="fas fa-check-double"></i> Approvals</a>
+          <a href="/profile" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
+          <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Rest of the content -->
+    <div class="container">
+      <h1>President Approval Portal</h1>
+
+      <!-- Student Drop Requests Section -->
+      <div class="section-header">
+        <h2>Student Drop Requests</h2>
+      </div>
+
+      {% if pending_student_drops %}
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Course Title</th>
+            <th>Reason</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_student_drops %}
+          <tr>
+            <td>{{ request.student_name }}</td>
+            <td>{{ request.course_title }}</td>
+            <td>{{ request.reason }}</td>
+            <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <span class="status-badge {{ request.status }}">{{ request.status }}</span>
+              {% if request.admin_approvals %}
+              <span>({{ (request.admin_approvals|tojson|fromjson)|length }}/{{ config.get_required_approvers('student_drop') }} approvals)</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('view_student_drop', request_id=request.id) }}" class="btn view">View</a>
+              <form action="{{ url_for('approve_student_drop', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn approve">Approve</button>
+              </form>
+              <form action="{{ url_for('reject_student_drop', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn reject">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-requests">No pending student drop requests found.</div>
+      {% endif %}
+
+      <!-- Medical Withdrawal Requests Section -->
+      <div class="section-header">
+        <h2>Medical Withdrawal Requests</h2>
+      </div>
+
+      {% if pending_medical_requests %}
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Term/Year</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_medical_requests %}
+          <tr>
+            <td>{{ request.first_name }} {{ request.last_name }}</td>
+            <td>{{ request.term_year }}</td>
+            <td>{{ request.reason_type }}</td>
+            <td>
+              <span class="status-badge {{ request.status }}">{{ request.status }}</span>
+              {% if request.admin_approvals %}
+              <span>({{ (request.admin_approvals|tojson|fromjson)|length }}/{{ config.get_required_approvers('medical_withdrawal') }} approvals)</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('view_medical_request', request_id=request.id) }}" class="btn view">View</a>
+              <form action="{{ url_for('approve_medical_withdrawal', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn approve">Approve</button>
+              </form>
+              <form action="{{ url_for('reject_medical_withdrawal', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn reject">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-requests">No pending medical withdrawal requests found.</div>
+      {% endif %}
+
+      <!-- FERPA Requests Section -->
+      <div class="section-header">
+        <h2>FERPA Requests</h2>
+      </div>
+
+      {% if pending_ferpa_requests %}
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_ferpa_requests %}
+          <tr>
+            <td>{{ request.name }}</td>
+            <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <span class="status-badge {{ request.status }}">{{ request.status }}</span>
+              {% if request.admin_approvals %}
+              <span>({{ (request.admin_approvals|tojson|fromjson)|length }}/{{ config.get_required_approvers('ferpa') }} approvals)</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('download_ferpa_pdf', request_id=request.id) }}" class="btn view">View</a>
+              <form action="{{ url_for('approve_ferpa', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn approve">Approve</button>
+              </form>
+              <form action="{{ url_for('reject_ferpa', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn reject">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-requests">No pending FERPA requests found.</div>
+      {% endif %}
+
+      <!-- Info Change Requests Section -->
+      <div class="section-header">
+        <h2>Name/SSN Change Requests</h2>
+      </div>
+
+      {% if pending_infochange_requests %}
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Request Type</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request in pending_infochange_requests %}
+          <tr>
+            <td>{{ request.name }}</td>
+            <td>
+              {% if "name" in request.choice and "ssn" in request.choice %}
+                Name & SSN Change
+              {% elif "name" in request.choice %}
+                Name Change
+              {% elif "ssn" in request.choice %}
+                SSN Change
+              {% else %}
+                Information Change
+              {% endif %}
+            </td>
+            <td>{{ request.date.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <span class="status-badge {{ request.status }}">{{ request.status }}</span>
+              {% if request.admin_approvals %}
+              <span>({{ (request.admin_approvals|tojson|fromjson)|length }}/{{ config.get_required_approvers('info_change') }} approvals)</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('download_infochange_pdf', request_id=request.id) }}" class="btn view">View</a>
+              <form action="{{ url_for('approve_infochange', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn approve">Approve</button>
+              </form>
+              <form action="{{ url_for('reject_infochange', request_id=request.id) }}" method="post" style="display: inline">
+                <button type="submit" class="btn reject">Reject</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-requests">No pending name/SSN change requests found.</div>
+      {% endif %}
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Toggle mobile menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (menuToggle && navLinks) {
+          menuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

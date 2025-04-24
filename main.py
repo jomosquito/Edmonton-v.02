@@ -708,8 +708,18 @@ def user_has_role(user_id, role_name):
         return True
 
     # Then check delegations
-    delegated = Delegation.get_active_delegations(user_id=user_id, role=role_name)
-    return len(delegated) > 0
+    now = datetime.utcnow()
+    delegation = Delegation.query.filter(
+        Delegation.delegate_id == user_id,
+        Delegation.role == role_name,
+        Delegation.active == True,
+        db.or_(
+            Delegation.end_date == None,
+            Delegation.end_date > now
+        )
+    ).first()
+
+    return delegation is not None
 
 def get_user_effective_roles(user_id):
     """Get all roles a user has, including delegated roles"""
@@ -771,6 +781,24 @@ def _process_approval(request, user_id, form_type):
 # -------------------------------
 # V3 Routes
 # -------------------------------
+@app.route('/president_portal')
+def president_portal():
+    # Get the current user
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Check if user has president role (directly or via delegation)
+    if not user_has_role(user_id, 'president'):
+        flash("You don't have permission to access the president portal.", "error")
+        return redirect(url_for('userhompage'))
+
+    # Redirect to the same page as department chair portal, instead of notifications
+    return redirect(url_for('chair_student_drops'))
 
 @app.route('/delegations', methods=['GET'])
 def delegations_page():
@@ -1835,26 +1863,24 @@ def userhompage():
     # Get delegated roles for display in the dashboard
     delegated_roles = user.get_delegated_roles()
 
+    # Check if user has department chair or president role
+    is_department_chair = user.is_department_chair
+    is_president = user_has_role(user_id, 'president')
+
     # Debug output
     print(f"User: {user.first_name} {user.last_name}")
     print(f"Direct roles: {[r.role.name for r in user.user_roles]}")
     print(f"Delegated roles: {delegated_roles}")
     print(f"is_department_chair: {user.is_department_chair}")
+    print(f"is_president: {is_president}")
     print(f"has_delegated_role('department_chair'): {user.has_delegated_role('department_chair')}")
-
-    # Look up delegation directly for debugging
-    test_delegation = Delegation.query.filter_by(
-        delegate_id=user.id,
-        role='department_chair',
-        active=True
-    ).first()
-    print(f"Delegation found: {test_delegation is not None}")
-    if test_delegation:
-        print(f"Delegation details: id={test_delegation.id}, role={test_delegation.role}")
 
     return render_template('userhompage.html',
                            user=user,
-                           delegated_roles=delegated_roles)
+                           delegated_roles=delegated_roles,
+                           is_department_chair=is_department_chair,
+                           is_president=is_president)
+
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     user_id = session.get('user_id')
@@ -1946,22 +1972,36 @@ def ap():
 
 @app.route('/notifications')
 def notifications():
-    # Query pending and partially approved medical withdrawal requests
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    # Check if user has appropriate permissions
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Allow access only to admins, department chairs, or presidents
+    is_admin = user.privilages_ == 'admin'
+    has_role = user_has_role(user_id, 'department_chair') or user_has_role(user_id, 'president')
+
+    if not (is_admin or has_role):
+        flash("You don't have permission to access this page.", "error")
+        return redirect(url_for('userhompage'))
+
+    # Query pending and partially approved requests
     pending_medical_requests = MedicalWithdrawalRequest.query.filter(
         MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
     ).all()
 
-    # Query pending and partially approved student drop requests
     pending_student_drops = StudentInitiatedDrop.query.filter(
         StudentInitiatedDrop.status.in_(['pending', 'pending_approval'])
     ).all()
 
-    # Query pending and partially approved FERPA requests
     pending_ferpa_requests = FERPARequest.query.filter(
         FERPARequest.status.in_(['pending', 'pending_approval'])
     ).all()
 
-    # Query pending and partially approved Info Change requests
     pending_infochange_requests = InfoChangeRequest.query.filter(
         InfoChangeRequest.status.in_(['pending', 'pending_approval'])
     ).all()
@@ -1972,7 +2012,10 @@ def notifications():
         pending_student_drops=pending_student_drops,
         pending_ferpa_requests=pending_ferpa_requests,
         pending_infochange_requests=pending_infochange_requests,
-        config=WorkflowConfig  # Pass WorkflowConfig class to template
+        config=WorkflowConfig,  # Pass WorkflowConfig class to template
+        user=user,  # Pass the user to the template
+        is_admin=is_admin,  # Pass admin status to the template
+        user_has_role=user_has_role  # Pass the user_has_role function to use in the template
     )
 
 # -------------------------------
@@ -2928,15 +2971,10 @@ def chair_student_drops():
     if not user:
         return redirect(url_for('login'))
 
-    # Debug output to troubleshoot
-    print(f"User ID: {user.id}, Email: {user.email_}")
-    print(f"Direct roles: {[r.role.name for r in user.user_roles]}")
-    print(f"Delegated roles: {user.delegated_roles}")
-    print(f"Is department chair: {user.is_department_chair}")
-
-    # Check if user is department chair (directly or via delegation)
-    if not user.is_department_chair:
-        flash("You don't have permission to access the department chair portal.", "error")
+    # Allow access to both department chairs and presidents
+    has_role = user_has_role(user_id, 'department_chair') or user_has_role(user_id, 'president')
+    if not has_role and user.privilages_ != 'admin':
+        flash("You don't have permission to access this page.", "error")
         return redirect(url_for('userhompage'))
 
     # Query pending and partially approved medical withdrawal requests
@@ -2959,13 +2997,21 @@ def chair_student_drops():
         InfoChangeRequest.status.in_(['pending', 'pending_approval'])
     ).all()
 
+    # Pass the user's role information to the template
+    is_president = user_has_role(user_id, 'president')
+    is_department_chair = user_has_role(user_id, 'department_chair')
+
     return render_template(
         'chair_student_drops.html',
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
         pending_ferpa_requests=pending_ferpa_requests,
         pending_infochange_requests=pending_infochange_requests,
-        config=WorkflowConfig  # Pass WorkflowConfig class to template
+        config=WorkflowConfig,  # Pass WorkflowConfig class to template
+        user=user,  # Pass the user to the template
+        is_admin=(user.privilages_ == 'admin'),
+        is_president=is_president,
+        is_department_chair=is_department_chair
     )
 
 @app.route('/mark_student_drop_viewed/<int:request_id>', methods=['POST'])
