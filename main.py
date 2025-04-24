@@ -85,9 +85,84 @@ class Profile(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
+    def get_delegated_roles(self):
+        """Get a list of roles that have been delegated to this user"""
+        delegations = Delegation.get_active_delegations(self.id)
+        return [d.role for d in delegations]
+
+    def has_delegated_role(self, role_name):
+        """Check if this user has been delegated a specific role"""
+        return Delegation.user_has_delegated_role(self.id, role_name)
+
+
     @property
     def is_department_chair(self):
-        return any(role.role.name == "department_chair" for role in self.user_roles)
+        """Check if user is a department chair (directly or via delegation)"""
+        # First check direct role assignments
+        for role in self.user_roles:
+            if role.role.name == 'department_chair':
+                return True
+
+        # Then check delegations
+        return self.has_delegated_role('department_chair')
+
+    @property
+    def delegated_roles(self):
+        """Get all roles that have been delegated to this user"""
+        delegations = Delegation.query.filter(
+            Delegation.delegate_id == self.id,
+            Delegation.active == True,
+            db.or_(
+                Delegation.end_date == None,
+                Delegation.end_date > datetime.utcnow()
+            )
+        ).all()
+
+        return [d.role for d in delegations]
+
+    @property
+    def effective_roles(self):
+        """Get all roles (direct and delegated) for this user"""
+        # Get direct roles
+        direct_roles = [role.role.name for role in self.user_roles]
+
+        # Get delegated roles
+        delegated_roles = self.get_delegated_roles()
+
+        # Combine both and return as a list
+        return list(set(direct_roles + delegated_roles))
+
+    @property
+    def is_department_chair(self):
+        """Check if the user is a department chair (either directly or via delegation)"""
+        if any(role.role.name == 'department_chair' for role in self.user_roles):
+            return True
+
+        # Check delegations
+        return 'department_chair' in self.delegated_roles
+
+    @property
+    def is_president(self):
+        """Check if user is a president (directly or via delegation)"""
+        # First check direct role assignments
+        for role in self.user_roles:
+            if role.role.name == 'president':
+                return True
+
+        # Then check delegations
+        return self.has_delegated_role('president')
+
+    @property
+    def all_roles(self):
+        """Get all roles (direct and delegated) for this user"""
+        # Get direct roles
+        direct_roles = [role.role.name for role in self.user_roles]
+
+        # Get delegated roles
+        delegated_roles = self.get_delegated_roles()
+
+        # Combine and remove duplicates
+        return list(set(direct_roles + delegated_roles))
 
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -517,7 +592,7 @@ class WorkflowConfig(db.Model):
     required_roles = db.Column(db.Text, default='[]')  # JSON array of role names in order
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    @staticmethod 
+    @staticmethod
     def get_required_approvers(form_type):
         config = WorkflowConfig.query.filter_by(form_type=form_type).first()
         return config.required_approvers if config else 2
@@ -552,20 +627,252 @@ class UserRole(db.Model):
     department = db.relationship('Department')
     user = db.relationship('Profile', back_populates='user_roles')
 
+class Delegation(db.Model):
+    __tablename__ = 'delegations'
+    id = db.Column(db.Integer, primary_key=True)
+    delegator_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    delegate_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime, nullable=True)
+    active = db.Column(db.Boolean, default=True)
+
+    delegator = db.relationship('Profile', foreign_keys=[delegator_id], backref='delegated_out')
+    delegate = db.relationship('Profile', foreign_keys=[delegate_id], backref='delegated_in')
+
+    @staticmethod
+    def get_active_delegations(user_id):
+        """Get all active delegations for a user"""
+        now = datetime.utcnow()
+        return Delegation.query.filter(
+            Delegation.delegate_id == user_id,
+            Delegation.active == True,
+            db.or_(
+                Delegation.end_date == None,
+                Delegation.end_date > now
+            )
+        ).all()
+
+    @staticmethod
+    def user_has_delegated_role(user_id, role_name):
+        """Check if a user has a specific delegated role"""
+        now = datetime.utcnow()
+        delegation = Delegation.query.filter(
+            Delegation.delegate_id == user_id,
+            Delegation.role == role_name,
+            Delegation.active == True,
+            db.or_(
+                Delegation.end_date == None,
+                Delegation.end_date > now
+            )
+        ).first()
+        return delegation is not None
+
+def user_has_role(user_id, role_name):
+    """Check if a user has a specific role, either directly or via delegation"""
+    # First check direct role assignments
+    user_role_query = UserRole.query.join(Role).filter(
+        UserRole.user_id == user_id,
+        Role.name == role_name
+    ).first()
+
+    if user_role_query:
+        return True
+
+    # Then check delegations
+    delegated = Delegation.get_active_delegations(user_id=user_id, role=role_name)
+    return len(delegated) > 0
+
+def get_user_effective_roles(user_id):
+    """Get all roles a user has, including delegated roles"""
+    # Get directly assigned roles
+    direct_roles = [ur.role.name for ur in UserRole.query.filter_by(user_id=user_id).join(Role)]
+
+    # Get delegated roles
+    delegated_roles = [d.role for d in Delegation.get_active_delegations(user_id=user_id)]
+
+    # Combine both sets of roles (removing duplicates)
+    return list(set(direct_roles + delegated_roles))
+
 def _process_approval(request, user_id, form_type):
     """Process an approval for any form type using workflow configuration"""
     if not request.has_admin_viewed(user_id):
         return False, 'You must view the request PDF before approving'
-    
+
     if request.has_admin_approved(user_id):
         return False, 'You have already approved this request'
 
     # Add admin to approvals list
     if not request.admin_approvals:
         admin_approvals = [str(user_id)]
+    else:
+        admin_approvals = json.loads(request.admin_approvals)
+        if str(user_id) not in admin_approvals:
+            admin_approvals.append(str(user_id))
+
+    request.admin_approvals = json.dumps(admin_approvals)
+
+    # Get workflow configuration
+    workflow = WorkflowConfig.query.filter_by(form_type=form_type).first()
+    if not workflow:
+        return False, f'No workflow configuration found for {form_type}'
+
+    # Get user's effective roles (including delegated roles)
+    user_roles = get_user_effective_roles(user_id)
+
+    # Check if user has required role from workflow
+    required_roles = json.loads(workflow.required_roles)
+    if not any(role in required_roles for role in user_roles):
+        return False, 'You do not have the required role to approve this request'
+
+    # Update status based on workflow config
+    if len(admin_approvals) >= workflow.required_approvers:
+        request.status = 'approved'
+        message = f'{form_type.replace("_", " ").title()} request has been fully approved.'
+    else:
+        request.status = 'pending_approval'
+        message = f'{form_type.replace("_", " ").title()} request has been partially approved. Awaiting additional approvals.'
+
+    # Mark as viewed if not already
+    viewed = json.loads(request.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    request.admin_viewed = json.dumps(viewed)
+
+    return True, message
 # -------------------------------
 # V3 Routes
 # -------------------------------
+
+@app.route('/delegations', methods=['GET'])
+def delegations_page():
+    """Page for managing role delegations"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Check if user has roles they can delegate
+    user_roles = [role.role.name for role in user.user_roles]
+    delegatable_roles = [role for role in user_roles if role in ['department_chair', 'president']]
+
+    # If user doesn't have delegatable roles and isn't admin, redirect
+    if not delegatable_roles and user.privilages_ != 'admin':
+        flash("You don't have any roles that can be delegated.", "warning")
+        return redirect(url_for('userhompage'))
+
+    # Get all active users except current user
+    all_users = Profile.query.filter(
+        Profile.id != user_id,
+        Profile.active == True
+    ).all()
+
+    # Get all delegations created by this user
+    my_delegations = Delegation.query.filter_by(delegator_id=user_id).all()
+
+    return render_template('delegations.html',
+                          user=user,
+                          all_users=all_users,
+                          delegatable_roles=delegatable_roles,
+                          my_delegations=my_delegations)
+
+@app.route('/create_delegation', methods=['POST'])
+def create_delegation():
+    """Create a new delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Get form data
+    delegate_id = request.form.get('delegate_id')
+    role = request.form.get('role')
+    end_date_str = request.form.get('end_date')
+
+    # Validate inputs
+    if not delegate_id or not role:
+        flash("Delegate and role are required fields.", "danger")
+        return redirect(url_for('delegations_page'))
+
+    # Check if user has the role they're trying to delegate
+    user_roles = [role.role.name for role in user.user_roles]
+    if role not in user_roles and user.privilages_ != 'admin':
+        flash("You can only delegate roles that you currently have.", "danger")
+        return redirect(url_for('delegations_page'))
+
+    # Check if role is delegatable
+    if role not in ['department_chair', 'president']:
+        flash("Only department chair and president roles can be delegated.", "danger")
+        return redirect(url_for('delegations_page'))
+
+    # Parse end date if provided
+    end_date = None
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        except ValueError:
+            flash("Invalid date format.", "danger")
+            return redirect(url_for('delegations_page'))
+
+    # Deactivate any existing active delegations for this role
+    existing = Delegation.query.filter_by(
+        delegator_id=user_id,
+        role=role,
+        active=True
+    ).all()
+
+    for delegation in existing:
+        delegation.active = False
+        delegation.end_date = datetime.utcnow()
+
+    # Create new delegation
+    new_delegation = Delegation(
+        delegator_id=user_id,
+        delegate_id=delegate_id,
+        role=role,
+        end_date=end_date,
+        active=True
+    )
+
+    db.session.add(new_delegation)
+    db.session.commit()
+
+    flash(f"Successfully delegated {role.replace('_', ' ')} role.", "success")
+    return redirect(url_for('delegations_page'))
+
+@app.route('/revoke_delegation/<int:delegation_id>', methods=['POST'])
+def revoke_delegation(delegation_id):
+    """Revoke an existing delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Get the delegation
+    delegation = Delegation.query.get_or_404(delegation_id)
+
+    # Check if user is authorized to revoke
+    if delegation.delegator_id != user_id and user.privilages_ != 'admin':
+        flash("You don't have permission to revoke this delegation.", "danger")
+        return redirect(url_for('delegations_page'))
+
+    # Revoke the delegation
+    delegation.active = False
+    delegation.end_date = datetime.utcnow()
+    db.session.commit()
+
+    flash(f"Delegation of {delegation.role.replace('_', ' ')} role has been revoked.", "success")
+    return redirect(url_for('delegations_page'))
+
 
 @app.route('/ferpa-form', methods=['GET', 'POST'])
 def ferpa_form():
@@ -1301,19 +1608,19 @@ def workflow_settings():
         for form_type in form_types:
             required_approvers = int(request.form.get(f"{form_type}_approvers", 2))
             required_roles = request.form.getlist(f"{form_type}_roles")
-            
+
             config = WorkflowConfig.query.filter_by(form_type=form_type).first()
             if config:
                 config.required_approvers = required_approvers
                 config.required_roles = json.dumps(required_roles)
             else:
                 config = WorkflowConfig(
-                    form_type=form_type, 
+                    form_type=form_type,
                     required_approvers=required_approvers,
                     required_roles=json.dumps(required_roles)
                 )
                 db.session.add(config)
-        
+
         db.session.commit()
         flash('Workflow settings updated successfully.', 'success')
         return redirect(url_for('workflow_settings'))
@@ -1325,7 +1632,7 @@ def workflow_settings():
             'approvers': config.required_approvers,
             'roles': json.loads(config.required_roles) if config.required_roles else []
         }
-    
+
     # Get all available roles for the form
     roles = Role.query.all()
 
@@ -1389,32 +1696,42 @@ def admin():
 
 @app.route('/adminpage')
 def adminpage():
-    # Authentication check
+    """Admin page that should show both direct and delegated roles"""
+    # Check if user is logged in and is an admin
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
 
-    # Special case for hardcoded admin users
-    if user_id == -2 or user_id == -1:
-        if session.get('admin'):
-            # Hardcoded admin is authenticated
-            profiles = Profile.query.all()
-            return render_template('adminpage.html', profiles=profiles)
-
-    # Regular database users
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
-        return redirect(url_for('login'))
+        flash('You do not have permission to access the admin page.', 'danger')
+        return redirect(url_for('userhompage'))
 
-    # Get all profiles for user management
-    profiles = Profile.query.options(
-        db.joinedload(Profile.user_roles)
-        .joinedload(UserRole.role),
-        db.joinedload(Profile.user_roles)
-        .joinedload(UserRole.department)
-    ).all()
+    # Get all users with their roles
+    all_users = Profile.query.all()
 
-    return render_template('adminpage.html', profiles=profiles)
+    # For each user, get their direct and delegated roles
+    users_with_roles = []
+    for u in all_users:
+        # Get direct role assignments
+        direct_roles = [role.role.name for role in u.user_roles]
+
+        # Get delegated roles
+        delegated_roles = u.get_delegated_roles()
+
+        # Combine roles (direct roles take precedence)
+        all_roles = direct_roles.copy()
+        for role in delegated_roles:
+            if role not in all_roles:
+                all_roles.append(f"{role} (delegated)")
+
+        users_with_roles.append({
+            'user': u,
+            'roles': all_roles
+        })
+
+    # Pass users_with_roles as 'profiles' to match what the template expects
+    return render_template('adminpage.html', profiles=users_with_roles)
 
 @app.route('/a')
 def ad():
@@ -1477,12 +1794,38 @@ def login():
 
 @app.route('/userhompage')
 def userhompage():
+    # Get the current user
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
-    user = Profile.query.get(user_id)
-    return render_template('userhompage.html', user=user)
 
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Get delegated roles for display in the dashboard
+    delegated_roles = user.get_delegated_roles()
+
+    # Debug output
+    print(f"User: {user.first_name} {user.last_name}")
+    print(f"Direct roles: {[r.role.name for r in user.user_roles]}")
+    print(f"Delegated roles: {delegated_roles}")
+    print(f"is_department_chair: {user.is_department_chair}")
+    print(f"has_delegated_role('department_chair'): {user.has_delegated_role('department_chair')}")
+
+    # Look up delegation directly for debugging
+    test_delegation = Delegation.query.filter_by(
+        delegate_id=user.id,
+        role='department_chair',
+        active=True
+    ).first()
+    print(f"Delegation found: {test_delegation is not None}")
+    if test_delegation:
+        print(f"Delegation details: id={test_delegation.id}, role={test_delegation.role}")
+
+    return render_template('userhompage.html',
+                           user=user,
+                           delegated_roles=delegated_roles)
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     user_id = session.get('user_id')
@@ -1644,7 +1987,7 @@ def auth_step_one():
     email, idtoken = open1()
 
     if result:
-      
+
         return redirect('/')
 
     return "Authentication failed", 400
@@ -1668,7 +2011,7 @@ def auth_step_two_callback():
 
         if not user:
             # Ensure the email is a CougarNet account
-            
+
             # Check if this is the first account being created
             is_first_account = Profile.query.count() == 0
 
@@ -1710,7 +2053,7 @@ def auth_step_two_callback():
             return redirect(url_for('adminpage'))  # Admin page
         else:
             return redirect(url_for('userhompage'))  # User homepage
-        
+
 
     return "Authentication failed", 400
 # -------------------------------
@@ -1793,16 +2136,16 @@ def update_user(id):
         user.phoneN_ = request.form.get("phoneN_")
         user.privilages_ = request.form.get("privileges")
         user.active = 'active' in request.form
-        
+
         if request.form.get("pass_word"):
             user.set_password(request.form.get("pass_word"))
 
         # SIMPLIFIED ROLE UPDATE
         new_role = request.form.get("user_roles")  # Change from user_role to user_roles to match the form field
-        
+
         # Clear existing roles
         UserRole.query.filter_by(user_id=id).delete()
-        
+
         # Add new role if selected
         if new_role:
             role = Role.query.filter_by(name=new_role).first()
@@ -1811,13 +2154,13 @@ def update_user(id):
                     user_id=user.id,
                     role_id=role.id
                 ))
-        
+
         db.session.commit()
         return redirect(url_for('adminpage'))  # Fix: Change from '/' to 'adminpage    # For GET request - show current role
     current_role = None
     if user.user_roles:  # Check if user has any roles
         current_role = user.user_roles[0].role.name if user.user_roles else 'student'
-    return render_template('update.html', 
+    return render_template('update.html',
                          profile=user,
                          current_role=current_role)
 
@@ -1827,7 +2170,7 @@ def create_profile():
         password = request.form.get("pass_word")
         if not password:
             return "Password is required", 400
-            
+
         # Create the new profile
         new_profile = Profile(
             first_name=request.form.get("first_name"),
@@ -1837,11 +2180,11 @@ def create_profile():
             active=request.form.get("active") == "on",
             pass_word=generate_password_hash(password)
         )
-        
+
         # Add profile to the database to get an ID
         db.session.add(new_profile)
         db.session.flush()  # This assigns an ID to new_profile without committing
-        
+
         # Assign role if specified in the form
         role_name = request.form.get("user_roles")
         if role_name:
@@ -1849,11 +2192,11 @@ def create_profile():
             if role:
                 user_role = UserRole(user_id=new_profile.id, role_id=role.id)
                 db.session.add(user_role)
-        
+
         # Commit all changes
         db.session.commit()
         return redirect('/ap')
-        
+
     # For GET request - get all roles to display in the form
     roles = Role.query.all()
     return render_template("create.html", roles=roles)
@@ -2047,7 +2390,7 @@ def approve_medical_withdrawal(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
-    
+
     # Check if this admin has already approved
     if req_record.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
@@ -2060,14 +2403,14 @@ def approve_medical_withdrawal(request_id):
         admin_approvals = json.loads(req_record.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
-    
+
     req_record.admin_approvals = json.dumps(admin_approvals)
-    
+
     # Update status based on workflow config
     required = WorkflowConfig.get_required_approvers('medical_withdrawal')
     if len(admin_approvals) >= required:
         req_record.status = 'approved'
-        
+
         # Get comments from form
         comments = request.form.get('comments', '')
 
@@ -2079,7 +2422,7 @@ def approve_medical_withdrawal(request_id):
             comments=comments
         )
         db.session.add(history_entry)
-        
+
         # Generate PDF with the updated function
         from pdf_utils import generate_medical_withdrawal_pdf
         pdf_path = generate_medical_withdrawal_pdf(req_record)
@@ -2094,7 +2437,7 @@ def approve_medical_withdrawal(request_id):
                 pdfs = json.loads(req_record.generated_pdfs)
                 pdfs.append(pdf_path)
                 req_record.generated_pdfs = json.dumps(pdfs)
-                
+
         flash('Medical withdrawal request has been fully approved.', 'success')
     else:
         # Mark as partially approved
@@ -2545,6 +2888,26 @@ def admin_student_drops():
 
 @app.route('/chair_student_drops')
 def chair_student_drops():
+    # Get the current user
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # Debug output to troubleshoot
+    print(f"User ID: {user.id}, Email: {user.email_}")
+    print(f"Direct roles: {[r.role.name for r in user.user_roles]}")
+    print(f"Delegated roles: {user.delegated_roles}")
+    print(f"Is department chair: {user.is_department_chair}")
+
+    # Check if user is department chair (directly or via delegation)
+    if not user.is_department_chair:
+        flash("You don't have permission to access the department chair portal.", "error")
+        return redirect(url_for('userhompage'))
+
     # Query pending and partially approved medical withdrawal requests
     pending_medical_requests = MedicalWithdrawalRequest.query.filter(
         MedicalWithdrawalRequest.status.in_(['pending', 'pending_approval'])
@@ -2614,7 +2977,7 @@ def _process_approval(request, user_id, form_type):
     """Process an approval for any form type using workflow configuration"""
     if not request.has_admin_viewed(user_id):
         return False, 'You must view the request PDF before approving'
-    
+
     if request.has_admin_approved(user_id):
         return False, 'You have already approved this request'
 
@@ -2625,26 +2988,27 @@ def _process_approval(request, user_id, form_type):
         admin_approvals = json.loads(request.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
-    
+
     request.admin_approvals = json.dumps(admin_approvals)
-    
+
     # Get workflow configuration
     workflow = WorkflowConfig.query.filter_by(form_type=form_type).first()
     if not workflow:
         return False, f'No workflow configuration found for {form_type}'
-    
-    # Get user's roles
+
+    # Get user's roles, including delegated roles
     user = Profile.query.get(user_id)
     if not user:
         return False, 'User not found'
-        
-    user_roles = [role.role.name for role in user.user_roles]
-    
+
+    # Include both direct roles and delegated roles
+    user_roles = user.effective_roles
+
     # Check if user has required role from workflow
     required_roles = json.loads(workflow.required_roles)
     if not any(role in required_roles for role in user_roles):
         return False, 'You do not have the required role to approve this request'
-    
+
     # Update status based on workflow config
     if len(admin_approvals) >= workflow.required_approvers:
         request.status = 'approved'
@@ -2660,6 +3024,7 @@ def _process_approval(request, user_id, form_type):
     request.admin_viewed = json.dumps(viewed)
 
     return True, message
+
 @app.route('/download_student_drop_pdf/<int:request_id>/<string:status>')
 def download_student_drop_pdf(request_id, status):
     """Download a generated PDF for a student drop request"""
@@ -2727,16 +3092,16 @@ def approve_student_drop(request_id):
     user = Profile.query.get(user_id)
     if not user:
         return "User not found", 404
-        
+
     # Get user's roles
     user_roles = [role.role.name for role in user.user_roles]
-    
+
     # Get workflow configuration
     workflow = WorkflowConfig.query.filter_by(form_type='student_drop').first()
     if not workflow:
         flash('No workflow configuration found for student drops.', 'error')
         return redirect(url_for('notifications'))
-        
+
     # Check if user has any of the required roles
     required_roles = json.loads(workflow.required_roles)
     if not any(role in required_roles for role in user_roles):
@@ -2744,11 +3109,11 @@ def approve_student_drop(request_id):
         return redirect(url_for('notifications'))
 
     req = StudentInitiatedDrop.query.get_or_404(request_id)
-    
+
     # Check if admin has viewed the PDF
     if not req.has_admin_viewed(user_id):
         return "You must view the PDF before approving", 400
-        
+
     # Check if this admin has already approved
     if req.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
@@ -2756,7 +3121,7 @@ def approve_student_drop(request_id):
 
     success, message = _process_approval(req, user_id, 'student_drop')
     flash(message, 'success' if success else 'danger')
-    
+
     db.session.commit()
     return redirect(url_for('notifications'))
     user_id = session.get('user_id')
@@ -2855,11 +3220,11 @@ def initialize_roles_and_departments():
             {'name': 'department_chair', 'level': 2},
             {'name': 'president', 'level': 3}
         ]
-        
+
         for role_data in default_roles:
             if not Role.query.filter_by(name=role_data['name']).first():
                 db.session.add(Role(**role_data))
-        
+
         # Create sample departments
         sample_departments = ['Computer Science', 'Mathematics', 'Biology']
         for dept_name in sample_departments:
@@ -2868,7 +3233,7 @@ def initialize_roles_and_departments():
                     name=dept_name,
                     code=dept_name[:3].upper()
                 ))
-        
+
         db.session.commit()
 
 if __name__ == "__main__":

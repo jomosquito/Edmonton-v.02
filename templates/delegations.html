@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+  <h2>Role Delegation Management</h2>
+  <p>This page allows you to delegate your approval authority to other users.</p>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h3>Create New Delegation</h3>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('create_delegation') }}" method="post">
+        <div class="mb-3">
+          <label for="delegate_id" class="form-label">Delegate To:</label>
+          <select name="delegate_id" id="delegate_id" class="form-control" required>
+            <option value="">Select a user...</option>
+            {% for user in all_users %}
+              <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }} ({{ user.email_ }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="role" class="form-label">Role to Delegate:</label>
+          <select name="role" id="role" class="form-control" required>
+            <option value="">Select a role...</option>
+            {% for role in delegatable_roles %}
+              <option value="{{ role }}">{{ role|replace('_', ' ')|title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="end_date" class="form-label">End Date (Optional):</label>
+          <input type="date" name="end_date" id="end_date" class="form-control">
+          <div class="form-text">If not specified, delegation will remain active until revoked.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Delegation</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h3>Your Active Delegations</h3>
+    </div>
+    <div class="card-body">
+      {% if my_delegations %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Delegated Role</th>
+              <th>Delegated To</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for delegation in my_delegations %}
+              {% if delegation.active %}
+                <tr>
+                  <td>{{ delegation.role|replace('_', ' ')|title }}</td>
+                  <td>{{ delegation.delegate.first_name }} {{ delegation.delegate.last_name }} ({{ delegation.delegate.email_ }})</td>
+                  <td>{{ delegation.start_date.strftime('%Y-%m-%d') }}</td>
+                  <td>{% if delegation.end_date %}{{ delegation.end_date.strftime('%Y-%m-%d') }}{% else %}No end date{% endif %}</td>
+                  <td>
+                    <form action="{{ url_for('revoke_delegation', delegation_id=delegation.id) }}" method="post">
+                      <button type="submit" class="btn btn-sm btn-danger">Revoke</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>You have no active delegations.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

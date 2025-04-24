@@ -1,211 +1,399 @@
+ompage.html
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <!-- Import Google Fonts for a modern look -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      /* CSS Variables for easy theme customization */
-      :root {
-        --primary-color: #2575fc;
-        --secondary-color: #6a11cb;
-        --accent-color: #f3ec78;
-        --background-color: #f0f2f5;
-        --card-bg: #fff;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <style>
+    :root {
+      --primary-color: #5b4cba;
+      --accent-color: #6a5acd;
+      --light-accent: #e6e6fa;
+      --bg-color: #f0f2f5;
+      --card-bg: #fff;
+      --text-color: #333;
+      --secondary-text: #666;
+      --border-color: #ddd;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 1.5rem 0;
+      font-size: 2rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Navigation */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      padding-top: 80px;
+      transition: all 0.3s;
+      z-index: 1;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: rgba(255,255,255,0.1);
+      transform: translateX(5px);
+    }
+
+    .sidebar a.active {
+      background-color: rgba(255,255,255,0.2);
+      border-left: 4px solid white;
+    }
+
+    .sidebar a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+    }
+
+    /* Dashboard cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .card h2 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .welcome-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      position: relative;
+    }
+
+    .welcome-card h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .welcome-card p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* Circular decorative elements */
+    .welcome-card .circle {
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .welcome-card .circle-1 {
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.1);
+      top: -30px;
+      right: 40px;
+    }
+
+    .welcome-card .circle-2 {
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.1);
+      bottom: 20px;
+      right: 20%;
+    }
+
+    /* Action cards */
+    .action-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .action-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-size: 1.25rem;
+    }
+
+    .action-card p {
+      color: var(--secondary-text);
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .action-card .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      align-self: flex-start;
+    }
+
+    .action-card .btn:hover {
+      background-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .action-card .btn i {
+      margin-right: 8px;
+    }
+
+    /* Status card */
+    .status-card {
+      background-color: var(--light-accent);
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .status-approved {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .status-rejected {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    /* Delegated roles section */
+    .delegated-roles {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e9ecef;
+      border-radius: 8px;
+      border-left: 4px solid #17a2b8;
+    }
+
+    .delegated-roles h3 {
+      color: #17a2b8;
+      margin-bottom: 10px;
+    }
+
+    .delegated-roles ul {
+      padding-left: 20px;
+    }
+
+    .delegated-roles li {
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 0;
       }
 
-      /* Reset and base styles */
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        background: var(--background-color);
-        color: #333;
-      }
-
-      /* Header styles with a gradient background */
-      header {
-        background: linear-gradient(
-          90deg,
-          var(--primary-color),
-          var(--secondary-color)
-        );
-        color: #fff;
-        padding: 20px;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 700;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      /* Layout container */
-      .dashboard-container {
+      .sidebar-nav {
         display: flex;
-        min-height: calc(100vh - 80px);
+        justify-content: center;
+        flex-wrap: wrap;
       }
 
-      /* Sidebar navigation */
-      nav {
-        width: 250px;
-        background: var(--secondary-color);
-        padding: 20px;
-        color: #fff;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      .main-content {
+        margin-left: 0;
       }
 
-      nav ul {
-        list-style: none;
-        padding: 0;
+      .dashboard-grid {
+        grid-template-columns: 1fr;
       }
+    }
+  </style>
+</head>
+<body>
+  <header>Dashboard</header>
 
-      nav ul li {
-        margin-bottom: 20px;
-      }
-
-      nav ul li a {
-        display: block;
-        padding: 10px;
-        border-radius: 5px;
-        color: #fff;
-        text-decoration: none;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-      }
-
-      nav ul li a:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(5px);
-      }
-
-      /* Main content area with fade-in animation */
-      main {
-        flex: 1;
-        padding: 40px;
-        animation: fadeIn 0.5s ease-in;
-      }
-
-      /* Card component with hover effects */
-      .card {
-        background: var(--card-bg);
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      }
-
-      .card h2 {
-        margin-bottom: 15px;
-        color: var(--primary-color);
-      }
-
-      .card p {
-        margin-bottom: 20px;
-        line-height: 1.6;
-      }
-
-      /* Button styles */
-      .btn {
-        display: inline-block;
-        margin: 10px 10px 10px 0;
-        padding: 10px 20px;
-        background: var(--primary-color);
-        color: #fff;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background 0.3s ease, transform 0.3s ease;
-      }
-
-      .btn:hover {
-        background: var(--secondary-color);
-        transform: translateY(-3px);
-      }
-
-      /* Fade-in animation */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .dashboard-container {
-          flex-direction: column;
-        }
-
-        nav {
-          width: 100%;
-          text-align: center;
-          box-shadow: none;
-        }
-
-        main {
-          padding: 20px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <header>Dashboard</header>
-    <div class="dashboard-container">
-      <nav>
-        <ul>
-          <li><a href="/userhompage">Dashboard</a></li>
-          <li><a href="/profile">Profile</a></li>
-          <li><a href="/settings">Request</a></li>
-          <li><a href="/status">Request Statuses</a></li>
-          <li><a href="{{ url_for('logout') }}">Logout</a></li>
-        </ul>
-      </nav>
-      <main>
-        <div class="card">
-          <h2>Welcome back, {{ user.first_name }}!</h2>
-          <p>
-            This is your personalized dashboard. Use the navigation on the left
-            to manage your account, view reports, or adjust settings.
-          </p>
-          <a class="btn" href="/profile">View Profile</a>
-          <a class="btn" href="/settings">Settings</a>
-          <a class="btn" href="/">Logout</a>
-          {% if user.privilages_ == "admin" %}
-          <a class="btn" href="/adminpage">Go to Admin Portal</a>
-          {% endif %}
-          {% if user.is_department_chair %}
-          <a class="btn" href="/chair_student_drops">Go to Department Chair Portal</a>
-          {% endif %}
+  <nav class="sidebar">
+    <div class="sidebar-nav">
+      <a href="/userhompage" class="active"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+      <a href="/settings"><i class="fas fa-file-alt"></i> Request</a>
+      <a href="/status"><i class="fas fa-tasks"></i> Request Statuses</a>
+      {% if user.is_department_chair or 'department_chair' in delegated_roles %}
+        <div class="action-card">
+          <h3>Department Chair Portal</h3>
+          <p>Review and manage student requests as department chair.</p>
+          <a href="{{ url_for('chair_student_drops') }}" class="btn">
+            <i class="fas fa-university"></i> Go to Department Chair Portal
+          </a>
         </div>
-        <div class="card">
-          <h2>Latest Updates</h2>
-          <p>
-            Keep up-to-date with the latest system notifications and account
-            updates.
-          </p>
-        </div>
-      </main>
+        {% endif %}
+      {% if user.is_president or 'president' in delegated_roles %}
+      <a href="/president_portal"><i class="fas fa-landmark"></i> President Portal</a>
+      {% endif %}
+      <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
-  </body>
+  </nav>
+
+  <main class="main-content">
+    <div class="dashboard-grid">
+      <!-- Welcome Card -->
+      <div class="card welcome-card">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <h1>Welcome back, {{ user.first_name }}!</h1>
+        <p>This is your personalized dashboard. Use the navigation on the left to manage your account, view reports, or adjust settings.</p>
+      </div>
+
+      <!-- Delegated Roles Card (if any) -->
+      {% if delegated_roles %}
+      <div class="card">
+        <h2>Delegated Roles</h2>
+        <div class="delegated-roles">
+          <h3>You have been delegated the following roles:</h3>
+          <ul>
+            {% for role in delegated_roles %}
+            <li>{{ role|replace('_', ' ')|title }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Request Forms Card -->
+      <div class="card action-card">
+        <h3>Request Forms</h3>
+        <p>Submit various requests like medical withdrawals or student drops.</p>
+        <a href="/settings" class="btn">
+          <i class="fas fa-file-alt"></i> View Request Options
+        </a>
+      </div>
+
+      <!-- Department Chair Portal Card (if department chair) -->
+      {% if user.is_department_chair or 'department_chair' in delegated_roles %}
+      <div class="card action-card">
+        <h3>Department Chair Portal</h3>
+        <p>Manage and review student requests that require department chair approval.</p>
+        <a href="/chair_student_drops" class="btn">
+          <i class="fas fa-university"></i> Go to Department Chair Portal
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- President Portal Card (if president) -->
+      {% if user.is_president or 'president' in delegated_roles %}
+      <div class="card action-card">
+        <h3>President Portal</h3>
+        <p>Review and manage all requests requiring presidential approval.</p>
+        <a href="/president_portal" class="btn">
+          <i class="fas fa-landmark"></i> Go to President Portal
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Profile Management Card -->
+      <div class="card action-card">
+        <h3>Manage Profile</h3>
+        <p>View and update your personal information and account settings.</p>
+        <a href="/profile" class="btn">
+          <i class="fas fa-user-edit"></i> Edit Profile
+        </a>
+      </div>
+
+      <!-- Role Delegation Card (if department chair or president) -->
+      {% if 'department_chair' in user.effective_roles or 'president' in user.effective_roles %}
+      <div class="card action-card">
+        <h3>Delegate Authority</h3>
+        <p>Temporarily delegate your approval authority to another user.</p>
+        <a href="/delegations" class="btn">
+          <i class="fas fa-exchange-alt"></i> Manage Delegations
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Status Card -->
+      <div class="card status-card">
+        <h2>Latest Updates</h2>
+        <p>Keep up-to-date with the latest system notifications and account updates.</p>
+      </div>
+    </div>
+  </main>
+</body>
 </html>
