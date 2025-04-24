@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.2.3)  24 APR 2025 04:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.2.3)  24 APR 2025 04:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./student_drop_1_pending_20250424090219.tex
-(student_drop_1_pending_20250424090219.tex
+**./student_drop_1_approved_20250424090759.tex
+(student_drop_1_approved_20250424090759.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 (C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -168,9 +168,27 @@ File: pd1enc.def 2023-11-26 v7.01g Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
 )
-! Interruption.
-<argument> \__file_size:n {intcalc.sty}
-                                       
+
+! LaTeX Error: File `intcalc.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
 l.803 \RequirePackage{intcalc}[2007/09/27]
-                                          
-? 
+                                          ^^M
+*** (cannot \read from terminal in nonstop modes)
+
+ 
+Here is how much of TeX's memory you used:
+ 3135 strings out of 474486
+ 50214 string characters out of 5743756
+ 1924542 words of memory out of 5000000
+ 25408 multiletter control sequences out of 15000+600000
+ 558367 words of font info for 37 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 75i,0n,79p,287b,36s stack positions out of 10000i,1000n,20000p,200000b,200000s
+!  ==> Fatal error occurred, no output PDF file produced!

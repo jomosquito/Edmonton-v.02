@@ -1323,6 +1323,8 @@ def approve_infochange(request_id):
 
     # Commit changes
     db.session.commit()
+    if user.user_roles =="department_chair":
+        return redirect(url_for('chair_student_drops'))
     return redirect(url_for('notifications'))
 
 @app.route('/reject_infochange/<int:request_id>', methods=['POST'])
@@ -1364,7 +1366,7 @@ def mark_ferpa_viewed(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if not user or user.privilages_ != 'admin':
+    if not user:
         return "Unauthorized", 403
 
     req_record = FERPARequest.query.get(request_id)
@@ -1392,7 +1394,7 @@ def mark_infochange_viewed(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if not user or user.privilages_ != 'admin':
+    if not user:
         return "Unauthorized", 403
 
     req_record = InfoChangeRequest.query.get(request_id)
@@ -2231,8 +2233,8 @@ def view_medical_request(request_id):
 
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.user_id != user_id:
-        return "Unauthorized", 403
+
+    
 
     return render_template('view_medical_request.html',
                           request=request_record,
@@ -2267,7 +2269,8 @@ def approve_medical_withdrawal(request_id):
     success, message = _process_approval(req, user_id, 'medical_withdrawal')
     flash(message, 'success' if success else 'danger')
     db.session.commit()
-
+    if user.user_roles =="department_chair":
+        return redirect(url_for('chair_student_drops'))
     return redirect(url_for('notifications'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
@@ -2278,8 +2281,7 @@ def reject_medical_withdrawal(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
+   
 
     req_record = MedicalWithdrawalRequest.query.get(request_id)
     if not req_record:
@@ -2309,7 +2311,8 @@ def reject_medical_withdrawal(request_id):
             req_record.generated_pdfs = json.dumps(pdfs)
 
         db.session.commit()
-
+    if user.user_roles =="department_chair":
+        return redirect(url_for('chair_student_drops'))
     return redirect(url_for('notifications'))
 
 @app.route('/view-student-drop/<int:request_id>')
@@ -2345,10 +2348,7 @@ def download_pdf(request_id, status):
         return "Request not found", 404
 
     # Check if user is admin or owner of the request
-    is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.user_id != user_id:
-        return "Unauthorized", 403
-
+    
     # If admin is viewing, mark as viewed
     if is_admin:
         if not request_record.admin_viewed:
@@ -2403,10 +2403,7 @@ def download_documentation(request_id, file_index):
         return "Request not found", 404
 
     # Check if user is admin or owner of the request
-    is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.user_id != user_id:
-        return "Unauthorized", 403
-
+   
     # Get documentation files
     if not request_record.documentation_files:
         return "No documentation files found", 404
@@ -2506,8 +2503,7 @@ def form_history():
 
     # Get current user (admin viewing the history)
     user = Profile.query.get(user_id)
-    if not user or user.privilages_ != 'admin':
-        return "Unauthorized", 403
+    
 
     # Combine all types of form submissions
     history_entries = []
@@ -2607,7 +2603,7 @@ def user_form_history(user_id):
         return redirect(url_for('login'))
 
     current_user = Profile.query.get(session['user_id'])
-    if not current_user or current_user.privilages_ != 'admin':
+    if not current_user :
         return "Unauthorized", 403
 
     # Get the user whose history we're viewing
@@ -2771,6 +2767,8 @@ def approve_student_drop(request_id):
     success, message = _process_approval(req, user_id, 'student_drop')
     flash(message, 'success' if success else 'danger')
     db.session.commit()
+    if user.user_roles =="department_chair":
+        return redirect(url_for('chair_student_drops'))
     return redirect(url_for('notifications'))
 
 def chair_student_drops():
@@ -2843,8 +2841,7 @@ def mark_student_drop_viewed(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if not user or user.privilages_ != 'admin':
-        return "Unauthorized", 403
+    
 
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
@@ -2936,7 +2933,7 @@ def download_student_drop_pdf(request_id, status):
 
     # Check if user is admin or owner of the request
     is_admin = user.privilages_ == 'admin'
-    if not is_admin and request_record.student_id != str(user_id):
+    if  request_record.student_id != str(user_id):
         return "Unauthorized", 403
 
     # If admin is viewing, mark as viewed
@@ -3042,9 +3039,7 @@ def approve_student_drop(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
-
+    
     req = StudentInitiatedDrop.query.get_or_404(request_id)
     if not req.has_admin_viewed(user_id):
         return "You must view the PDF before approving", 400
@@ -3070,6 +3065,8 @@ def approve_student_drop(request_id):
     req.admin_viewed = json.dumps(viewed)
 
     db.session.commit()
+    if user.user_roles =="department_chair":
+        return redirect(url_for('chair_student_drops'))
     return redirect(url_for('notifications'))
 
 @app.route('/reject_student_drop/<int:request_id>', methods=['POST'])
@@ -3080,9 +3077,7 @@ def reject_student_drop(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
-
+    
     req_record = StudentInitiatedDrop.query.get(request_id)
     if not req_record:
         return "Request not found", 404
