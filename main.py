@@ -519,7 +519,7 @@ class WorkflowConfig(db.Model):
     @staticmethod
     def get_required_approvers(form_type):
         config = WorkflowConfig.query.filter_by(form_type=form_type).first()
-        return config.required_approvers if config else 2  # Default to 2 if not configured
+        return config.required_approvers if config else 1  # Default to 2 if not configured
 
 class Department(db.Model):
     __tablename__ = 'departments'
@@ -1120,6 +1120,42 @@ def approve_ferpa(request_id):
     if not user_id:
         return redirect(url_for('login'))
 
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    req = FERPARequest.query.get_or_404(request_id)
+    if not req.has_admin_viewed(user_id):
+        flash('You must view the request PDF before approving.', 'danger')
+        return redirect(url_for('notifications'))
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+
+    approvals = json.loads(req.admin_approvals or '[]')
+    approvals.append(str(user_id))
+    req.admin_approvals = json.dumps(approvals)
+
+    required = WorkflowConfig.get_required_approvers('ferpa')
+    if len(approvals) >= required:
+        req.status = 'approved'
+        flash(f'FERPA request fully approved ({len(approvals)}/{required}).', 'success')
+    else:
+        req.status = 'pending_approval'
+        flash(f'FERPA request partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
+
+    viewed = json.loads(req.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    req.admin_viewed = json.dumps(viewed)
+
+    db.session.commit()
+    return redirect(url_for('notifications'))
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
     # Check if user is admin
     user = Profile.query.get(user_id)
     if user.privilages_ != 'admin':
@@ -1202,6 +1238,43 @@ def reject_ferpa(request_id):
 
 @app.route('/approve_infochange/<int:request_id>', methods=['POST'])
 def approve_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        flash('You do not have permission to approve requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    req = InfoChangeRequest.query.get_or_404(request_id)
+    if not req.has_admin_viewed(user_id):
+        flash('You must view the request PDF before approving.', 'danger')
+        return redirect(url_for('notifications'))
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+
+    approvals = json.loads(req.admin_approvals or '[]')
+    approvals.append(str(user_id))
+    req.admin_approvals = json.dumps(approvals)
+
+    required = WorkflowConfig.get_required_approvers('info_change')
+    if len(approvals) >= required:
+        req.status = 'approved'
+        flash(f'Name/SSN change fully approved ({len(approvals)}/{required}).', 'success')
+    else:
+        req.status = 'pending_approval'
+        flash(f'Name/SSN change partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
+
+    viewed = json.loads(req.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    req.admin_viewed = json.dumps(viewed)
+
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
@@ -2636,6 +2709,36 @@ def mark_student_drop_viewed(request_id):
 
 @app.route('/approve_student_drop/<int:request_id>', methods=['POST'])
 def approve_student_drop(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if user.privilages_ != 'admin':
+        return "Unauthorized", 403
+
+    req = StudentInitiatedDrop.query.get_or_404(request_id)
+    if not req.has_admin_viewed(user_id):
+        return "You must view the PDF before approving", 400
+    if req.has_admin_approved(user_id):
+        flash('You have already approved this request.', 'warning')
+        return redirect(url_for('notifications'))
+
+    approvals = json.loads(req.admin_approvals or '[]')
+    approvals.append(str(user_id))
+    req.admin_approvals = json.dumps(approvals)
+
+    required = WorkflowConfig.get_required_approvers('student_drop')
+    if len(approvals) >= required:
+        req.status = 'approved'
+        flash(f'Student drop fully approved ({len(approvals)}/{required}).', 'success')
+    else:
+        req.status = 'pending_approval'
+        flash(f'Student drop partially approved ({len(approvals)}/{required}); awaiting more.', 'success')
+
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
     """Approve a student-initiated drop request and generate a PDF"""
     user_id = session.get('user_id')
     if not user_id:
