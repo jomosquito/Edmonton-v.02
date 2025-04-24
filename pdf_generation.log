@@ -3146,3 +3146,755 @@ Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
 2025-04-19 19:25:06,865 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "GET /create HTTP/1.1" 200 -
 2025-04-19 19:25:06,886 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
 2025-04-19 19:25:06,887 - INFO - 127.0.0.1 - - [19/Apr/2025 19:25:06] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 22:56:51,659 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 22:56:51,660 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 22:56:51,660 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 22:56:51,660 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 22:56:51,660 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 22:56:51,663 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_pending_20250424035651.tex
+2025-04-23 22:56:51,664 - INFO - Replaced ##FORMID## with 2
+2025-04-23 22:56:51,664 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 22:56:51,664 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 22:56:51,664 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 22:56:51,664 - DEBUG - Searching for pdflatex executable...
+2025-04-23 22:56:51,664 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 22:56:52,576 - INFO - Found pdflatex at: pdflatex
+2025-04-23 22:56:52,576 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 22:56:52,576 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_pending_20250424035651.tex
+2025-04-23 22:56:52,577 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_2_pending_20250424035651.tex
+2025-04-23 22:56:53,428 - INFO - 127.0.0.1 - - [23/Apr/2025 22:56:53] "POST /mark_student_drop_viewed/2 HTTP/1.1" 200 -
+2025-04-23 22:56:58,707 - INFO - 127.0.0.1 - - [23/Apr/2025 22:56:58] "[32mPOST /approve_student_drop/2 HTTP/1.1[0m" 302 -
+2025-04-23 22:56:59,040 - INFO - 127.0.0.1 - - [23/Apr/2025 22:56:59] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 22:56:59,389 - INFO - 127.0.0.1 - - [23/Apr/2025 22:56:59] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 22:56:59,395 - INFO - 127.0.0.1 - - [23/Apr/2025 22:56:59] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 22:58:52,942 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:15:33,343 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:15:33,343 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:15:33,348 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:15:33,348 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:15:33,349 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:15:33,353 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_rejected_20250424041533.tex
+2025-04-23 23:15:33,353 - INFO - Replaced ##FORMID## with 2
+2025-04-23 23:15:33,353 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-23 23:15:33,353 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:15:33,354 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:15:33,354 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:15:33,354 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:15:33,680 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:15:33,680 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:15:33,680 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_rejected_20250424041533.tex
+2025-04-23 23:15:33,681 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_2_rejected_20250424041533.tex
+2025-04-23 23:15:35,777 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:15:35,777 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:15:35,778 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:15:35,779 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:15:35,779 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:15:35,781 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_rejected_20250424041535.tex
+2025-04-23 23:15:35,781 - INFO - Replaced ##FORMID## with 2
+2025-04-23 23:15:35,781 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-23 23:15:35,781 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:15:35,781 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:15:35,781 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:15:35,781 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:15:36,029 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:15:36,029 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:15:36,031 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_2_rejected_20250424041535.tex
+2025-04-23 23:15:36,031 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_2_rejected_20250424041535.tex
+2025-04-23 23:17:07,317 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:17:07,317 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:17:07,317 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:17:07,317 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:17:07,317 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:17:07,319 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_3_pending_20250424041707.tex
+2025-04-23 23:17:07,319 - INFO - Replaced ##FORMID## with 3
+2025-04-23 23:17:07,319 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 23:17:07,319 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:17:07,319 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:17:07,319 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:17:07,320 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:17:07,621 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:17:07,621 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:17:07,621 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_3_pending_20250424041707.tex
+2025-04-23 23:17:07,622 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_3_pending_20250424041707.tex
+2025-04-23 23:17:09,380 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:09] "POST /mark_student_drop_viewed/3 HTTP/1.1" 200 -
+2025-04-23 23:17:10,431 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:10] "[32mPOST /approve_student_drop/3 HTTP/1.1[0m" 302 -
+2025-04-23 23:17:10,761 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:10] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:17:11,128 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:11] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:17:11,133 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:11] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:17:50,337 - INFO - 127.0.0.1 - - [23/Apr/2025 23:17:50] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:18:55,102 - ERROR - Error compiling LaTeX file:
+2025-04-23 23:18:55,104 - ERROR - 
+2025-04-23 23:18:55,104 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(student_drop_3_pending_20250424041707.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/letltxmacro\letltxmacro
+.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/auxhook\auxhook.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def)
+
+! LaTeX Error: File `intcalc.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.803 \RequirePackage{intcalc}[2007/09/27]
+                                          ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on c:/Users\johnp\Desktop\Edmonton-v.02\static\pdfs\student_
+drop_3_pending_20250424041707.log.
+
+2025-04-23 23:18:55,119 - INFO - 127.0.0.1 - - [23/Apr/2025 23:18:55] "[33mGET /download_student_drop_pdf/3/pending HTTP/1.1[0m" 404 -
+2025-04-23 23:19:15,196 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:19:15,197 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:19:15,200 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:19:15,201 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:19:15,201 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:19:15,206 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_3_rejected_20250424041915.tex
+2025-04-23 23:19:15,206 - INFO - Replaced ##FORMID## with 3
+2025-04-23 23:19:15,206 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-23 23:19:15,206 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:19:15,207 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:19:15,207 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:19:15,207 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:19:15,659 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:19:15,659 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:19:15,659 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_3_rejected_20250424041915.tex
+2025-04-23 23:19:15,661 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_3_rejected_20250424041915.tex
+2025-04-23 23:19:16,821 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:16] "GET /ap HTTP/1.1" 200 -
+2025-04-23 23:19:16,896 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:16] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:19:17,237 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:17] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:19:20,423 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:20] "GET /profile HTTP/1.1" 200 -
+2025-04-23 23:19:22,308 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:22] "GET /settings HTTP/1.1" 200 -
+2025-04-23 23:19:23,501 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:23] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:19:23,808 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:23] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:19:31,072 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:31] "[32mPOST /submit_student_drop HTTP/1.1[0m" 302 -
+2025-04-23 23:19:31,107 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:31] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:19:33,195 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:33] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:19:33,980 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:33] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:19:34,271 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:34] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:19:34,395 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:34] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:19:38,533 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:38] "GET /ap HTTP/1.1" 200 -
+2025-04-23 23:19:38,598 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:38] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:19:38,769 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:38] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:19:41,037 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:41] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:19:41,347 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:41] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:19:41,390 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:41] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:19:44,195 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:44] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:19:45,728 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:45] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:19:45,747 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:45] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:19:48,250 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:48] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:19:48,272 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:48] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:19:51,667 - INFO - 127.0.0.1 - - [23/Apr/2025 23:19:51] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:19:54,212 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:21:01,988 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:21:01,988 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:21:01,988 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:21:01,988 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:21:01,988 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:21:01,991 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_4_pending_20250424042101.tex
+2025-04-23 23:21:01,991 - INFO - Replaced ##FORMID## with 4
+2025-04-23 23:21:01,991 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 23:21:01,991 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:21:01,991 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:21:01,991 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:21:01,991 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:21:02,381 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:21:02,381 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:21:02,381 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_4_pending_20250424042101.tex
+2025-04-23 23:21:02,383 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_4_pending_20250424042101.tex
+2025-04-23 23:21:03,741 - INFO - 127.0.0.1 - - [23/Apr/2025 23:21:03] "POST /mark_student_drop_viewed/4 HTTP/1.1" 200 -
+2025-04-23 23:21:05,374 - INFO - 127.0.0.1 - - [23/Apr/2025 23:21:05] "[32mPOST /approve_student_drop/4 HTTP/1.1[0m" 302 -
+2025-04-23 23:21:05,702 - INFO - 127.0.0.1 - - [23/Apr/2025 23:21:05] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:21:06,051 - INFO - 127.0.0.1 - - [23/Apr/2025 23:21:06] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:21:06,058 - INFO - 127.0.0.1 - - [23/Apr/2025 23:21:06] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:21:35,838 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:21:55,873 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:21:55,873 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:21:55,874 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:21:55,874 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:21:55,874 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:21:55,876 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_4_rejected_20250424042155.tex
+2025-04-23 23:21:55,876 - INFO - Replaced ##FORMID## with 4
+2025-04-23 23:21:55,876 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-23 23:21:55,876 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:21:55,876 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:21:55,876 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:21:55,876 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:21:56,242 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:21:56,242 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:21:56,243 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_4_rejected_20250424042155.tex
+2025-04-23 23:21:56,243 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_4_rejected_20250424042155.tex
+2025-04-23 23:22:01,253 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:01] "GET /ap HTTP/1.1" 200 -
+2025-04-23 23:22:01,571 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:01] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:22:01,616 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:01] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:22:10,908 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:10] "GET /profile HTTP/1.1" 200 -
+2025-04-23 23:22:13,332 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:13] "GET /settings HTTP/1.1" 200 -
+2025-04-23 23:22:15,232 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:15] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:22:15,320 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:15] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:22:22,738 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:22] "[32mPOST /submit_student_drop HTTP/1.1[0m" 302 -
+2025-04-23 23:22:22,819 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:22] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:22:27,537 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:27] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:22:28,499 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:28] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:22:28,542 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:28] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:22:28,857 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:28] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:22:30,658 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:30] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:22:30,691 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:30] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:22:30,842 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:30] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:22:32,285 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:22:32,285 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:22:32,285 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:22:32,285 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:22:32,285 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:22:32,294 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_5_pending_20250424042232.tex
+2025-04-23 23:22:32,295 - INFO - Replaced ##FORMID## with 5
+2025-04-23 23:22:32,295 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 23:22:32,295 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:22:32,295 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:22:32,295 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:22:32,295 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:22:32,639 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:22:32,640 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:22:32,640 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_5_pending_20250424042232.tex
+2025-04-23 23:22:32,640 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_5_pending_20250424042232.tex
+2025-04-23 23:22:34,311 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:34] "POST /mark_student_drop_viewed/5 HTTP/1.1" 200 -
+2025-04-23 23:22:35,094 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:35] "[32mPOST /approve_student_drop/5 HTTP/1.1[0m" 302 -
+2025-04-23 23:22:35,416 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:35] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:22:35,782 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:35] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:22:35,807 - INFO - 127.0.0.1 - - [23/Apr/2025 23:22:35] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:23:11,983 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:24:05,133 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:24:05,134 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:24:05,135 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:24:05,135 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:24:05,136 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:24:05,138 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_5_rejected_20250424042405.tex
+2025-04-23 23:24:05,138 - INFO - Replaced ##FORMID## with 5
+2025-04-23 23:24:05,138 - INFO - Replaced ##STATUS## with REJECTED
+2025-04-23 23:24:05,138 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:24:05,138 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:24:05,138 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:24:05,138 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:24:05,484 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:24:05,484 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:24:05,484 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_5_rejected_20250424042405.tex
+2025-04-23 23:24:05,485 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_5_rejected_20250424042405.tex
+2025-04-23 23:24:13,274 - ERROR - Error compiling LaTeX file:
+2025-04-23 23:24:13,274 - ERROR - 
+2025-04-23 23:24:13,275 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(student_drop_5_rejected_20250424042405.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/letltxmacro\letltxmacro
+.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/auxhook\auxhook.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def)
+
+! LaTeX Error: File `intcalc.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.803 \RequirePackage{intcalc}[2007/09/27]
+                                          ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on c:/Users\johnp\Desktop\Edmonton-v.02\static\pdfs\student_
+drop_5_rejected_20250424042405.log.
+
+2025-04-23 23:24:13,277 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:13] "[32mPOST /reject_student_drop/5 HTTP/1.1[0m" 302 -
+2025-04-23 23:24:13,300 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:13] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:24:13,346 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:13] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:24:13,650 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:13] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:24:16,754 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:16] "GET /ap HTTP/1.1" 200 -
+2025-04-23 23:24:17,030 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:17] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:24:17,124 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:17] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:24:21,747 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:21] "GET /profile HTTP/1.1" 200 -
+2025-04-23 23:24:23,063 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:23] "GET /settings HTTP/1.1" 200 -
+2025-04-23 23:24:24,401 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:24] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:24:24,469 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:24] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:24:32,335 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:32] "[32mPOST /submit_student_drop HTTP/1.1[0m" 302 -
+2025-04-23 23:24:32,578 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:32] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:24:36,486 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:36] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:24:37,525 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:37] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:24:37,569 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:37] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:24:37,876 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:37] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:24:39,416 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:39] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:24:39,489 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:39] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:24:39,657 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:39] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:24:40,733 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:24:40,733 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:24:40,733 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:24:40,734 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:24:40,734 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:24:40,737 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_20250424042440.tex
+2025-04-23 23:24:40,737 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:24:40,737 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 23:24:40,737 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:24:40,737 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:24:40,737 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:24:40,737 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:24:41,029 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:24:41,029 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:24:41,029 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_20250424042440.tex
+2025-04-23 23:24:41,030 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_20250424042440.tex
+2025-04-23 23:24:42,656 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:42] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:24:43,750 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:43] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:24:44,074 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:44] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:24:44,425 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:44] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:24:44,435 - INFO - 127.0.0.1 - - [23/Apr/2025 23:24:44] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:11,761 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:11] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:25:15,641 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:15] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:25:15,958 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:15] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:25:17,994 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:17] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:25:19,728 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:19] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:25:22,534 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:22] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:25:22,884 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:22] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:22,887 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:22] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:24,310 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:24] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:25:24,668 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:24] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:24,670 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:24] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:26,577 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:26] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:25:26,922 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:26] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:26,923 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:26] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:30,742 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:30] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:25:31,087 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:31] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:31,088 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:31] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:33,790 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:33] "GET /profile HTTP/1.1" 200 -
+2025-04-23 23:25:35,803 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:35] "GET /settings HTTP/1.1" 200 -
+2025-04-23 23:25:37,132 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:37] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:25:37,485 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:37] "GET /student_initiated_drop HTTP/1.1" 200 -
+2025-04-23 23:25:45,470 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:45] "[32mPOST /submit_student_drop HTTP/1.1[0m" 302 -
+2025-04-23 23:25:45,804 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:45] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:25:48,150 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:48] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:25:49,707 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:49] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:25:50,057 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:50] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:50,058 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:50] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:53,187 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:53] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:25:53,546 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:53] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:53,547 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:53] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:25:55,112 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:25:55,112 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:25:55,112 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:25:55,112 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:25:55,112 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:25:55,117 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_7_pending_20250424042555.tex
+2025-04-23 23:25:55,117 - INFO - Replaced ##FORMID## with 7
+2025-04-23 23:25:55,118 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 23:25:55,118 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:25:55,118 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:25:55,119 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:25:55,119 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:25:55,397 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:25:55,397 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:25:55,397 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_7_pending_20250424042555.tex
+2025-04-23 23:25:55,398 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_7_pending_20250424042555.tex
+2025-04-23 23:25:57,075 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:57] "POST /mark_student_drop_viewed/7 HTTP/1.1" 200 -
+2025-04-23 23:25:59,130 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:59] "[32mPOST /approve_student_drop/7 HTTP/1.1[0m" 302 -
+2025-04-23 23:25:59,471 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:59] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:25:59,835 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:59] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:25:59,845 - INFO - 127.0.0.1 - - [23/Apr/2025 23:25:59] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:26:09,566 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:09] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:26:28,423 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:26:30,664 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:26:30,664 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:26:30,664 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:26:30,664 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:26:30,664 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:26:30,666 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042630.tex
+2025-04-23 23:26:30,666 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:26:30,666 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:26:30,667 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:26:30,667 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:26:30,667 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:26:30,667 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:26:30,939 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:26:30,939 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:26:30,939 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042630.tex
+2025-04-23 23:26:30,939 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424042630.tex
+2025-04-23 23:26:34,377 - ERROR - Error compiling LaTeX file:
+2025-04-23 23:26:34,377 - ERROR - 
+2025-04-23 23:26:34,377 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(student_drop_6_pending_approval_20250424042630.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/letltxmacro\letltxmacro
+.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/auxhook\auxhook.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def)
+
+! LaTeX Error: File `intcalc.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.803 \RequirePackage{intcalc}[2007/09/27]
+                                          ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on c:/Users\johnp\Desktop\Edmonton-v.02\static\pdfs\student_
+drop_6_pending_approval_20250424042630.log.
+
+2025-04-23 23:26:34,378 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:34] "[33mGET /download_student_drop_pdf/6/pending HTTP/1.1[0m" 404 -
+2025-04-23 23:26:46,226 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:46] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:26:46,248 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:46] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:26:47,697 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:47] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:26:50,428 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:50] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:26:52,049 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:52] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:26:52,519 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:52] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:26:52,562 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:52] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:26:54,936 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:54] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:26:58,673 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:58] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:26:58,680 - INFO - 127.0.0.1 - - [23/Apr/2025 23:26:58] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:27:00,875 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:00] "GET /settings HTTP/1.1" 200 -
+2025-04-23 23:27:02,700 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:02] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:27:04,141 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:04] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:27:04,449 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:04] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:04,481 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:04] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:27:06,122 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:06] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:27:06,167 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:06] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:06,301 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:06] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:27:11,997 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:11] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:27:15,540 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:15] "[32mPOST /workflow_settings HTTP/1.1[0m" 302 -
+2025-04-23 23:27:15,550 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:15] "GET /workflow_settings HTTP/1.1" 200 -
+2025-04-23 23:27:17,210 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:17] "GET /status HTTP/1.1" 200 -
+2025-04-23 23:27:18,603 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:18] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 23:27:19,944 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:19] "GET /adminpage HTTP/1.1" 200 -
+2025-04-23 23:27:20,251 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:20] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:20,277 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:20] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:27:21,828 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:21] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:27:21,900 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:21] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:22,083 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:22] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:27:25,627 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:27:25,627 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:27:25,627 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:27:25,627 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:27:25,627 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:27:25,630 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042725.tex
+2025-04-23 23:27:25,630 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:27:25,630 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:27:25,630 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:27:25,630 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:27:25,630 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:27:25,630 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:27:25,915 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:27:25,915 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:27:25,915 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042725.tex
+2025-04-23 23:27:25,916 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424042725.tex
+2025-04-23 23:27:27,428 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:27] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:27:28,202 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:28] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:27:28,527 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:28] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:27:28,877 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:28] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:28,883 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:28] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:27:32,699 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:32] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:27:33,854 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:33] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:27:34,182 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:34] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:27:34,527 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:34] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:27:34,532 - INFO - 127.0.0.1 - - [23/Apr/2025 23:27:34] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:28:33,466 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:28:33,466 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:28:33,466 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:28:33,466 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:28:33,466 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:28:33,468 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_7_pending_approval_20250424042833.tex
+2025-04-23 23:28:33,468 - INFO - Replaced ##FORMID## with 7
+2025-04-23 23:28:33,468 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:28:33,468 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:28:33,468 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:28:33,468 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:28:33,468 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:28:33,752 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:28:33,752 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:28:33,752 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_7_pending_approval_20250424042833.tex
+2025-04-23 23:28:33,752 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_7_pending_approval_20250424042833.tex
+2025-04-23 23:28:35,538 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:35] "POST /mark_student_drop_viewed/7 HTTP/1.1" 200 -
+2025-04-23 23:28:36,459 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:36] "[32mPOST /approve_student_drop/7 HTTP/1.1[0m" 302 -
+2025-04-23 23:28:37,057 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:37] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:28:37,420 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:37] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:28:37,427 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:37] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:28:39,947 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:39] "POST /mark_student_drop_viewed/7 HTTP/1.1" 200 -
+2025-04-23 23:28:41,234 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:41] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:28:41,584 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:41] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:28:41,586 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:41] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:28:43,936 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:43] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:28:44,283 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:44] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:28:44,285 - INFO - 127.0.0.1 - - [23/Apr/2025 23:28:44] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:29:45,995 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:29:55,374 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:29:55,375 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:29:55,375 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:29:55,375 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:29:55,375 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:29:55,378 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042955.tex
+2025-04-23 23:29:55,378 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:29:55,378 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:29:55,378 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:29:55,378 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:29:55,378 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:29:55,378 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:29:55,853 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:29:55,854 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:29:55,854 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424042955.tex
+2025-04-23 23:29:55,854 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424042955.tex
+2025-04-23 23:29:57,117 - INFO - 127.0.0.1 - - [23/Apr/2025 23:29:57] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:29:57,890 - INFO - 127.0.0.1 - - [23/Apr/2025 23:29:57] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:29:58,252 - INFO - 127.0.0.1 - - [23/Apr/2025 23:29:58] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:29:58,807 - INFO - 127.0.0.1 - - [23/Apr/2025 23:29:58] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:29:58,812 - INFO - 127.0.0.1 - - [23/Apr/2025 23:29:58] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:30:04,603 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:30:04,603 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:30:04,603 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:30:04,603 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:30:04,604 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:30:04,605 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043004.tex
+2025-04-23 23:30:04,605 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:30:04,605 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:30:04,605 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:30:04,605 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:30:04,605 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:30:04,605 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:30:04,879 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:30:04,880 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:30:04,880 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043004.tex
+2025-04-23 23:30:04,880 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424043004.tex
+2025-04-23 23:30:06,362 - INFO - 127.0.0.1 - - [23/Apr/2025 23:30:06] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:30:07,041 - INFO - 127.0.0.1 - - [23/Apr/2025 23:30:07] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:30:07,365 - INFO - 127.0.0.1 - - [23/Apr/2025 23:30:07] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:30:07,712 - INFO - 127.0.0.1 - - [23/Apr/2025 23:30:07] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:30:07,715 - INFO - 127.0.0.1 - - [23/Apr/2025 23:30:07] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:31:09,480 - INFO -  * Detected change in 'c:\\Users\\johnp\\Desktop\\Edmonton-v.02\\main.py', reloading
+2025-04-23 23:31:32,773 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:31:32,774 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:31:32,774 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:31:32,775 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:31:32,775 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:31:32,780 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043132.tex
+2025-04-23 23:31:32,780 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:31:32,780 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:31:32,781 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:31:32,781 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:31:32,781 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:31:32,781 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:31:33,316 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:31:33,316 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:31:33,316 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043132.tex
+2025-04-23 23:31:33,317 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424043132.tex
+2025-04-23 23:31:34,542 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:34] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:31:35,680 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:35] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:31:36,067 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:36] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:31:36,720 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:36] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:31:36,730 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:36] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:31:41,032 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:41] "POST /mark_student_drop_viewed/6 HTTP/1.1" 200 -
+2025-04-23 23:31:42,150 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:42] "[32mPOST /approve_student_drop/6 HTTP/1.1[0m" 302 -
+2025-04-23 23:31:42,482 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:42] "GET /notifications HTTP/1.1" 200 -
+2025-04-23 23:31:42,831 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:42] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 23:31:42,832 - INFO - 127.0.0.1 - - [23/Apr/2025 23:31:42] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 23:31:59,385 - DEBUG - PDF directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:31:59,385 - DEBUG - Template directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates
+2025-04-23 23:31:59,385 - DEBUG - Looking for template at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\student_drop_template.tex
+2025-04-23 23:31:59,385 - INFO - Student drop template not found, using medical withdrawal template
+2025-04-23 23:31:59,386 - INFO - Template found at: c:\Users\johnp\Desktop\Edmonton-v.02\static\templates\medical_withdrawal_template.tex
+2025-04-23 23:31:59,388 - DEBUG - Created temporary LaTeX file at: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043159.tex
+2025-04-23 23:31:59,388 - INFO - Replaced ##FORMID## with 6
+2025-04-23 23:31:59,388 - INFO - Replaced ##STATUS## with PENDING_APPROVAL
+2025-04-23 23:31:59,388 - INFO - Replaced ##FULLNAME## with jpgleite@CougarNet.UH.EDU None
+2025-04-23 23:31:59,388 - INFO - Replaced ##MYUHID## with 1
+2025-04-23 23:31:59,388 - DEBUG - Searching for pdflatex executable...
+2025-04-23 23:31:59,388 - DEBUG - Trying pdflatex at: pdflatex
+2025-04-23 23:31:59,653 - INFO - Found pdflatex at: pdflatex
+2025-04-23 23:31:59,653 - DEBUG - Running pdflatex with output directory: c:\Users\johnp\Desktop\Edmonton-v.02\static\pdfs
+2025-04-23 23:31:59,653 - DEBUG - Source file: c:\Users\johnp\Desktop\Edmonton-v.02\static\temp\student_drop_6_pending_approval_20250424043159.tex
+2025-04-23 23:31:59,654 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=c:/Users/johnp/Desktop/Edmonton-v.02/static/pdfs student_drop_6_pending_approval_20250424043159.tex
+2025-04-23 23:32:03,834 - ERROR - Error compiling LaTeX file:
+2025-04-23 23:32:03,834 - ERROR - 
+2025-04-23 23:32:03,834 - ERROR - This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(student_drop_6_pending_approval_20250424043159.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.s
+ty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefine
+keys.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.s
+ty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds
+.sty))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/letltxmacro\letltxmacro
+.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/auxhook\auxhook.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettit
+lestring.sty
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+)))
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty)
+(C:\Users\johnp\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def)
+
+! LaTeX Error: File `intcalc.sty' not found.
+
+Type X to quit or <RETURN> to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+<read *> 
+         
+l.803 \RequirePackage{intcalc}[2007/09/27]
+                                          ^^M
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on c:/Users\johnp\Desktop\Edmonton-v.02\static\pdfs\student_
+drop_6_pending_approval_20250424043159.log.
+
+2025-04-23 23:32:03,835 - INFO - 127.0.0.1 - - [23/Apr/2025 23:32:03] "[33mGET /download_student_drop_pdf/6/pending HTTP/1.1[0m" 404 -

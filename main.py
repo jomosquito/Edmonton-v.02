@@ -8,11 +8,17 @@ from wtforms import StringField, SubmitField, SelectMultipleField, BooleanField,
 from wtforms.validators import DataRequired, Length, Email, Optional
 from O365 import Account
 from datetime import datetime, timedelta, date
+import os
+from operator import itemgetter
+
+def utc_to_gmt5(dt):
+    """Convert UTC datetime to GMT-5"""
+    return dt - timedelta(hours=5)
+
 from config import client_id, client_secret, SECRET_KEY
 from form_utils import allowed_file, return_choice, generate_ferpa, generate_ssn_name
 from sqlalchemy.orm import joinedload
 import json
-import os
 import re
 import uuid
 import jwt
@@ -504,6 +510,17 @@ class Role(db.Model):
     level = db.Column(db.Integer)  # 1=student, 2=chair, 3=president
     user_roles = db.relationship('UserRole', back_populates='role')
 
+class WorkflowConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    form_type = db.Column(db.String(50), unique=True, nullable=False)
+    required_approvers = db.Column(db.Integer, default=2)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @staticmethod
+    def get_required_approvers(form_type):
+        config = WorkflowConfig.query.filter_by(form_type=form_type).first()
+        return config.required_approvers if config else 2  # Default to 2 if not configured
+
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
@@ -778,7 +795,7 @@ def name_ssn_change():
 
                 # Generate PDF with debug output
                 print(f"Generating Name/SSN Change PDF with data: {data}")
-                pdf_file = generate_ssn_name(data, forms_dir, signatures_dir)
+                pdf_file = generate_ssn_name(data, forms_dir, os.path.join('static', 'uploads', 'signatures'))
                 print(f"Generated PDF file: {pdf_file}")
 
                 if not pdf_file:
@@ -884,19 +901,13 @@ def status():
     ferpa_requests = FERPARequest.query.filter_by(user_id=user_id).all()
     infochange_requests = InfoChangeRequest.query.filter_by(user_id=user_id).all()
 
-    # Debug: Print counts to console
-    print(f"Status page for user {user_id}:")
-    print(f"Medical requests: {len(medical_requests)}")
-    print(f"Student drop requests: {len(student_drop_requests)}")
-    print(f"FERPA requests: {len(ferpa_requests)}")
-    print(f"Name/SSN change requests: {len(infochange_requests)}")
-
     return render_template(
         'status.html',
         medical_requests=medical_requests,
         student_drop_requests=student_drop_requests,
         ferpa_requests=ferpa_requests,
-        infochange_requests=infochange_requests
+        infochange_requests=infochange_requests,
+        config=WorkflowConfig  # Pass WorkflowConfig class to template
     )
 
 # Modified routes for FERPA and Name/SSN PDF downloads
@@ -1332,18 +1343,75 @@ def mark_infochange_viewed(request_id):
 
     return {"success": True}
 
-# -------------------------------
-# V3 Routes
-# -------------------------------
+@app.route('/workflow_settings', methods=['GET', 'POST'])
+def workflow_settings():
+    """Admin page to configure workflow settings like number of required approvers"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
 
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
 
-# Helper function to convert UTC to GMT-5
-def utc_to_gmt5(utc_datetime):
-    """Convert UTC datetime to GMT-5 timezone"""
-    if utc_datetime is None:
-        return None
-    return utc_datetime - timedelta(hours=5)
+    if request.method == 'POST':
+        # Update workflow configs
+        form_types = ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change']
+        for form_type in form_types:
+            required_approvers = int(request.form.get(form_type, 2))
+            config = WorkflowConfig.query.filter_by(form_type=form_type).first()
+            if config:
+                config.required_approvers = required_approvers
+            else:
+                config = WorkflowConfig(form_type=form_type, required_approvers=required_approvers)
+                db.session.add(config)
+        
+        db.session.commit()
+        flash('Workflow settings updated successfully.', 'success')
+        return redirect(url_for('workflow_settings'))
 
+    # Get current configs
+    configs = {}
+    for config in WorkflowConfig.query.all():
+        configs[config.form_type] = config.required_approvers
+
+    return render_template('workflow_settings.html', configs=configs)
+
+# Update model methods to use configurable approver count
+def _is_fully_approved(model, form_type):
+    """Generic helper to check if a form has enough approvals"""
+    if not model.admin_approvals:
+        return False
+    try:
+        approved_by = json.loads(model.admin_approvals)
+        required_approvers = WorkflowConfig.get_required_approvers(form_type)
+        return len(approved_by) >= required_approvers
+    except:
+        return False
+
+# Update the is_fully_approved methods for each model
+def is_fully_approved(self):
+    return _is_fully_approved(self, 'medical_withdrawal')
+
+MedicalWithdrawalRequest.is_fully_approved = is_fully_approved
+
+def is_fully_approved(self):
+    return _is_fully_approved(self, 'student_drop')
+
+StudentInitiatedDrop.is_fully_approved = is_fully_approved
+
+def is_fully_approved(self):
+    return _is_fully_approved(self, 'ferpa')
+
+FERPARequest.is_fully_approved = is_fully_approved
+
+def is_fully_approved(self):
+    return _is_fully_approved(self, 'info_change')
+
+InfoChangeRequest.is_fully_approved = is_fully_approved
+
+##### V3 Integration of New Forms #####
 # -------------------------------
 # Routes
 # -------------------------------
@@ -1576,7 +1644,8 @@ def notifications():
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
         pending_ferpa_requests=pending_ferpa_requests,
-        pending_infochange_requests=pending_infochange_requests
+        pending_infochange_requests=pending_infochange_requests,
+        config=WorkflowConfig  # Pass WorkflowConfig class to template
     )
 
 # -------------------------------
@@ -1747,7 +1816,6 @@ def change_privileges(id):
     db.session.commit()
     return redirect(url_for('adminpage'))
 
-# Delete a profile
 @app.route('/delete/<int:id>')
 def erase(id):
     data = Profile.query.get(id)
@@ -1784,12 +1852,13 @@ def update_user(id):
         if new_role:
             role = Role.query.filter_by(name=new_role).first()
             if role:
-                db.session.add(UserRole(user_id=user.id, role_id=role.id))
+                db.session.add(UserRole(
+                    user_id=user.id,
+                    role_id=role.id
+                ))
         
         db.session.commit()
-        return redirect(url_for('adminpage'))  # Fix: Change from '/' to 'adminpage'
-
-    # For GET request - show current role
+        return redirect(url_for('adminpage'))  # Fix: Change from '/' to 'adminpage    # For GET request - show current role
     current_role = None
     if user.user_roles:  # Check if user has any roles
         current_role = user.user_roles[0].role.name if user.user_roles else 'student'
@@ -1858,7 +1927,7 @@ def medical_withdrawal_form():
 def submit_medical_withdrawal():
     user_id = session.get('user_id')
     if not user_id:
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))  # Redirect to login if the user is not logged in
 
     try:
         # Extract course data
@@ -2023,12 +2092,12 @@ def approve_medical_withdrawal(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
-        
+    
     # Check if this admin has already approved
     if req_record.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
-
+    
     # Add admin to approvals list
     if not req_record.admin_approvals:
         admin_approvals = [str(user_id)]
@@ -2039,8 +2108,11 @@ def approve_medical_withdrawal(request_id):
     
     req_record.admin_approvals = json.dumps(admin_approvals)
     
-    # Check if we now have 2 approvals, if so mark as fully approved
-    if len(admin_approvals) >= 2:
+    # Get required number of approvers from workflow config
+    required_approvers = WorkflowConfig.get_required_approvers('medical_withdrawal')
+    
+    # Check if we have enough approvals based on workflow config
+    if len(admin_approvals) >= required_approvers:
         req_record.status = 'approved'
         
         # Get comments from form
@@ -2055,11 +2127,11 @@ def approve_medical_withdrawal(request_id):
         )
         db.session.add(history_entry)
         
-        # Generate PDF with LaTeX
+        # Generate PDF with the updated function
         from pdf_utils import generate_medical_withdrawal_pdf
         pdf_path = generate_medical_withdrawal_pdf(req_record)
 
-        # Store the PDF path
+        # Store the PDF path in the request record
         if pdf_path:
             # If this is the first generated PDF
             if not req_record.generated_pdfs:
@@ -2075,7 +2147,7 @@ def approve_medical_withdrawal(request_id):
         # Mark as partially approved
         req_record.status = 'pending_approval'
         flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
-    
+
     db.session.commit()
     return redirect(url_for('notifications'))
 
@@ -2114,11 +2186,11 @@ def reject_medical_withdrawal(request_id):
     req_record.status = 'rejected'
     db.session.commit()
 
-    # Generate PDF with LaTeX
+    # Generate PDF with the updated function
     from pdf_utils import generate_medical_withdrawal_pdf
     pdf_path = generate_medical_withdrawal_pdf(req_record)
 
-    # Store the PDF path
+    # Store the PDF path in the request record
     if pdf_path:
         # If this is the first generated PDF
         if not req_record.generated_pdfs:
@@ -2162,7 +2234,6 @@ def download_pdf(request_id, status):
         request_record.admin_viewed = json.dumps(admin_viewed)
         db.session.commit()
 
-    # Rest of existing code remains the same
     # Find the most recent PDF with the given status
     pdf_dir = os.path.join('static', 'pdfs')
     search_pattern = f"medical_withdrawal_{request_id}_{status}_"
@@ -2175,7 +2246,7 @@ def download_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key(os.path.getctime))
+        latest_pdf = max(matching_files, key=lambda x: os.path.getctime(x))
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database
@@ -2282,10 +2353,8 @@ def submit_student_drop():
         signature_upload.save(filepath)
         signature = filepath
     elif signature_type == 'text':
-        signature_text = request.form.get('signature_text')
-        if not signature_text:
-            return "Typed signature is required for the selected option", 400
-        signature = signature_text
+        # Just store the text as the signature
+        signature = request.form.get('signature_text')
 
     # Save the drop request to the database
     drop_request = StudentInitiatedDrop(
@@ -2293,7 +2362,7 @@ def submit_student_drop():
         student_id=student_id,
         course_title=course_title,
         reason=reason,
-        date=date,  # Use the converted Python date object
+        date=date,
         signature=signature,
         status='pending'
     )
@@ -2312,7 +2381,7 @@ def form_history():
     # Get current user (admin viewing the history)
     user = Profile.query.get(user_id)
     if not user or user.privilages_ != 'admin':
-        return redirect(url_for('login'))
+        return "Unauthorized", 403
 
     # Combine all types of form submissions
     history_entries = []
@@ -2533,8 +2602,10 @@ def chair_student_drops():
         pending_medical_requests=pending_medical_requests,
         pending_student_drops=pending_student_drops,
         pending_ferpa_requests=pending_ferpa_requests,
-        pending_infochange_requests=pending_infochange_requests
+        pending_infochange_requests=pending_infochange_requests,
+        config=WorkflowConfig  # Pass WorkflowConfig class to template
     )
+
 @app.route('/mark_student_drop_viewed/<int:request_id>', methods=['POST'])
 def mark_student_drop_viewed(request_id):
     """Mark a student drop request as viewed by the current admin"""
@@ -2597,8 +2668,11 @@ def approve_student_drop(request_id):
     
     req_record.admin_approvals = json.dumps(admin_approvals)
     
-    # Check if we now have 2 approvals, if so mark as fully approved
-    if len(admin_approvals) >= 2:
+    # Get required number of approvers from workflow config
+    required_approvers = WorkflowConfig.get_required_approvers('student_drop')
+    
+    # Check if we have enough approvals based on workflow config
+    if len(admin_approvals) >= required_approvers:
         req_record.status = 'approved'
         
         # Generate PDF with the updated function
@@ -2620,7 +2694,7 @@ def approve_student_drop(request_id):
     else:
         # Mark as partially approved
         req_record.status = 'pending_approval'
-        flash('Student drop request has been partially approved. Awaiting second approval.', 'success')
+        flash('Student drop request has been partially approved. Awaiting additional approval.', 'success')
 
     db.session.commit()
     return redirect(url_for('notifications'))
@@ -2730,7 +2804,7 @@ def download_student_drop_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key(os.path.getctime))
+        latest_pdf = max(matching_files, key=lambda x: os.path.getctime(x))
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database

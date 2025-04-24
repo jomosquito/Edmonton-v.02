@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Workflow Settings</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-4">
+                    <h4>Required Approvers Configuration</h4>
+                    <p class="text-muted">Set the number of approvers required for each form type</p>
+                    
+                    <div class="mb-3">
+                        <label for="medical_withdrawal" class="form-label">Medical Withdrawal Forms</label>
+                        <input type="number" class="form-control" id="medical_withdrawal" name="medical_withdrawal" 
+                               min="1" max="10" value="{{ configs.get('medical_withdrawal', 2) }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="student_drop" class="form-label">Student Drop Forms</label>
+                        <input type="number" class="form-control" id="student_drop" name="student_drop" 
+                               min="1" max="10" value="{{ configs.get('student_drop', 2) }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ferpa" class="form-label">FERPA Forms</label>
+                        <input type="number" class="form-control" id="ferpa" name="ferpa" 
+                               min="1" max="10" value="{{ configs.get('ferpa', 2) }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="info_change" class="form-label">Name/SSN Change Forms</label>
+                        <input type="number" class="form-control" id="info_change" name="info_change" 
+                               min="1" max="10" value="{{ configs.get('info_change', 2) }}" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

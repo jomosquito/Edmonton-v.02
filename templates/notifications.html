@@ -305,6 +305,7 @@
           <a href="/adminpage"><i class="fas fa-users"></i> Manage Users</a>
           <a href="/create"><i class="fas fa-user-plus"></i> Create User</a>
           <a href="/form_history"><i class="fas fa-history"></i> Form History</a>
+          <a href="/workflow_settings"><i class="fas fa-cogs"></i> Workflow Settings</a>
           <a href="/profile" class="profile-link"><i class="fas fa-user-circle"></i> My Profile</a>
           <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
@@ -345,7 +346,7 @@
             <td>
               {{ request.status }}
               {% if request.status == 'pending_approval' %}
-                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('medical_withdrawal') }}</span>
               {% endif %}
             </td>
             <td>
@@ -433,7 +434,7 @@
             <td>
               {{ request.status }}
               {% if request.status == 'pending_approval' %}
-                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+                <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('student_drop') }}</span>
               {% endif %}
             </td>
             <td>
@@ -518,7 +519,7 @@
       <td>
         {{ request.status }}
         {% if request.status == 'pending_approval' %}
-          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('ferpa') }}</span>
         {% endif %}
       </td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
@@ -552,7 +553,8 @@
             style="display: inline"
           >
             <button type="submit" class="reject" id="reject-ferpa-{{ request.id }}"
-                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-times"></i> Reject
             </button>
           </form>
@@ -594,7 +596,7 @@
       <td>
         {{ request.status }}
         {% if request.status == 'pending_approval' %}
-          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/2</span>
+          <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('info_change') }}</span>
         {% endif %}
       </td>
       <td>{{ request.time.strftime('%m/%d/%Y') if request.time else "N/A" }}</td>
@@ -628,7 +630,8 @@
             style="display: inline"
           >
             <button type="submit" class="reject" id="reject-infochange-{{ request.id }}"
-                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}>
+                    {% if not request.has_admin_viewed(session.get('user_id')) %}disabled{% endif %}
+                    {% if request.has_admin_approved(session.get('user_id')) %}disabled{% endif %}>
               <i class="fas fa-times"></i> Reject
             </button>
           </form>

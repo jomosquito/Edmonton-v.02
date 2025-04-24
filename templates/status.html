@@ -305,9 +305,7 @@
                   <div class="status-badge status-{{ request.status }}">
                     {{ request.status.upper() }} {% if request.status ==
                     'pending_approval' %}
-                    <span class="approval-count"
-                      >{{ request.admin_approvals|from_json|length }}/2</span
-                    >
+                    <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('ferpa') }}</span>
                     {% endif %}
                   </div>
                 </td>
@@ -359,9 +357,7 @@
                   <div class="status-badge status-{{ request.status }}">
                     {{ request.status.upper() }} {% if request.status ==
                     'pending_approval' %}
-                    <span class="approval-count"
-                      >{{ request.admin_approvals|from_json|length }}/2</span
-                    >
+                    <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('info_change') }}</span>
                     {% endif %}
                   </div>
                 </td>
@@ -415,9 +411,7 @@
                   <div class="status-badge status-{{ request.status }}">
                     {{ request.status.upper() }} {% if request.status ==
                     'pending_approval' %}
-                    <span class="approval-count"
-                      >{{ request.admin_approvals|from_json|length }}/2</span
-                    >
+                    <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('medical_withdrawal') }}</span>
                     {% endif %}
                   </div>
                 </td>
@@ -470,9 +464,7 @@
                   <div class="status-badge status-{{ request.status }}">
                     {{ request.status.upper() }} {% if request.status ==
                     'pending_approval' %}
-                    <span class="approval-count"
-                      >{{ request.admin_approvals|from_json|length }}/2</span
-                    >
+                    <span class="approval-count">{{ request.admin_approvals|from_json|length }}/{{ config.get_required_approvers('student_drop') }}</span>
                     {% endif %}
                   </div>
                 </td>
