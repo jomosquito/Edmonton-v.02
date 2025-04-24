@@ -3450,3 +3450,211 @@ Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
 2025-04-23 14:35:18,013 - INFO - 127.0.0.1 - - [23/Apr/2025 14:35:18] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
 2025-04-23 14:35:18,013 - INFO - 127.0.0.1 - - [23/Apr/2025 14:35:18] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
 2025-04-23 14:35:43,831 - INFO - 127.0.0.1 - - [23/Apr/2025 14:35:43] "GET / HTTP/1.1" 200 -
+2025-04-23 20:29:11,012 - INFO - PDF directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-23 20:29:11,016 - INFO - Template directory (absolute): /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates
+2025-04-23 20:29:11,018 - INFO - Looking for template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/templates/medical_withdrawal_template.tex
+2025-04-23 20:29:11,019 - INFO - Successfully read template (3588 bytes)
+2025-04-23 20:29:11,020 - INFO - Using text for signature: hiiii
+2025-04-23 20:29:11,020 - INFO - Replaced ##FORMID## with 8
+2025-04-23 20:29:11,020 - INFO - Replaced ##STATUS## with PENDING
+2025-04-23 20:29:11,020 - INFO - Replaced ##FULLNAME## with jamascar@CougarNet.UH.EDU  Gupta
+2025-04-23 20:29:11,020 - INFO - Replaced ##MYUHID## with 2199291
+2025-04-23 20:29:11,020 - INFO - Replaced ##COLLEGE## with uh
+2025-04-23 20:29:11,020 - INFO - Replaced ##DEGREE## with degree
+2025-04-23 20:29:11,020 - INFO - Replaced ##PHONE## with 1233451312
+2025-04-23 20:29:11,020 - INFO - Replaced ##ADDRESS## with big address
+2025-04-23 20:29:11,021 - INFO - Replaced ##CITY## with ghs
+2025-04-23 20:29:11,021 - INFO - Replaced ##STATE## with asda
+2025-04-23 20:29:11,021 - INFO - Replaced ##ZIP## with asddasd
+2025-04-23 20:29:11,021 - INFO - Replaced ##EMAIL## with jamascar@CougarNet.UH.EDU
+2025-04-23 20:29:11,021 - INFO - Replaced ##TERM_YEAR## with Summer 2025
+2025-04-23 20:29:11,021 - INFO - Replaced ##LAST_DATE## with September 29, 8228
+2025-04-23 20:29:11,021 - INFO - Replaced ##REASON_TYPE## with Medical
+2025-04-23 20:29:11,021 - INFO - Replaced ##DETAILS## with asdasd
+2025-04-23 20:29:11,021 - INFO - Replaced ##FINANCIAL_ASSISTANCE## with Yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##HEALTH_INSURANCE## with Yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##CAMPUS_HOUSING## with Yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##VISA_STATUS## with Yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##GI_BILL## with Yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##INITIAL## with yes
+2025-04-23 20:29:11,021 - INFO - Replaced ##SIGNATURE_DATE## with April 24, 2025
+2025-04-23 20:29:11,021 - INFO - Replaced ##CREATED_DATE## with April 24, 2025
+2025-04-23 20:29:11,021 - INFO - Replaced ##COURSES## with 213213 & 123123 & 312213 \\
+
+2025-04-23 20:29:11,021 - INFO - Replaced ##ADMIN_SIGNATURE_SECTION## with 
+2025-04-23 20:29:11,021 - INFO - Created temporary LaTeX file at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_8_pending_20250424012911.tex
+2025-04-23 20:29:11,021 - INFO - Saved debug template at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/debug_template_20250424012911.tex
+2025-04-23 20:29:11,021 - INFO - Searching for pdflatex executable...
+2025-04-23 20:29:11,021 - INFO - Trying pdflatex at: pdflatex
+2025-04-23 20:29:11,039 - INFO - Found pdflatex at: pdflatex
+2025-04-23 20:29:11,039 - INFO - Running pdflatex with output directory: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs
+2025-04-23 20:29:11,039 - INFO - Source file: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/temp/medical_withdrawal_8_pending_20250424012911.tex
+2025-04-23 20:29:11,039 - INFO - Running command: pdflatex -interaction=nonstopmode -output-directory=/Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs medical_withdrawal_8_pending_20250424012911.tex
+2025-04-23 20:29:11,392 - INFO - pdflatex stdout: This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./medical_withdrawal_8_pending_20250424012911.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size12.clo))
+(/usr/local/texlive/2025/texmf-dist/t...
+2025-04-23 20:29:11,730 - INFO - PDF generated successfully at: /Users/zorro/Documents/GitHub/Edmonton-v.02/static/pdfs/medical_withdrawal_8_pending_20250424012911.pdf
+2025-04-23 20:29:11,731 - INFO - PDF file size: 41826 bytes
+2025-04-23 20:29:11,732 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:11] "[32mPOST /submit_medical_withdrawal HTTP/1.1[0m" 302 -
+2025-04-23 20:29:11,737 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:11] "GET /status HTTP/1.1" 200 -
+2025-04-23 20:29:14,494 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:14] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 20:29:15,660 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:15] "GET /chair_student_drops HTTP/1.1" 200 -
+2025-04-23 20:29:15,674 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:15] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 20:29:15,674 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:15] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 20:29:20,134 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:20] "GET /download_pdf/8/pending HTTP/1.1" 200 -
+2025-04-23 20:29:22,232 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:22] "[33mPOST /mark_pdf_viewed/8 HTTP/1.1[0m" 404 -
+2025-04-23 20:29:25,099 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:25] "[32mPOST /simple_approve_withdrawal/8 HTTP/1.1[0m" 302 -
+2025-04-23 20:29:25,111 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:25] "GET /chair_student_drops HTTP/1.1" 200 -
+2025-04-23 20:29:25,132 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:25] "[36mGET /static/css/admin_navbar.css HTTP/1.1[0m" 304 -
+2025-04-23 20:29:25,132 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:25] "[36mGET /static/js/admin.js HTTP/1.1[0m" 304 -
+2025-04-23 20:29:35,729 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:35] "[32mGET /logout HTTP/1.1[0m" 302 -
+2025-04-23 20:29:35,734 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:35] "GET / HTTP/1.1" 200 -
+2025-04-23 20:29:37,615 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:37] "[32mGET /creat HTTP/1.1[0m" 302 -
+2025-04-23 20:29:37,619 - DEBUG - Converted retries value: 1 -> Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2025-04-23 20:29:37,619 - DEBUG - Initializing with Entra authority: https://login.microsoftonline.com/common
+2025-04-23 20:29:37,621 - DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
+2025-04-23 20:29:37,702 - DEBUG - https://login.microsoftonline.com:443 "GET /common/v2.0/.well-known/openid-configuration HTTP/11" 200 1547
+2025-04-23 20:29:37,702 - DEBUG - openid_config("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration") = {'token_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/token', 'token_endpoint_auth_methods_supported': ['client_secret_post', 'private_key_jwt', 'client_secret_basic'], 'jwks_uri': 'https://login.microsoftonline.com/common/discovery/v2.0/keys', 'response_modes_supported': ['query', 'fragment', 'form_post'], 'subject_types_supported': ['pairwise'], 'id_token_signing_alg_values_supported': ['RS256'], 'response_types_supported': ['code', 'id_token', 'code id_token', 'id_token token'], 'scopes_supported': ['openid', 'profile', 'email', 'offline_access'], 'issuer': 'https://login.microsoftonline.com/{tenantid}/v2.0', 'request_uri_parameter_supported': False, 'userinfo_endpoint': 'https://graph.microsoft.com/oidc/userinfo', 'authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', 'device_authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/devicecode', 'http_logout_supported': True, 'frontchannel_logout_supported': True, 'end_session_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/logout', 'claims_supported': ['sub', 'iss', 'cloud_instance_name', 'cloud_instance_host_name', 'cloud_graph_host_name', 'msgraph_host', 'aud', 'exp', 'iat', 'auth_time', 'acr', 'nonce', 'preferred_username', 'name', 'tid', 'ver', 'at_hash', 'c_hash', 'email'], 'kerberos_endpoint': 'https://login.microsoftonline.com/common/kerberos', 'tenant_region_scope': None, 'cloud_instance_name': 'microsoftonline.com', 'cloud_graph_host_name': 'graph.windows.net', 'msgraph_host': 'graph.microsoft.com', 'rbac_url': 'https://pas.windows.net'}
+2025-04-23 20:29:37,702 - DEBUG - Broker enabled? None
+2025-04-23 20:29:37,703 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:37] "[32mGET /stepone HTTP/1.1[0m" 302 -
+2025-04-23 20:29:37,872 - DEBUG - Converted retries value: 1 -> Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2025-04-23 20:29:37,872 - DEBUG - Initializing with Entra authority: https://login.microsoftonline.com/common
+2025-04-23 20:29:37,874 - DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
+2025-04-23 20:29:37,965 - DEBUG - https://login.microsoftonline.com:443 "GET /common/v2.0/.well-known/openid-configuration HTTP/11" 200 1547
+2025-04-23 20:29:37,966 - DEBUG - openid_config("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration") = {'token_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/token', 'token_endpoint_auth_methods_supported': ['client_secret_post', 'private_key_jwt', 'client_secret_basic'], 'jwks_uri': 'https://login.microsoftonline.com/common/discovery/v2.0/keys', 'response_modes_supported': ['query', 'fragment', 'form_post'], 'subject_types_supported': ['pairwise'], 'id_token_signing_alg_values_supported': ['RS256'], 'response_types_supported': ['code', 'id_token', 'code id_token', 'id_token token'], 'scopes_supported': ['openid', 'profile', 'email', 'offline_access'], 'issuer': 'https://login.microsoftonline.com/{tenantid}/v2.0', 'request_uri_parameter_supported': False, 'userinfo_endpoint': 'https://graph.microsoft.com/oidc/userinfo', 'authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', 'device_authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/devicecode', 'http_logout_supported': True, 'frontchannel_logout_supported': True, 'end_session_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/logout', 'claims_supported': ['sub', 'iss', 'cloud_instance_name', 'cloud_instance_host_name', 'cloud_graph_host_name', 'msgraph_host', 'aud', 'exp', 'iat', 'auth_time', 'acr', 'nonce', 'preferred_username', 'name', 'tid', 'ver', 'at_hash', 'c_hash', 'email'], 'kerberos_endpoint': 'https://login.microsoftonline.com/common/kerberos', 'tenant_region_scope': None, 'cloud_instance_name': 'microsoftonline.com', 'cloud_graph_host_name': 'graph.windows.net', 'msgraph_host': 'graph.microsoft.com', 'rbac_url': 'https://pas.windows.net'}
+2025-04-23 20:29:37,966 - DEBUG - Broker enabled? None
+2025-04-23 20:29:37,966 - DEBUG - Generate or reuse correlation_id: 9e42d743-5268-4b5d-b2bc-4eb5a2f63e47
+2025-04-23 20:29:38,112 - DEBUG - https://login.microsoftonline.com:443 "POST /common/oauth2/v2.0/token HTTP/11" 200 5091
+2025-04-23 20:29:38,113 - DEBUG - event={
+    "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+    "data": {
+        "claims": null,
+        "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+        "code": "1.AQMAvboLF_CikEytSw6PDwxCWdtbnCCH37hEstFycBDTpoYBAQADAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_1zNsRFMDqE_HmKCR22uyLpy2bp2PHKVmbE2q7jc5EliN5sE7IKFoKE9BwELtuNcC6HGRiIJBrmNxOHJ5i8FIwhGC-rDVgZyna_gd172FVkZCUiLN83GGJxALvhs86Msqgt9kXTXy4UHpBOrXKIXJ4TJkTkdgD8zOFC6bF61Mb_GoLGr9sNiiS48STd4CfygSv4vgKKF55TxWe6QNdRraEQeLv2le7LcxCBueUtBKodWLsH6XSUUOyKuI0j3WXsK-tcLyRym9YjdlZXS-Ccs85GM5wSIFHUU6wBzOXbS-fKYXMAWTwdjlFr94FrTGZ-91qv6J0HajNpqr85qW2pw0NxRjbz3Ht90zQ79pdhGiI8ynvw3Wm-iT-ruyHzs-IW-0Nyl0XBGIqvp2Mvr1ft_U3-pgH8EuooBHpvUWdFQ87Knu5TQzRA1k_ilpRtD3eLiXwnEJeJvc_UrPTqXNORXDTgG0TVqrNJoOZ0eKUqH24wdVN82IFH1L9tpkmUjvnmAC_JQsrZZt82o7eGqEBF2d5CG_xZYg5FHpGoPzq3HpBIhNpe3TpE8z6vlJbN4fJrR9pmxsVN8NT3Jorer_u_m-cljggkS76bWZGym-k9rMnHETtepQjEEDVtRjXr8y39pxvNRABBV-AQt1tSV4PcaMtj_nLitdbVXLW_yFe45BMGYwrWg01S-7cdlZPrneb9z_IxIa05QCIvzsfFwUPW_tZh6Pgk7wG8-D9a1ahM-Ja_4g0f0UMjk3Rdteu-pVnzpekgANVT9KM2O-_8gE6m0IvpkqklWy0iqYbkMnzsUQ_8Brwu8dtKVhRNRMtdGSzVmd6aiPbK4iQWmpzd81PEa4Be1I0-0VxckDTqod9qj0kWBsIjkj2j6FU9w1r8oECQheUcnrGnntREjy8nSHZQw-EDrf_vZTveAazadr7",
+        "code_verifier": "_Gk-hwOblDYJST9zs0~HXeMUWar.RZE4udn6Cy2gQIP",
+        "redirect_uri": "http://localhost:5000/steptwo",
+        "scope": [
+            "email",
+            "profile",
+            "offline_access",
+            "Mail.ReadWrite",
+            "Mail.Send",
+            "openid"
+        ]
+    },
+    "environment": "login.microsoftonline.com",
+    "grant_type": "authorization_code",
+    "params": null,
+    "response": {
+        "access_token": "********",
+        "client_info": "eyJ1aWQiOiJlMDZiZTNmOS1kZTZkLTRkNmYtYjNhMC0zMzEyNTc4Njg5YTkiLCJ1dGlkIjoiMTcwYmJhYmQtYTJmMC00YzkwLWFkNGItMGU4ZjBmMGM0MjU5In0",
+        "expires_in": 4751,
+        "ext_expires_in": 4751,
+        "id_token": "********",
+        "refresh_token": "********",
+        "scope": "Mail.ReadWrite Mail.Send openid profile email",
+        "token_type": "Bearer"
+    },
+    "scope": [
+        "Mail.ReadWrite",
+        "Mail.Send",
+        "openid",
+        "profile",
+        "email"
+    ],
+    "token_endpoint": "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+}
+2025-04-23 20:29:38,114 - DEBUG - Current username changed from None to jamascar@CougarNet.UH.EDU
+2025-04-23 20:29:38,117 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:38] "[32mGET /steptwo?code=1.AQMAvboLF_CikEytSw6PDwxCWdtbnCCH37hEstFycBDTpoYBAQADAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_1zNsRFMDqE_HmKCR22uyLpy2bp2PHKVmbE2q7jc5EliN5sE7IKFoKE9BwELtuNcC6HGRiIJBrmNxOHJ5i8FIwhGC-rDVgZyna_gd172FVkZCUiLN83GGJxALvhs86Msqgt9kXTXy4UHpBOrXKIXJ4TJkTkdgD8zOFC6bF61Mb_GoLGr9sNiiS48STd4CfygSv4vgKKF55TxWe6QNdRraEQeLv2le7LcxCBueUtBKodWLsH6XSUUOyKuI0j3WXsK-tcLyRym9YjdlZXS-Ccs85GM5wSIFHUU6wBzOXbS-fKYXMAWTwdjlFr94FrTGZ-91qv6J0HajNpqr85qW2pw0NxRjbz3Ht90zQ79pdhGiI8ynvw3Wm-iT-ruyHzs-IW-0Nyl0XBGIqvp2Mvr1ft_U3-pgH8EuooBHpvUWdFQ87Knu5TQzRA1k_ilpRtD3eLiXwnEJeJvc_UrPTqXNORXDTgG0TVqrNJoOZ0eKUqH24wdVN82IFH1L9tpkmUjvnmAC_JQsrZZt82o7eGqEBF2d5CG_xZYg5FHpGoPzq3HpBIhNpe3TpE8z6vlJbN4fJrR9pmxsVN8NT3Jorer_u_m-cljggkS76bWZGym-k9rMnHETtepQjEEDVtRjXr8y39pxvNRABBV-AQt1tSV4PcaMtj_nLitdbVXLW_yFe45BMGYwrWg01S-7cdlZPrneb9z_IxIa05QCIvzsfFwUPW_tZh6Pgk7wG8-D9a1ahM-Ja_4g0f0UMjk3Rdteu-pVnzpekgANVT9KM2O-_8gE6m0IvpkqklWy0iqYbkMnzsUQ_8Brwu8dtKVhRNRMtdGSzVmd6aiPbK4iQWmpzd81PEa4Be1I0-0VxckDTqod9qj0kWBsIjkj2j6FU9w1r8oECQheUcnrGnntREjy8nSHZQw-EDrf_vZTveAazadr7&client_info=eyJ1aWQiOiJlMDZiZTNmOS1kZTZkLTRkNmYtYjNhMC0zMzEyNTc4Njg5YTkiLCJ1dGlkIjoiMTcwYmJhYmQtYTJmMC00YzkwLWFkNGItMGU4ZjBmMGM0MjU5In0&state=wzFlioVhpOuNnRyD&session_state=0040ba69-8836-2009-5e26-5b14156103d7 HTTP/1.1[0m" 302 -
+2025-04-23 20:29:38,123 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:38] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 20:29:50,801 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:50] "GET / HTTP/1.1" 200 -
+2025-04-23 20:29:52,346 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:52] "[32mGET /creat HTTP/1.1[0m" 302 -
+2025-04-23 20:29:52,351 - DEBUG - Converted retries value: 1 -> Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2025-04-23 20:29:52,351 - DEBUG - Initializing with Entra authority: https://login.microsoftonline.com/common
+2025-04-23 20:29:52,352 - DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
+2025-04-23 20:29:52,442 - DEBUG - https://login.microsoftonline.com:443 "GET /common/v2.0/.well-known/openid-configuration HTTP/11" 200 1547
+2025-04-23 20:29:52,443 - DEBUG - openid_config("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration") = {'token_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/token', 'token_endpoint_auth_methods_supported': ['client_secret_post', 'private_key_jwt', 'client_secret_basic'], 'jwks_uri': 'https://login.microsoftonline.com/common/discovery/v2.0/keys', 'response_modes_supported': ['query', 'fragment', 'form_post'], 'subject_types_supported': ['pairwise'], 'id_token_signing_alg_values_supported': ['RS256'], 'response_types_supported': ['code', 'id_token', 'code id_token', 'id_token token'], 'scopes_supported': ['openid', 'profile', 'email', 'offline_access'], 'issuer': 'https://login.microsoftonline.com/{tenantid}/v2.0', 'request_uri_parameter_supported': False, 'userinfo_endpoint': 'https://graph.microsoft.com/oidc/userinfo', 'authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', 'device_authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/devicecode', 'http_logout_supported': True, 'frontchannel_logout_supported': True, 'end_session_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/logout', 'claims_supported': ['sub', 'iss', 'cloud_instance_name', 'cloud_instance_host_name', 'cloud_graph_host_name', 'msgraph_host', 'aud', 'exp', 'iat', 'auth_time', 'acr', 'nonce', 'preferred_username', 'name', 'tid', 'ver', 'at_hash', 'c_hash', 'email'], 'kerberos_endpoint': 'https://login.microsoftonline.com/common/kerberos', 'tenant_region_scope': None, 'cloud_instance_name': 'microsoftonline.com', 'cloud_graph_host_name': 'graph.windows.net', 'msgraph_host': 'graph.microsoft.com', 'rbac_url': 'https://pas.windows.net'}
+2025-04-23 20:29:52,443 - DEBUG - Broker enabled? None
+2025-04-23 20:29:52,443 - INFO - 127.0.0.1 - - [23/Apr/2025 20:29:52] "[32mGET /stepone HTTP/1.1[0m" 302 -
+2025-04-23 20:31:05,061 - DEBUG - Converted retries value: 1 -> Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2025-04-23 20:31:05,062 - DEBUG - Initializing with Entra authority: https://login.microsoftonline.com/common
+2025-04-23 20:31:05,064 - DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
+2025-04-23 20:31:05,181 - DEBUG - https://login.microsoftonline.com:443 "GET /common/v2.0/.well-known/openid-configuration HTTP/11" 200 1547
+2025-04-23 20:31:05,182 - DEBUG - openid_config("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration") = {'token_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/token', 'token_endpoint_auth_methods_supported': ['client_secret_post', 'private_key_jwt', 'client_secret_basic'], 'jwks_uri': 'https://login.microsoftonline.com/common/discovery/v2.0/keys', 'response_modes_supported': ['query', 'fragment', 'form_post'], 'subject_types_supported': ['pairwise'], 'id_token_signing_alg_values_supported': ['RS256'], 'response_types_supported': ['code', 'id_token', 'code id_token', 'id_token token'], 'scopes_supported': ['openid', 'profile', 'email', 'offline_access'], 'issuer': 'https://login.microsoftonline.com/{tenantid}/v2.0', 'request_uri_parameter_supported': False, 'userinfo_endpoint': 'https://graph.microsoft.com/oidc/userinfo', 'authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', 'device_authorization_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/devicecode', 'http_logout_supported': True, 'frontchannel_logout_supported': True, 'end_session_endpoint': 'https://login.microsoftonline.com/common/oauth2/v2.0/logout', 'claims_supported': ['sub', 'iss', 'cloud_instance_name', 'cloud_instance_host_name', 'cloud_graph_host_name', 'msgraph_host', 'aud', 'exp', 'iat', 'auth_time', 'acr', 'nonce', 'preferred_username', 'name', 'tid', 'ver', 'at_hash', 'c_hash', 'email'], 'kerberos_endpoint': 'https://login.microsoftonline.com/common/kerberos', 'tenant_region_scope': None, 'cloud_instance_name': 'microsoftonline.com', 'cloud_graph_host_name': 'graph.windows.net', 'msgraph_host': 'graph.microsoft.com', 'rbac_url': 'https://pas.windows.net'}
+2025-04-23 20:31:05,182 - DEBUG - Broker enabled? None
+2025-04-23 20:31:05,183 - DEBUG - Generate or reuse correlation_id: e44e5fb1-8ee0-43cb-a747-2f6534ed9c7f
+2025-04-23 20:31:05,307 - DEBUG - https://login.microsoftonline.com:443 "POST /common/oauth2/v2.0/token HTTP/11" 200 5997
+2025-04-23 20:31:05,309 - DEBUG - event={
+    "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+    "data": {
+        "claims": null,
+        "client_id": "209c5bdb-df87-44b8-b2d1-727010d3a686",
+        "code": "1.AQMAvboLF_CikEytSw6PDwxCWdtbnCCH37hEstFycBDTpoYBAQADAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9DOehKCmW38ubfiB96YGe2o8evCp0TAa8qC3EKaDM9ToLPR5gi97pme0-1tNPKx8Mwiqi2NoxqeNHJnN-U4kaB6iJ98NhCrmycvaDuT6DMVeuAz6w3ZtutVYFQJq1gj1Wsj-hXdO03vU2-CxHVBMffhNUOlMx86s5A5nJ-Sg5LAF0A8FnC4dOTVfK90JEAaDEh9q7AL0CYIv3zGJRestim93CYK8fLBlTwNbqz4WE6FsD2LqHdrs3duzT-LOfg9d33KKjsvn_Z9G7MOoOlt1-aF8lFLyLZ6HLMT-a_TULliu6abC5GJGc_QYTnfsc6KAKHpZESSDhqyuJf0U3t8iXWAfq3tbct-nONNQ6XLQuzgEPIyDpnL6ahayN1gGWUfXWVHn6Ff4wAa5m4b1XIyQl4aVe5vu53GFyIH5TO6UMQn0EdkqQJ_p-HdToDXa_9hmQUhtK9z80z-N2Di9xVLNgjqvT4viKZJyRZlt0GcvLQGVLIsIeBD8ImTelRV5c6NXsbHIkxiYDZJAe8ZKOmqh74sX65D-d9YhmXjzlPCbtIFg_T6AKzJjdQcvKGRBbGUqQ6dN3YGP1OujAmtrRNHcniBICONmDwQh2PU3JW9uRYX0aseiIioBXrk_j5dwfF5WUjuW3l_-KPA81Nit3mOgkUZ7o35Rvun0U9sv8jPRoTwoOQVBqTkshB5jWJeaeELGRNVDBWGGhUeShOt4nCgg9M08L87TryWM95eFSqNJjLSaR_RGM6JpYWnjju_Jwjr8saNIvBhoQ3TRxLsZf3_wIjb4O1hDnh8UJxOTBaTHLluc_f2PWKPaR5u5Ta8uuXLEM7e0_9hP6BeuEWkStpZ6_SKv_mC-WWRzEdIc3vtx2-n3GZcCyWoziCj_q_-fwncQ1qsNOpirt1pX-LdgnUQNCz7HxQW4EHwufA2cW5CgA",
+        "code_verifier": "~pbMD3O.xEnGrUo1KJj8fNg75624huR0ksm_XyctezB",
+        "redirect_uri": "http://localhost:5000/steptwo",
+        "scope": [
+            "email",
+            "profile",
+            "offline_access",
+            "Mail.ReadWrite",
+            "Mail.Send",
+            "openid"
+        ]
+    },
+    "environment": "login.microsoftonline.com",
+    "grant_type": "authorization_code",
+    "params": null,
+    "response": {
+        "access_token": "********",
+        "client_info": "eyJ1aWQiOiIwMjNlMDIzOS1iMTY0LTQ4NzYtOWM2OC00NDBiOTljNzY2YWYiLCJ1dGlkIjoiMTcwYmJhYmQtYTJmMC00YzkwLWFkNGItMGU4ZjBmMGM0MjU5In0",
+        "expires_in": 4018,
+        "ext_expires_in": 4018,
+        "id_token": "********",
+        "refresh_token": "********",
+        "scope": "Calendars.Read Calendars.Read.Shared Calendars.ReadWrite Calendars.ReadWrite.Shared Contacts.Read Contacts.Read.Shared Contacts.ReadWrite Contacts.ReadWrite.Shared Files.Read.All Files.ReadWrite.All Mail.Read Mail.Read.Shared Mail.ReadWrite Mail.ReadWrite.Shared Mail.Send Mail.Send.Shared MailboxSettings.ReadWrite openid Presence.Read profile Sites.Read.All Sites.ReadWrite.All Tasks.Read Tasks.ReadWrite User.Read User.ReadBasic.All email",
+        "token_type": "Bearer"
+    },
+    "scope": [
+        "Calendars.Read",
+        "Calendars.Read.Shared",
+        "Calendars.ReadWrite",
+        "Calendars.ReadWrite.Shared",
+        "Contacts.Read",
+        "Contacts.Read.Shared",
+        "Contacts.ReadWrite",
+        "Contacts.ReadWrite.Shared",
+        "Files.Read.All",
+        "Files.ReadWrite.All",
+        "Mail.Read",
+        "Mail.Read.Shared",
+        "Mail.ReadWrite",
+        "Mail.ReadWrite.Shared",
+        "Mail.Send",
+        "Mail.Send.Shared",
+        "MailboxSettings.ReadWrite",
+        "openid",
+        "Presence.Read",
+        "profile",
+        "Sites.Read.All",
+        "Sites.ReadWrite.All",
+        "Tasks.Read",
+        "Tasks.ReadWrite",
+        "User.Read",
+        "User.ReadBasic.All",
+        "email"
+    ],
+    "token_endpoint": "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+}
+2025-04-23 20:31:05,309 - DEBUG - Current username changed from None to jpgleite@CougarNet.UH.EDU
+2025-04-23 20:31:05,313 - INFO - 127.0.0.1 - - [23/Apr/2025 20:31:05] "[32mGET /steptwo?code=1.AQMAvboLF_CikEytSw6PDwxCWdtbnCCH37hEstFycBDTpoYBAQADAA.AgABBAIAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P9DOehKCmW38ubfiB96YGe2o8evCp0TAa8qC3EKaDM9ToLPR5gi97pme0-1tNPKx8Mwiqi2NoxqeNHJnN-U4kaB6iJ98NhCrmycvaDuT6DMVeuAz6w3ZtutVYFQJq1gj1Wsj-hXdO03vU2-CxHVBMffhNUOlMx86s5A5nJ-Sg5LAF0A8FnC4dOTVfK90JEAaDEh9q7AL0CYIv3zGJRestim93CYK8fLBlTwNbqz4WE6FsD2LqHdrs3duzT-LOfg9d33KKjsvn_Z9G7MOoOlt1-aF8lFLyLZ6HLMT-a_TULliu6abC5GJGc_QYTnfsc6KAKHpZESSDhqyuJf0U3t8iXWAfq3tbct-nONNQ6XLQuzgEPIyDpnL6ahayN1gGWUfXWVHn6Ff4wAa5m4b1XIyQl4aVe5vu53GFyIH5TO6UMQn0EdkqQJ_p-HdToDXa_9hmQUhtK9z80z-N2Di9xVLNgjqvT4viKZJyRZlt0GcvLQGVLIsIeBD8ImTelRV5c6NXsbHIkxiYDZJAe8ZKOmqh74sX65D-d9YhmXjzlPCbtIFg_T6AKzJjdQcvKGRBbGUqQ6dN3YGP1OujAmtrRNHcniBICONmDwQh2PU3JW9uRYX0aseiIioBXrk_j5dwfF5WUjuW3l_-KPA81Nit3mOgkUZ7o35Rvun0U9sv8jPRoTwoOQVBqTkshB5jWJeaeELGRNVDBWGGhUeShOt4nCgg9M08L87TryWM95eFSqNJjLSaR_RGM6JpYWnjju_Jwjr8saNIvBhoQ3TRxLsZf3_wIjb4O1hDnh8UJxOTBaTHLluc_f2PWKPaR5u5Ta8uuXLEM7e0_9hP6BeuEWkStpZ6_SKv_mC-WWRzEdIc3vtx2-n3GZcCyWoziCj_q_-fwncQ1qsNOpirt1pX-LdgnUQNCz7HxQW4EHwufA2cW5CgA&client_info=eyJ1aWQiOiIwMjNlMDIzOS1iMTY0LTQ4NzYtOWM2OC00NDBiOTljNzY2YWYiLCJ1dGlkIjoiMTcwYmJhYmQtYTJmMC00YzkwLWFkNGItMGU4ZjBmMGM0MjU5In0&state=zRDByHZXpQWnmltC&session_state=0040ba69-9b5e-b92c-c603-10e21d9fd2b1 HTTP/1.1[0m" 302 -
+2025-04-23 20:31:05,320 - INFO - 127.0.0.1 - - [23/Apr/2025 20:31:05] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 20:31:07,922 - INFO - 127.0.0.1 - - [23/Apr/2025 20:31:07] "GET /settings HTTP/1.1" 200 -
+2025-04-23 20:31:11,577 - INFO - 127.0.0.1 - - [23/Apr/2025 20:31:11] "GET /userhompage HTTP/1.1" 200 -
+2025-04-23 20:41:14,497 - INFO -  * Detected change in '/Users/zorro/Documents/GitHub/Edmonton-v.02/main.py', reloading

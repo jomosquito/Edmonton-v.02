@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block content %}
 <div class="container mt-4">
   <h1>Approval Workflows</h1>
-  <a href="#" class="btn btn-primary mb-3 disabled"
-    >Add Workflow (Coming Soon)</a
-  >
+  <a href="{{ url_for('add_workflow') }}" class="btn btn-primary mb-3">
+    <i class="fas fa-plus"></i> Add Workflow
+  </a>
   <div class="card">
     <div class="card-header bg-primary text-white">Configured Workflows</div>
     <div class="card-body">

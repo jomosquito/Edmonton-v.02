@@ -94,6 +94,14 @@ class Profile(db.Model):
     def can_approve_forms(self):
         return self.is_admin or self.is_department_chair
 
+    @property
+    def is_president(self):
+        """Check if user has president role"""
+        for user_role in self.user_roles:
+            if user_role.role.name == 'president':
+                return True
+        return False
+
 class StudentInitiatedDrop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(100), nullable=False)
@@ -800,14 +808,6 @@ def ferpa_form():
                     official_other=data['OTHEROFFICIALS'],
                     info_choices=info_choices_str,
                     info_other=data['OTHERINFO'],
-                    release_choices=release_choices_str,
-                    release_other=data['OTHERRELEASE'],
-                    release_to=data['RELEASE'],
-                    purpose=data['PURPOSE'],
-                    additional_names=data['ADDITIONALS'],
-                    password=data['PASSWORD'],
-                    peoplesoft_id=data['PEOPLESOFT'],
-                    date=date_obj
                 )
 
                 # Commit FERPA request to database
@@ -2498,7 +2498,7 @@ def download_pdf(request_id, status):
 
     if matching_files:
         # Sort by creation time, newest first
-        latest_pdf = max(matching_files, key=os.path.getctime)
+        latest_pdf = max(matching_files, key(os.path.getctime))
         return send_file(latest_pdf, as_attachment=True)
     elif request_record.generated_pdfs:
         # Check if we have stored paths in the database
@@ -4692,6 +4692,47 @@ def admin_org_hierarchy_report():
     org_units = OrganizationalUnit.query.all()
     return render_template('admin/org_hierarchy_report.html', org_units=org_units)
 
+@app.route('/president_portal')
+def president_portal():
+    """View for president approval portal"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+    
+    # Check if user has president role
+    is_president = False
+    for user_role in user.user_roles:
+        if user_role.role.name == 'president':
+            is_president = True
+            break
+    
+    if not is_president:
+        flash('Access denied: President privileges required', 'error')
+        return redirect(url_for('userhompage'))
+    
+    # Get pending requests for review
+    pending_medical_requests = MedicalWithdrawalRequest.query.filter_by(status='pending_approval').all()
+    pending_student_drops = StudentInitiatedDrop.query.filter_by(status='pending_approval').all()
+    pending_ferpa_requests = FERPARequest.query.filter_by(status='pending_approval').all()
+    pending_infochange_requests = InfoChangeRequest.query.filter_by(status='pending_approval').all()
+    
+    return render_template(
+        'president_portal.html',
+        pending_medical_requests=pending_medical_requests,
+        pending_student_drops=pending_student_drops,
+        pending_ferpa_requests=pending_ferpa_requests,
+        pending_infochange_requests=pending_infochange_requests,
+        session=session
+    )
+
+
+
+
+
 # Update the initialization in the main block
 if __name__ == "__main__":
     with app.app_context():
@@ -4699,6 +4740,4 @@ if __name__ == "__main__":
         initialize_roles_and_departments()
         initialize_organization_structure()  # Add the new initialization
     app.run(debug=True)
-
-
 

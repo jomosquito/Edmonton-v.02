@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>President Portal - Edmonton</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/main.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Admin Navigation Bar -->
+    <nav class="admin-navbar">
+      <div class="nav-container">
+        <div class="top-bar">
+          <a href="/president_portal" class="logo">
+            <i class="fas fa-university"></i> President Portal
+          </a>
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <div class="nav-links">
+          <a href="/userhompage"><i class="fas fa-home"></i> Dashboard</a>
+          <a href="/president_portal"
+            ><i class="fas fa-check-double"></i> Approvals</a
+          >
+          <a href="/notifications"><i class="fas fa-bell"></i> Notifications</a>
+          <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+          <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <header>
+        <h1>President Approval Portal</h1>
+        <p>Review and approve pending requests</p>
+      </header>
+
+      <section class="approval-section">
+        <h2>Medical Withdrawal Requests</h2>
+        {% if pending_medical_requests %}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Date Submitted</th>
+              <th>Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in pending_medical_requests %}
+            <tr>
+              <td>
+                {{ request.student.first_name }} {{ request.student.last_name }}
+              </td>
+              <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>{{ request.reason }}</td>
+              <td>
+                <a
+                  href="/medical_withdrawal/{{ request.id }}/view"
+                  class="btn btn-small"
+                  >View Details</a
+                >
+                <a
+                  href="/medical_withdrawal/{{ request.id }}/approve"
+                  class="btn btn-small btn-success"
+                  >Approve</a
+                >
+                <a
+                  href="/medical_withdrawal/{{ request.id }}/deny"
+                  class="btn btn-small btn-danger"
+                  >Deny</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No pending medical withdrawal requests.</p>
+        {% endif %}
+      </section>
+
+      <section class="approval-section">
+        <h2>Student Drop Requests</h2>
+        {% if pending_student_drops %}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Date Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for drop in pending_student_drops %}
+            <tr>
+              <td>
+                {{ drop.student.first_name }} {{ drop.student.last_name }}
+              </td>
+              <td>{{ drop.course.code }}</td>
+              <td>{{ drop.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                <a href="/student_drop/{{ drop.id }}/view" class="btn btn-small"
+                  >View Details</a
+                >
+                <a
+                  href="/student_drop/{{ drop.id }}/approve"
+                  class="btn btn-small btn-success"
+                  >Approve</a
+                >
+                <a
+                  href="/student_drop/{{ drop.id }}/deny"
+                  class="btn btn-small btn-danger"
+                  >Deny</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No pending student drop requests.</p>
+        {% endif %}
+      </section>
+
+      <section class="approval-section">
+        <h2>FERPA Requests</h2>
+        {% if pending_ferpa_requests %}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Type</th>
+              <th>Date Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in pending_ferpa_requests %}
+            <tr>
+              <td>
+                {{ request.student.first_name }} {{ request.student.last_name }}
+              </td>
+              <td>{{ request.request_type }}</td>
+              <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                <a
+                  href="/ferpa_request/{{ request.id }}/view"
+                  class="btn btn-small"
+                  >View Details</a
+                >
+                <a
+                  href="/ferpa_request/{{ request.id }}/approve"
+                  class="btn btn-small btn-success"
+                  >Approve</a
+                >
+                <a
+                  href="/ferpa_request/{{ request.id }}/deny"
+                  class="btn btn-small btn-danger"
+                  >Deny</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No pending FERPA requests.</p>
+        {% endif %}
+      </section>
+
+      <section class="approval-section">
+        <h2>Information Change Requests</h2>
+        {% if pending_infochange_requests %}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Change Type</th>
+              <th>Date Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in pending_infochange_requests %}
+            <tr>
+              <td>
+                {{ request.student.first_name }} {{ request.student.last_name }}
+              </td>
+              <td>{{ request.change_type }}</td>
+              <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                <a
+                  href="/infochange_request/{{ request.id }}/view"
+                  class="btn btn-small"
+                  >View Details</a
+                >
+                <a
+                  href="/infochange_request/{{ request.id }}/approve"
+                  class="btn btn-small btn-success"
+                  >Approve</a
+                >
+                <a
+                  href="/infochange_request/{{ request.id }}/deny"
+                  class="btn btn-small btn-danger"
+                  >Deny</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No pending information change requests.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Toggle mobile menu
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navLinks = document.querySelector(".nav-links");
+
+        if (menuToggle && navLinks) {
+          menuToggle.addEventListener("click", function () {
+            navLinks.classList.toggle("active");
+          });
+        }
+
+        // Set active link based on current page
+        const currentPath = window.location.pathname;
+        const navItems = document.querySelectorAll(".nav-links a");
+
+        navItems.forEach((item) => {
+          const href = item.getAttribute("href");
+          if (
+            currentPath === href ||
+            (href !== "/" && currentPath.startsWith(href))
+          ) {
+            item.classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
