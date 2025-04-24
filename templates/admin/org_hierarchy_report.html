@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h1>Organizational Hierarchy Report</h1>
+  <div class="card">
+    <div class="card-header bg-primary text-white">Hierarchy</div>
+    <div class="card-body">
+      <ul>
+        {% for unit in org_units %}
+        <li>
+          {{ unit.full_path }} ({{ unit.code }}) - {{ 'Active' if unit.active
+          else 'Inactive' }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

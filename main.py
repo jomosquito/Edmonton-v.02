@@ -10,7 +10,7 @@ from O365 import Account
 from datetime import datetime, timedelta, date
 from config import client_id, client_secret, SECRET_KEY
 from form_utils import allowed_file, return_choice, generate_ferpa, generate_ssn_name
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, relationship
 import json
 import os
 import re
@@ -4679,6 +4679,18 @@ def delegation_history():
         now=now,
         is_admin=is_admin
     )
+
+@app.route('/admin/org_hierarchy_report')
+def admin_org_hierarchy_report():
+    """Display a report of the organizational hierarchy"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+    org_units = OrganizationalUnit.query.all()
+    return render_template('admin/org_hierarchy_report.html', org_units=org_units)
 
 # Update the initialization in the main block
 if __name__ == "__main__":

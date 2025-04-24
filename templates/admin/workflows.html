@@ -1,94 +1,49 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="container mt-4">
-    <h1>Approval Workflows Management</h1>
-    
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <p>Configure multi-step approval workflows for different form types</p>
-        <a href="{{ url_for('add_workflow') }}" class="btn btn-primary">Add New Workflow</a>
+  <h1>Approval Workflows</h1>
+  <a href="#" class="btn btn-primary mb-3 disabled"
+    >Add Workflow (Coming Soon)</a
+  >
+  <div class="card">
+    <div class="card-header bg-primary text-white">Configured Workflows</div>
+    <div class="card-body">
+      {% if workflows %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Form Type</th>
+            <th>Org Unit</th>
+            <th>Active</th>
+            <th>Steps</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for wf in workflows %}
+          <tr>
+            <td>{{ wf.name }}</td>
+            <td>{{ wf.form_type or 'All' }}</td>
+            <td>{{ wf.org_unit.name if wf.org_unit else 'All Units' }}</td>
+            <td>{{ 'Yes' if wf.active else 'No' }}</td>
+            <td>
+              <ul>
+                {% for step in wf.steps|sort(attribute='order') %}
+                <li>
+                  {{ step.order }}. {{ step.name }} ({{ step.approver_role.name
+                  if step.approver_role else 'Any' }}) {% if step.org_unit %}
+                  [{{ step.org_unit.name }}]{% endif %}
+                </li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No workflows configured.</p>
+      {% endif %}
     </div>
-
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            Approval Workflows
-        </div>
-        <div class="card-body">
-            {% if workflows %}
-                <div class="list-group">
-                    {% for workflow in workflows %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-1">{{ workflow.name }}</h5>
-                                <div>
-                                    <a href="{{ url_for('edit_workflow', workflow_id=workflow.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                </div>
-                            </div>
-                            <p class="mb-1">{{ workflow.description or 'No description' }}</p>
-                            
-                            <div class="row mt-2">
-                                <div class="col-md-4">
-                                    <span class="badge bg-info">Form Type: {{ workflow.form_type }}</span>
-                                </div>
-                                <div class="col-md-4">
-                                    {% if workflow.org_unit %}
-                                        <span class="badge bg-secondary">Unit: {{ workflow.org_unit.name }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    {% if workflow.department %}
-                                        <span class="badge bg-secondary">Department: {{ workflow.department.name }}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            {% if workflow.steps %}
-                                <div class="mt-3">
-                                    <h6>Approval Steps:</h6>
-                                    <div class="d-flex flex-wrap mt-2">
-                                        {% for step in workflow.steps|sort(attribute='order') %}
-                                            <div class="card me-2 mb-2" style="min-width: 200px;">
-                                                <div class="card-header {% if step.active %}bg-success{% else %}bg-danger{% endif %} text-white py-1">
-                                                    <small>Step {{ step.order }}: {{ step.name }}</small>
-                                                </div>
-                                                <div class="card-body py-2">
-                                                    <small>Approver Role: {{ step.approver_role.name if step.approver_role else 'Any' }}</small><br>
-                                                    <small>Min Approvers: {{ step.min_approvers }}</small>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-warning mt-3">
-                                    This workflow has no steps defined. <a href="{{ url_for('edit_workflow', workflow_id=workflow.id) }}">Add steps</a> to make it functional.
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>No approval workflows found. Add one to get started.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <h3>About Approval Workflows</h3>
-        <p>
-            Approval workflows define the process that form submissions follow to receive approvals.
-            Each workflow consists of ordered steps with specific approver roles.
-        </p>
-        <p>
-            You can create different workflows for:
-            <ul>
-                <li>Different form types (Medical Withdrawal, FERPA, etc.)</li>
-                <li>Different departments (Computer Science vs. Mathematics)</li>
-                <li>Different organizational units (College of Engineering vs. College of Business)</li>
-            </ul>
-            
-            More specific workflows take precedence over general ones.
-        </p>
-    </div>
+  </div>
 </div>
 {% endblock %}

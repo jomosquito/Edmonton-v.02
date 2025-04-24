@@ -93,5 +93,44 @@
             </ul>
         </p>
     </div>
+
+    <div class="mt-4">
+        <h1>Delegation History</h1>
+        <div class="card">
+            <div class="card-header bg-primary text-white">Delegations</div>
+            <div class="card-body">
+                {% if delegations %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Delegator</th>
+                        <th>Delegate</th>
+                        <th>Org Unit</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Reason</th>
+                        <th>Revoked</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in delegations %}
+                    <tr>
+                        <td>{{ d.delegator.display_name }}</td>
+                        <td>{{ d.delegate.display_name }}</td>
+                        <td>{{ d.org_unit.name if d.org_unit else 'All' }}</td>
+                        <td>{{ d.start_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ d.end_date.strftime('%Y-%m-%d') if d.end_date else '' }}</td>
+                        <td>{{ d.reason or '' }}</td>
+                        <td>{{ 'Yes' if d.revoked else 'No' }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No delegations found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
