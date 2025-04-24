@@ -139,6 +139,74 @@ class StudentInitiatedDrop(db.Model):
     def check_password(self, password):
         return check_password_hash(self.pass_word, password)
 
+class WorkflowStep(db.Model):
+    """Defines an ordered approval step for a given form_type."""
+    __tablename__ = 'workflow_steps'
+    id = db.Column(db.Integer, primary_key=True)
+    form_type = db.Column(db.String(50), nullable=False)       # e.g. 'ferpa', 'info_change', etc.
+    step_order = db.Column(db.Integer, nullable=False)         # 1,2,3…
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=True)
+    role = db.relationship('Role')
+    user = db.relationship('Profile')
+    def __repr__(self):
+        target = self.user or self.role
+        return f"<WorkflowStep {self.form_type} step {self.step_order} → {target}>"
+
+class Delegation(db.Model):
+    """When an approver delegates their rights to another user."""
+    __tablename__ = 'delegations'
+    id = db.Column(db.Integer, primary_key=True)
+    approver_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    delegatee_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime, nullable=True)
+    active = db.Column(db.Boolean, default=True)
+    approver = db.relationship('Profile', foreign_keys=[approver_id], backref='delegations_given')
+    delegatee = db.relationship('Profile', foreign_keys=[delegatee_id], backref='delegations_received')
+    def __repr__(self):
+        return f"<Delegation {self.approver_id}→{self.delegatee_id} active={self.active}>"
+
+def get_steps_for_form(form_type):
+    """Return ordered list of WorkflowStep for this form_type."""
+    return WorkflowStep.query\
+        .filter_by(form_type=form_type)\
+        .order_by(WorkflowStep.step_order)\
+        .all()
+
+def can_user_approve(user: Profile, form_type: str) -> bool:
+    """
+    Returns True if the given user is assigned (directly or via role),
+    or has an active delegation for one of the steps in this form's workflow.
+    """
+    now = datetime.utcnow()
+    for step in get_steps_for_form(form_type):
+        # direct user assignment
+        if step.user_id and step.user_id == user.id:
+            return True
+
+        # role-based assignment
+        if step.role_id and any(ur.role_id == step.role_id for ur in user.user_roles):
+            return True
+
+        # delegation: has someone delegated this step to me?
+        for d in user.delegations_received:
+            if not d.active:
+                continue
+            if d.start_date <= now and (d.end_date is None or now <= d.end_date):
+                # Check if the delegator is assigned to this step directly
+                if d.approver_id == step.user_id:
+                    return True
+
+                # Check if the delegator has the role assigned to this step
+                if step.role_id and any(ur.role_id == step.role_id for ur in d.approver.user_roles):
+                    return True
+
+    # Admin users can always approve
+    if user.privilages_ == 'admin':
+        return True
+
+    return False
 
 class WithdrawalHistory(db.Model):
     __tablename__ = 'withdrawal_history'
@@ -395,7 +463,299 @@ class InfoChangeRequest(db.Model):
         except:
             return False
 
+### V4 ROUTES ###
+@app.route('/workflow_management')
+def workflow_management():
+    """Admin page to manage workflow steps and approvers"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
 
+    # Check if user is admin
+    user = Profile.query.get(user_id)
+    if not user or user.privilages_ != 'admin':
+        return redirect(url_for('login'))
+
+    # Get all form types, roles, and users for the UI
+    form_types = ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change']
+    roles = Role.query.all()
+    users = Profile.query.filter(Profile.privilages_ != 'user').all()  # All non-basic users
+
+    # Get current workflow steps for each form type
+    workflows = {}
+    for form_type in form_types:
+        workflows[form_type] = WorkflowStep.query\
+            .filter_by(form_type=form_type)\
+            .order_by(WorkflowStep.step_order)\
+            .all()
+
+    # Get workflow configs (required approvers)
+    configs = {}
+    for config in WorkflowConfig.query.all():
+        configs[config.form_type] = config.required_approvers
+
+    return render_template(
+        'workflow_management.html',
+        workflows=workflows,
+        form_types=form_types,
+        roles=roles,
+        users=users,
+        configs=configs
+    )
+
+@app.route('/add_workflow_step', methods=['POST'])
+def add_workflow_step():
+    """Add a new workflow step"""
+    user_id = session.get('user_id')
+    if not user_id or Profile.query.get(user_id).privilages_ != 'admin':
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    try:
+        form_type = request.form.get('form_type')
+        role_id = request.form.get('role_id')
+        user_id_for_step = request.form.get('user_id')
+
+        # Validate that at least one of role_id or user_id is provided
+        if not role_id and not user_id_for_step:
+            return jsonify({"success": False, "message": "Must provide either a role or user"}), 400
+
+        # Find the highest existing step_order for this form type
+        highest_step = WorkflowStep.query.filter_by(form_type=form_type).order_by(
+            WorkflowStep.step_order.desc()).first()
+        next_step = 1 if not highest_step else highest_step.step_order + 1
+
+        # Create the new workflow step
+        new_step = WorkflowStep(
+            form_type=form_type,
+            step_order=next_step,
+            role_id=role_id if role_id else None,
+            user_id=user_id_for_step if user_id_for_step else None
+        )
+
+        db.session.add(new_step)
+        db.session.commit()
+
+        return jsonify({"success": True, "step_id": new_step.id})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/delete_workflow_step/<int:step_id>', methods=['POST'])
+def delete_workflow_step(step_id):
+    """Delete a workflow step and reorder remaining steps"""
+    user_id = session.get('user_id')
+    if not user_id or Profile.query.get(user_id).privilages_ != 'admin':
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    try:
+        step = WorkflowStep.query.get_or_404(step_id)
+        form_type = step.form_type
+        deleted_order = step.step_order
+
+        # Delete the step
+        db.session.delete(step)
+
+        # Reorder remaining steps
+        later_steps = WorkflowStep.query.filter(
+            WorkflowStep.form_type == form_type,
+            WorkflowStep.step_order > deleted_order
+        ).all()
+
+        for later_step in later_steps:
+            later_step.step_order -= 1
+
+        db.session.commit()
+        return jsonify({"success": True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/reorder_workflow_steps/<string:form_type>', methods=['POST'])
+def reorder_workflow_steps(form_type):
+    """Reorder workflow steps based on JSON payload"""
+    user_id = session.get('user_id')
+    if not user_id or Profile.query.get(user_id).privilages_ != 'admin':
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    try:
+        # Payload should be {step_id: new_order, step_id: new_order, ...}
+        new_orders = request.json
+
+        for step_id, new_order in new_orders.items():
+            step = WorkflowStep.query.get(int(step_id))
+            if step and step.form_type == form_type:
+                step.step_order = int(new_order)
+
+        db.session.commit()
+        return jsonify({"success": True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/delegation_management')
+def delegation_management():
+    """Admin page to manage approval delegations"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    # For admins, show all delegations. For others, show only their own.
+    is_admin = user.privilages_ == 'admin'
+
+    if is_admin:
+        delegations = Delegation.query.all()
+    else:
+        delegations = Delegation.query.filter(
+            (Delegation.approver_id == user_id) |
+            (Delegation.delegatee_id == user_id)
+        ).all()
+
+    # Get all users that can be delegated to
+    eligible_users = Profile.query.filter(Profile.active == True).all()
+
+    return render_template(
+        'delegation_management.html',
+        delegations=delegations,
+        eligible_users=eligible_users,
+        current_user=user,
+        is_admin=is_admin
+    )
+
+@app.route('/add_delegation', methods=['POST'])
+def add_delegation():
+    """Create a new delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    try:
+        approver_id = user_id
+        delegatee_id = request.form.get('delegatee_id')
+        start_date_str = request.form.get('start_date')
+        end_date_str = request.form.get('end_date')
+
+        if not delegatee_id:
+            return jsonify({"success": False, "message": "No delegatee selected"}), 400
+
+        # Parse dates
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else datetime.utcnow()
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+
+        # Create the delegation
+        new_delegation = Delegation(
+            approver_id=approver_id,
+            delegatee_id=delegatee_id,
+            start_date=start_date,
+            end_date=end_date,
+            active=True
+        )
+
+        db.session.add(new_delegation)
+        db.session.commit()
+
+        flash('Delegation created successfully.', 'success')
+        return redirect(url_for('delegation_management'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating delegation: {str(e)}', 'danger')
+        return redirect(url_for('delegation_management'))
+
+@app.route('/toggle_delegation/<int:delegation_id>', methods=['POST'])
+def toggle_delegation(delegation_id):
+    """Toggle a delegation's active status"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    try:
+        delegation = Delegation.query.get_or_404(delegation_id)
+
+        # Check if user is authorized to modify this delegation
+        user = Profile.query.get(user_id)
+        if user.privilages_ != 'admin' and delegation.approver_id != user_id:
+            return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+        # Toggle the active state
+        delegation.active = not delegation.active
+        db.session.commit()
+
+        return jsonify({"success": True, "active": delegation.active})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/delete_delegation/<int:delegation_id>', methods=['POST'])
+def delete_delegation(delegation_id):
+    """Delete a delegation"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "message": "Not logged in"}), 401
+
+    try:
+        delegation = Delegation.query.get_or_404(delegation_id)
+
+        # Check if user is authorized to delete this delegation
+        user = Profile.query.get(user_id)
+        if user.privilages_ != 'admin' and delegation.approver_id != user_id:
+            return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+        db.session.delete(delegation)
+        db.session.commit()
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@app.route('/setup_roles', methods=['GET'])
+def setup_roles():
+    """Initialize standard roles if they don't exist yet"""
+    user_id = session.get('user_id')
+    if not user_id or Profile.query.get(user_id).privilages_ != 'admin':
+        flash('Unauthorized', 'danger')
+        return redirect(url_for('login'))
+
+    try:
+        # Define standard roles
+        standard_roles = [
+            {"name": "student", "level": 1, "description": "Normal basic user role"},
+            {"name": "department_chair", "level": 2, "description": "Can approve any form but not view form history"},
+            {"name": "president", "level": 3, "description": "Access to approve any form and view form history"},
+            {"name": "admin", "level": 4, "description": "Has access to the whole entire admin portal"}
+        ]
+
+        created = 0
+        for role_data in standard_roles:
+            existing_role = Role.query.filter_by(name=role_data["name"]).first()
+            if not existing_role:
+                new_role = Role(
+                    name=role_data["name"],
+                    level=role_data["level"],
+                    description=role_data["description"]
+                )
+                db.session.add(new_role)
+                created += 1
+
+        db.session.commit()
+        flash(f'Successfully created {created} new roles', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating roles: {str(e)}', 'danger')
+
+    return redirect(url_for('workflow_management'))
+
+### V4 ROUTES ###
 ### V3 Integration of New Forms ###
 
 ##### V3 Form Classes #####
@@ -502,41 +862,56 @@ class InfoChangeForm(FlaskForm):
 
 ##### V3 Form Classes #####
 
-# Add after your existing models but before routes
 class Role(db.Model):
+    """Defines user roles in the system."""
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)  # student, department_chair, president
-    level = db.Column(db.Integer)  # 1=student, 2=chair, 3=president
-    user_roles = db.relationship('UserRole', back_populates='role')
+    name = db.Column(db.String(50), unique=True, nullable=False)  # e.g. 'student', 'department_chair', 'president', 'admin'
+    level = db.Column(db.Integer, default=1)  # Higher number means higher access level
+    description = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f"<Role {self.name} (level {self.level})>"
+
+class UserRole(db.Model):
+    """Associates users with roles."""
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=True)
+
+    user = db.relationship('Profile', back_populates='user_roles')
+    role = db.relationship('Role')
+    department = db.relationship('Department', back_populates='user_roles')
+
+    def __repr__(self):
+        return f"<UserRole {self.user_id} - {self.role_id}>"
 
 class WorkflowConfig(db.Model):
+    """Stores configuration for workflows, like required number of approvers."""
+    __tablename__ = 'workflow_configs'
     id = db.Column(db.Integer, primary_key=True)
-    form_type = db.Column(db.String(50), unique=True, nullable=False)
+    form_type = db.Column(db.String(50), unique=True, nullable=False)  # e.g. 'medical_withdrawal'
     required_approvers = db.Column(db.Integer, default=2)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
     def get_required_approvers(form_type):
+        """Get required number of approvers for a form type, default to 2 if not configured."""
         config = WorkflowConfig.query.filter_by(form_type=form_type).first()
-        return config.required_approvers if config else 1  # Default to 2 if not configured
+        return config.required_approvers if config else 2
 
 class Department(db.Model):
     __tablename__ = 'departments'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(20), unique=True, nullable=False)
-    chairs = db.relationship('UserRole', back_populates='department')
+    # Now we define the relationship correctly
+    user_roles = db.relationship('UserRole', back_populates='department')
 
-class UserRole(db.Model):
-    __tablename__ = 'user_roles'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('profile.id'))
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'))
-    role = db.relationship('Role', back_populates='user_roles')
-    department = db.relationship('Department')
-    user = db.relationship('Profile', back_populates='user_roles')
+    def __repr__(self):
+        return f"<Department {self.name} ({self.code})>"
 
 
 @app.before_request
@@ -1121,14 +1496,15 @@ def approve_ferpa(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        flash('You do not have permission to approve requests.', 'danger')
+    if not can_user_approve(user, 'ferpa') and user.privilages_ != 'admin':
+        flash('You do not have permission to approve this request.', 'danger')
         return redirect(url_for('notifications'))
 
     req = FERPARequest.query.get_or_404(request_id)
     if not req.has_admin_viewed(user_id):
         flash('You must view the request PDF before approving.', 'danger')
         return redirect(url_for('notifications'))
+
     if req.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
@@ -1149,59 +1525,6 @@ def approve_ferpa(request_id):
     if str(user_id) not in viewed:
         viewed.append(str(user_id))
     req.admin_viewed = json.dumps(viewed)
-
-    db.session.commit()
-    return redirect(url_for('notifications'))
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    # Check if user is admin
-    user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        flash('You do not have permission to approve requests.', 'danger')
-        return redirect(url_for('notifications'))
-
-    ferpa_request = FERPARequest.query.get_or_404(request_id)
-    
-    # Check if admin has viewed the PDF
-    if not ferpa_request.has_admin_viewed(user_id):
-        flash('You must view the request PDF before approving.', 'danger')
-        return redirect(url_for('notifications'))
-    
-    # Check if this admin has already approved
-    if ferpa_request.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
-        return redirect(url_for('notifications'))
-    
-    # Add admin to approvals list
-    if not ferpa_request.admin_approvals:
-        admin_approvals = [str(user_id)]
-    else:
-        admin_approvals = json.loads(ferpa_request.admin_approvals)
-        if str(user_id) not in admin_approvals:
-            admin_approvals.append(str(user_id))
-    
-    ferpa_request.admin_approvals = json.dumps(admin_approvals)
-    
-    # Check if we now have 2 approvals, if so mark as fully approved
-    if len(admin_approvals) >= 2:
-        ferpa_request.status = 'approved'
-        flash('FERPA request has been fully approved.', 'success')
-    else:
-        # Mark as partially approved
-        ferpa_request.status = 'pending_approval'
-        flash('FERPA request has been partially approved. Awaiting second approval.', 'success')
-    
-    # Update the admin_viewed field as well
-    if hasattr(ferpa_request, 'admin_viewed'):
-        if not ferpa_request.admin_viewed:
-            admin_viewed = [str(user_id)]
-        else:
-            admin_viewed = json.loads(ferpa_request.admin_viewed)
-            if str(user_id) not in admin_viewed:
-                admin_viewed.append(str(user_id))
-        ferpa_request.admin_viewed = json.dumps(admin_viewed)
 
     db.session.commit()
     return redirect(url_for('notifications'))
@@ -1286,17 +1609,17 @@ def approve_infochange(request_id):
         return redirect(url_for('notifications'))
 
     infochange_request = InfoChangeRequest.query.get_or_404(request_id)
-    
+
     # Check if admin has viewed the PDF
     if not infochange_request.has_admin_viewed(user_id):
         flash('You must view the request PDF before approving.', 'danger')
         return redirect(url_for('notifications'))
-    
+
     # Check if this admin has already approved
     if infochange_request.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
-    
+
     # Add admin to approvals list
     if not infochange_request.admin_approvals:
         admin_approvals = [str(user_id)]
@@ -1304,9 +1627,9 @@ def approve_infochange(request_id):
         admin_approvals = json.loads(infochange_request.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
-    
+
     infochange_request.admin_approvals = json.dumps(admin_approvals)
-    
+
     # Check if we now have 2 approvals, if so mark as fully approved
     if len(admin_approvals) >= 2:
         infochange_request.status = 'approved'
@@ -1315,7 +1638,7 @@ def approve_infochange(request_id):
         # Mark as partially approved
         infochange_request.status = 'pending_approval'
         flash('Name/SSN change request has been partially approved. Awaiting second approval.', 'success')
-    
+
     # Update the admin_viewed field as well
     if hasattr(infochange_request, 'admin_viewed'):
         if not infochange_request.admin_viewed:
@@ -1418,50 +1741,42 @@ def mark_infochange_viewed(request_id):
 
 @app.route('/workflow_settings', methods=['GET', 'POST'])
 def workflow_settings():
-    """Admin page to configure workflow settings like number of required approvers"""
+    """Update workflow settings like required approvers"""
     user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
-
-    # Check if user is admin
-    user = Profile.query.get(user_id)
-    if not user or user.privilages_ != 'admin':
+    if not user_id or Profile.query.get(user_id).privilages_ != 'admin':
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        # Update workflow configs
-        form_types = ['medical_withdrawal', 'student_drop', 'ferpa', 'info_change']
-        for form_type in form_types:
+        try:
+            form_type = request.form.get('form_type')
+            if not form_type:
+                flash('Missing form type', 'danger')
+                return redirect(url_for('workflow_management'))
+
             required_approvers = int(request.form.get(form_type, 2))
+
+            # Update or create the workflow config
             config = WorkflowConfig.query.filter_by(form_type=form_type).first()
             if config:
                 config.required_approvers = required_approvers
             else:
-                config = WorkflowConfig(form_type=form_type, required_approvers=required_approvers)
+                config = WorkflowConfig(
+                    form_type=form_type,
+                    required_approvers=required_approvers
+                )
                 db.session.add(config)
-        
-        db.session.commit()
-        flash('Workflow settings updated successfully.', 'success')
-        return redirect(url_for('workflow_settings'))
 
-    # Get current configs
-    configs = {}
-    for config in WorkflowConfig.query.all():
-        configs[config.form_type] = config.required_approvers
+            db.session.commit()
+            flash(f'Workflow settings for {form_type} updated successfully', 'success')
 
-    return render_template('workflow_settings.html', configs=configs)
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating workflow settings: {str(e)}', 'danger')
 
-# Update model methods to use configurable approver count
-def _is_fully_approved(model, form_type):
-    """Generic helper to check if a form has enough approvals"""
-    if not model.admin_approvals:
-        return False
-    try:
-        approved_by = json.loads(model.admin_approvals)
-        required_approvers = WorkflowConfig.get_required_approvers(form_type)
-        return len(approved_by) >= required_approvers
-    except:
-        return False
+        return redirect(url_for('workflow_management'))
+
+    # For GET requests, redirect to workflow management
+    return redirect(url_for('workflow_management'))
 
 # Update the is_fully_approved methods for each model
 def is_fully_approved(self):
@@ -1764,7 +2079,7 @@ def auth_step_one():
     email, idtoken = open1()
 
     if result:
-      
+
         return redirect('/')
 
     return "Authentication failed", 400
@@ -1828,7 +2143,7 @@ def auth_step_two_callback():
             return redirect(url_for('adminpage'))  # Admin page
         else:
             return redirect(url_for('userhompage'))  # User homepage
-        
+
 
     return "Authentication failed", 400
 # -------------------------------
@@ -1911,16 +2226,16 @@ def update_user(id):
         user.phoneN_ = request.form.get("phoneN_")
         user.privilages_ = request.form.get("privileges")
         user.active = 'active' in request.form
-        
+
         if request.form.get("pass_word"):
             user.set_password(request.form.get("pass_word"))
 
         # SIMPLIFIED ROLE UPDATE
         new_role = request.form.get("user_roles")  # Change from user_role to user_roles to match the form field
-        
+
         # Clear existing roles
         UserRole.query.filter_by(user_id=id).delete()
-        
+
         # Add new role if selected
         if new_role:
             role = Role.query.filter_by(name=new_role).first()
@@ -1929,13 +2244,13 @@ def update_user(id):
                     user_id=user.id,
                     role_id=role.id
                 ))
-        
+
         db.session.commit()
         return redirect(url_for('adminpage'))  # Fix: Change from '/' to 'adminpage    # For GET request - show current role
     current_role = None
     if user.user_roles:  # Check if user has any roles
         current_role = user.user_roles[0].role.name if user.user_roles else 'student'
-    return render_template('update.html', 
+    return render_template('update.html',
                          profile=user,
                          current_role=current_role)
 
@@ -1945,7 +2260,7 @@ def create_profile():
         password = request.form.get("pass_word")
         if not password:
             return "Password is required", 400
-            
+
         # Create the new profile
         new_profile = Profile(
             first_name=request.form.get("first_name"),
@@ -1955,11 +2270,11 @@ def create_profile():
             active=request.form.get("active") == "on",
             pass_word=generate_password_hash(password)
         )
-        
+
         # Add profile to the database to get an ID
         db.session.add(new_profile)
         db.session.flush()  # This assigns an ID to new_profile without committing
-        
+
         # Assign role if specified in the form
         role_name = request.form.get("user_roles")
         if role_name:
@@ -1967,11 +2282,11 @@ def create_profile():
             if role:
                 user_role = UserRole(user_id=new_profile.id, role_id=role.id)
                 db.session.add(user_role)
-        
+
         # Commit all changes
         db.session.commit()
         return redirect('/ap')
-        
+
     # For GET request - get all roles to display in the form
     roles = Role.query.all()
     return render_template("create.html", roles=roles)
@@ -2149,77 +2464,58 @@ def view_medical_request(request_id):
 
 @app.route('/approve_medical_withdrawal/<int:request_id>', methods=['POST'])
 def approve_medical_withdrawal(request_id):
-    """Approve a medical withdrawal request and generate a PDF"""
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
+    if not user:
+        return redirect(url_for('login'))
 
-    req_record = MedicalWithdrawalRequest.query.get(request_id)
-    if not req_record:
-        return "Request not found", 404
+    # Check if user has permission to approve (either direct, role-based, or delegation)
+    if not can_user_approve(user, 'medical_withdrawal') and user.privilages_ != 'admin':
+        flash('You do not have permission to approve this request.', 'danger')
+        return redirect(url_for('notifications'))
+
+    req = MedicalWithdrawalRequest.query.get_or_404(request_id)
 
     # Check if admin has viewed the PDF
-    if not req_record.has_admin_viewed(user_id):
-        return "You must view the request PDF before approving", 400
-    
+    if not req.has_admin_viewed(user_id):
+        flash('You must view the request PDF before approving.', 'danger')
+        return redirect(url_for('notifications'))
+
     # Check if this admin has already approved
-    if req_record.has_admin_approved(user_id):
+    if req.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
-    
+
     # Add admin to approvals list
-    if not req_record.admin_approvals:
+    if not req.admin_approvals:
         admin_approvals = [str(user_id)]
     else:
-        admin_approvals = json.loads(req_record.admin_approvals)
+        admin_approvals = json.loads(req.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
-    
-    req_record.admin_approvals = json.dumps(admin_approvals)
-    
-    # Get required number of approvers from workflow config
+
+    req.admin_approvals = json.dumps(admin_approvals)
+
+    # Get the required number of approvals from the workflow config
     required_approvers = WorkflowConfig.get_required_approvers('medical_withdrawal')
-    
-    # Check if we have enough approvals based on workflow config
+
+    # Check if we now have enough approvals
     if len(admin_approvals) >= required_approvers:
-        req_record.status = 'approved'
-        
-        # Get comments from form
-        comments = request.form.get('comments', '')
-
-        # Create history record
-        history_entry = WithdrawalHistory(
-            withdrawal_id=request_id,
-            admin_id=user_id,
-            action='approved',
-            comments=comments
-        )
-        db.session.add(history_entry)
-        
-        # Generate PDF with the updated function
-        from pdf_utils import generate_medical_withdrawal_pdf
-        pdf_path = generate_medical_withdrawal_pdf(req_record)
-
-        # Store the PDF path in the request record
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-                
-        flash('Medical withdrawal request has been fully approved.', 'success')
+        req.status = 'approved'
+        flash(f'Medical withdrawal request has been fully approved ({len(admin_approvals)}/{required_approvers}).', 'success')
     else:
         # Mark as partially approved
-        req_record.status = 'pending_approval'
-        flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
+        req.status = 'pending_approval'
+        flash(f'Medical withdrawal request has been partially approved ({len(admin_approvals)}/{required_approvers}). Awaiting more approvals.', 'success')
+
+    # Update the admin_viewed field as well
+    viewed = json.loads(req.admin_viewed or '[]')
+    if str(user_id) not in viewed:
+        viewed.append(str(user_id))
+    req.admin_viewed = json.dumps(viewed)
 
     db.session.commit()
     return redirect(url_for('notifications'))
@@ -2755,12 +3051,12 @@ def approve_student_drop(request_id):
     # Check if admin has viewed the PDF
     if not req_record.has_admin_viewed(user_id):
         return "You must view the request PDF before approving", 400
-    
+
     # Check if this admin has already approved
     if req_record.has_admin_approved(user_id):
         flash('You have already approved this request.', 'warning')
         return redirect(url_for('notifications'))
-    
+
     # Add admin to approvals list
     if not req_record.admin_approvals:
         admin_approvals = [str(user_id)]
@@ -2768,16 +3064,16 @@ def approve_student_drop(request_id):
         admin_approvals = json.loads(req_record.admin_approvals)
         if str(user_id) not in admin_approvals:
             admin_approvals.append(str(user_id))
-    
+
     req_record.admin_approvals = json.dumps(admin_approvals)
-    
+
     # Get required number of approvers from workflow config
     required_approvers = WorkflowConfig.get_required_approvers('student_drop')
-    
+
     # Check if we have enough approvals based on workflow config
     if len(admin_approvals) >= required_approvers:
         req_record.status = 'approved'
-        
+
         # Generate PDF with the updated function
         from pdf_utils import generate_student_drop_pdf
         pdf_path = generate_student_drop_pdf(req_record)
@@ -2792,7 +3088,7 @@ def approve_student_drop(request_id):
                 pdfs = json.loads(req_record.generated_pdfs)
                 pdfs.append(pdf_path)
                 req_record.generated_pdfs = json.dumps(pdfs)
-                
+
         flash('Student drop request has been fully approved.', 'success')
     else:
         # Mark as partially approved
@@ -2955,11 +3251,11 @@ def initialize_roles_and_departments():
             {'name': 'department_chair', 'level': 2},
             {'name': 'president', 'level': 3}
         ]
-        
+
         for role_data in default_roles:
             if not Role.query.filter_by(name=role_data['name']).first():
                 db.session.add(Role(**role_data))
-        
+
         # Create sample departments
         sample_departments = ['Computer Science', 'Mathematics', 'Biology']
         for dept_name in sample_departments:
@@ -2968,7 +3264,7 @@ def initialize_roles_and_departments():
                     name=dept_name,
                     code=dept_name[:3].upper()
                 ))
-        
+
         db.session.commit()
 
 if __name__ == "__main__":
