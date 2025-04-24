@@ -1135,15 +1135,26 @@ def approve_ferpa(request_id):
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        flash('You do not have permission to approve requests.', 'danger')
+    if not user:
+        return "User not found", 404
+
+    # 1) load workflow for FERPA
+    workflow = WorkflowConfig.query.filter_by(form_type='ferpa').first()
+    if not workflow:
+        flash('No workflow configured for FERPA requests.', 'danger')
         return redirect(url_for('notifications'))
 
+    # 2) role check
+    user_roles = [ur.role.name for ur in user.user_roles]
+    if not any(r in json.loads(workflow.required_roles) for r in user_roles):
+        flash('You lack the role to approve FERPA requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    # 3) fetch and process approval
     req = FERPARequest.query.get_or_404(request_id)
     success, message = _process_approval(req, user_id, 'ferpa')
     flash(message, 'success' if success else 'danger')
 
-    # Commit changes
     db.session.commit()
     return redirect(url_for('notifications'))
 
@@ -1179,6 +1190,34 @@ def reject_ferpa(request_id):
 
 @app.route('/approve_infochange/<int:request_id>', methods=['POST'])
 def approve_infochange(request_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    user = Profile.query.get(user_id)
+    if not user:
+        return "User not found", 404
+
+    # 1) load workflow for InfoChange
+    workflow = WorkflowConfig.query.filter_by(form_type='info_change').first()
+    if not workflow:
+        flash('No workflow configured for Name/SSN change requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    # 2) role check
+    user_roles = [ur.role.name for ur in user.user_roles]
+    if not any(r in json.loads(workflow.required_roles) for r in user_roles):
+        flash('You lack the role to approve Name/SSN change requests.', 'danger')
+        return redirect(url_for('notifications'))
+
+    # 3) fetch and process approval
+    req = InfoChangeRequest.query.get_or_404(request_id)
+    success, message = _process_approval(req, user_id, 'info_change')
+    flash(message, 'success' if success else 'danger')
+
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
@@ -2031,83 +2070,33 @@ def view_medical_request(request_id):
 
 @app.route('/approve_medical_withdrawal/<int:request_id>', methods=['POST'])
 def approve_medical_withdrawal(request_id):
-    """Approve a medical withdrawal request and generate a PDF"""
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
 
     user = Profile.query.get(user_id)
-    if user.privilages_ != 'admin':
-        return "Unauthorized", 403
+    if not user:
+        return "User not found", 404
 
-    req_record = MedicalWithdrawalRequest.query.get(request_id)
-    if not req_record:
-        return "Request not found", 404
-
-    # Check if admin has viewed the PDF
-    if not req_record.has_admin_viewed(user_id):
-        return "You must view the request PDF before approving", 400
-    
-    # Check if this admin has already approved
-    if req_record.has_admin_approved(user_id):
-        flash('You have already approved this request.', 'warning')
+    # 1) load config for this form
+    workflow = WorkflowConfig.query.filter_by(form_type='medical_withdrawal').first()
+    if not workflow:
+        flash('No workflow configured for medical withdrawals.', 'danger')
         return redirect(url_for('notifications'))
 
-    # Add admin to approvals list
-    if not req_record.admin_approvals:
-        admin_approvals = [str(user_id)]
-    else:
-        admin_approvals = json.loads(req_record.admin_approvals)
-        if str(user_id) not in admin_approvals:
-            admin_approvals.append(str(user_id))
-    
-    req_record.admin_approvals = json.dumps(admin_approvals)
-    
-    # Update status based on workflow config
-    required = WorkflowConfig.get_required_approvers('medical_withdrawal')
-    if len(admin_approvals) >= required:
-        req_record.status = 'approved'
-        
-        # Get comments from form
-        comments = request.form.get('comments', '')
+    # 2) check user roles
+    user_roles = [ur.role.name for ur in user.user_roles]
+    required = json.loads(workflow.required_roles)
+    if not any(r in required for r in user_roles):
+        flash('You lack the role to approve medical withdrawals.', 'danger')
+        return redirect(url_for('notifications'))
 
-        # Create history record
-        history_entry = WithdrawalHistory(
-            withdrawal_id=request_id,
-            admin_id=user_id,
-            action='approved',
-            comments=comments
-        )
-        db.session.add(history_entry)
-        
-        # Generate PDF with the updated function
-        from pdf_utils import generate_medical_withdrawal_pdf
-        pdf_path = generate_medical_withdrawal_pdf(req_record)
-
-        # Store the PDF path in the request record
-        if pdf_path:
-            # If this is the first generated PDF
-            if not req_record.generated_pdfs:
-                req_record.generated_pdfs = json.dumps([pdf_path])
-            else:
-                # Otherwise append to existing list
-                pdfs = json.loads(req_record.generated_pdfs)
-                pdfs.append(pdf_path)
-                req_record.generated_pdfs = json.dumps(pdfs)
-                
-        flash('Medical withdrawal request has been fully approved.', 'success')
-    else:
-        # Mark as partially approved
-        req_record.status = 'pending_approval'
-        flash('Medical withdrawal request has been partially approved. Awaiting second approval.', 'success')
-
-    # Mark as viewed if not already
-    viewed = json.loads(req_record.admin_viewed or '[]')
-    if str(user_id) not in viewed:
-        viewed.append(str(user_id))
-    req_record.admin_viewed = json.dumps(viewed)
-
+    # 3) fetch the request and hand off to the helper
+    req = MedicalWithdrawalRequest.query.get_or_404(request_id)
+    success, message = _process_approval(req, user_id, 'medical_withdrawal')
+    flash(message, 'success' if success else 'danger')
     db.session.commit()
+
     return redirect(url_for('notifications'))
 
 @app.route('/reject_medical_withdrawal/<int:request_id>', methods=['POST'])
